@@ -4319,7 +4319,165 @@ dynamicFields.innerHTML = `
 `;
 }
 }
+// تابع ثبت‌نام پیمانکار
+async submitContractorForm(e) {
+  e.preventDefault();
+  
+  // بررسی اعتبارسنجی مرحله
+  if (!this.validateContractorStep(this.contractorCurrentStep)) {
+    return;
+  }
 
+  // بررسی پذیرش قوانین
+  const terms = document.getElementById('contractorTerms').checked;
+  if (!terms) {
+    this.showToast('لطفاً با قوانین و مقررات موافقت کنید.', 'error');
+    return;
+  }
+
+  // دریافت اطلاعات فرم
+  const accountType = document.getElementById('accountType').value;
+  const email = document.getElementById('contractorEmail').value;
+  const password = document.getElementById('contractorPassword').value;
+  const mobile = document.getElementById('mobile').value;
+  const contactPerson = document.getElementById('contactPerson').value;
+  const mainExpertise = document.getElementById('mainExpertise').value;
+  const phone = document.getElementById('phone')?.value || '';
+
+  // غیرفعال کردن دکمه ثبت‌نام
+  const submitBtn = document.getElementById('submitBtn');
+  const originalText = submitBtn.innerHTML;
+  submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>در حال ثبت‌نام...';
+  submitBtn.disabled = true;
+
+  try {
+    // ثبت‌نام در Supabase Auth با مکانیزم retry پیشرفته
+    let retries = 3;
+    let authData, authError;
+    let attempt = 0;
+    let success = false;
+
+    while (retries > 0 && !success) {
+      attempt++;
+      try {
+        const result = await supabase.auth.signUp({
+          email,
+          password,
+          options: {
+            emailRedirectTo: window.location.origin + '/login'
+          }
+        });
+
+        authData = result.data;
+        authError = result.error;
+
+        if (!authError) {
+          success = true;
+          break;
+        }
+
+        // مدیریت خطاها
+        if (authError.status === 429) {
+          retries--;
+          if (retries > 0) {
+            const waitTime = Math.pow(2, attempt) * 1000;
+            this.showToast(`محدودیت ثبت‌نام. تلاش مجدد در ${waitTime/1000} ثانیه...`, 'warning');
+            await new Promise(resolve => setTimeout(resolve, waitTime));
+          }
+        } else if (authError.status === 400) {
+          if (authError.message.includes('already registered')) {
+            throw new Error('این ایمیل قبلاً ثبت‌نام شده است.');
+          } else {
+            throw new Error('ایمیل نامعتبر است.');
+          }
+        } else {
+          throw authError;
+        }
+      } catch (err) {
+        if (err.message.includes('قبلاً ثبت‌نام شده') || err.message.includes('نامعتبر')) {
+          throw err;
+        }
+        retries--;
+        if (retries > 0) {
+          await new Promise(resolve => setTimeout(resolve, 2000));
+        } else {
+          throw err;
+        }
+      }
+    }
+
+    if (!success) {
+      throw new Error('محدودیت ثبت‌نام موقتاً اعمال شده. لطفاً ۱۰ دقیقه بعد تلاش کنید.');
+    }
+
+    if (!authData || !authData.user) {
+      throw new Error('خطا در ثبت‌نام. لطفاً مجدداً تلاش کنید.');
+    }
+
+    // آماده‌سازی اطلاعات پروفایل
+    const profileData = {
+      user_id: authData.user.id,
+      email,
+      user_type: 'contractor',
+      account_type: accountType,
+      phone: mobile,
+      landline: phone,
+      contact_person: contactPerson,
+      main_expertise: mainExpertise,
+      verification_status: 'pending',
+      trust_level: 1,
+      created_at: new Date().toISOString(),
+      terms_accepted_at: terms ? new Date().toISOString() : null,
+      terms_version: '1.0'
+    };
+
+    if (accountType === 'individual') {
+      profileData.full_name = document.getElementById('fullName')?.value;
+      profileData.national_code = document.getElementById('nationalCode')?.value;
+    } else {
+      profileData.company_name = document.getElementById('companyName')?.value;
+      profileData.company_id = document.getElementById('companyId')?.value;
+    }
+
+    // ذخیره پروفایل
+    const { error: profileError } = await supabase
+      .from('profiles')
+      .insert([profileData]);
+
+    if (profileError) {
+      try {
+        await supabase.auth.admin.deleteUser(authData.user.id);
+      } catch (deleteError) {
+        console.error('خطا در حذف کاربر:', deleteError);
+      }
+      throw profileError;
+    }
+
+    this.showToast('ثبت‌نام پیمانکار با موفقیت انجام شد!', 'success');
+
+    this.userData = {
+      id: authData.user.id,
+      email,
+      full_name: profileData.full_name || profileData.company_name,
+      phone: mobile,
+      user_type: 'contractor',
+      account_type: accountType,
+      terms_accepted: true
+    };
+    localStorage.setItem('peymanyar_user', JSON.stringify(this.userData));
+
+    setTimeout(() => {
+      this.showPage('home');
+    }, 1500);
+
+  } catch (error) {
+    console.error('خطای ثبت‌نام:', error);
+    this.showToast('خطا در ثبت‌نام: ' + error.message, 'error');
+  } finally {
+    submitBtn.innerHTML = originalText;
+    submitBtn.disabled = false;
+  }
+}
 updateSubExpertise() {
 const mainExpertise = document.getElementById('mainExpertise').value;
 const subContainer = document.getElementById('subExpertiseContainer');
