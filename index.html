@@ -1318,46 +1318,45 @@ body { background-color: #121212; color: #e0e0e0; }
 <label for="searchLocation" class="form-label">موقعیت جغرافیایی</label>
 <select class="form-select" id="searchLocation" multiple style="height: 200px;">
 <optgroup label="مناطق مرکزی">
-<option value="all">✅ کل ایران</option>
-<option value="tehran">تهران</option>
-<option value="alborz">البرز</option>
-<option value="qom">قم</option>
-<option value="markazi">مرکزی</option>
-<option value="qazvin">قزوین</option>
-<option value="esfahan">اصفهان</option>
-<option value="yazd">یزد</option>
-<option value="semnan">سمنان</option>
+  <option value="tehran">تهران</option>
+  <option value="alborz">البرز</option>
+  <option value="qom">قم</option>
+  <option value="markazi">مرکزی</option>
+  <option value="qazvin">قزوین</option>
+  <option value="zanjan">زنجان</option>
+  <option value="esfahan">اصفهان</option>
+  <option value="yazd">یزد</option>
+  <option value="semnan">سمنان</option>
 </optgroup>
 <optgroup label="مناطق شمالی">
-<option value="gilan">گیلان</option>
-<option value="mazandaran">مازندران</option>
-<option value="golestan">گلستان</option>
-<option value="ardabil">اردبیل</option>
-<option value="zanjan">زنجان</option>
+  <option value="gilan">گیلان</option>
+  <option value="mazandaran">مازندران</option>
+  <option value="golestan">گلستان</option>
+  <option value="ardabil">اردبیل</option>
 </optgroup>
 <optgroup label="مناطق غربی">
-<option value="west-azerbaijan">آذربایجان غربی</option>
-<option value="east-azerbaijan">آذربایجان شرقی</option>
-<option value="kurdistan">کردستان</option>
-<option value="hamadan">همدان</option>
-<option value="kermanshah">کرمانشاه</option>
-<option value="ilam">ایلام</option>
-<option value="lorestan">لرستان</option>
+  <option value="west-azerbaijan">آذربایجان غربی</option>
+  <option value="east-azerbaijan">آذربایجان شرقی</option>
+  <option value="kurdistan">کردستان</option>
+  <option value="hamadan">همدان</option>
+  <option value="kermanshah">کرمانشاه</option>
+  <option value="ilam">ایلام</option>
+  <option value="lorestan">لرستان</option>
 </optgroup>
 <optgroup label="مناطق جنوبی">
-<option value="khuzestan">خوزستان</option>
-<option value="fars">فارس</option>
-<option value="hormozgan">هرمزگان</option>
-<option value="bushehr">بوشهر</option>
-<option value="kohgiluyeh-boyer-ahmad">کهگیلویه و بویراحمد</option>
-<option value="chaharmahal-bakhtiari">چهارمحال و بختیاری</option>
+  <option value="khuzestan">خوزستان</option>
+  <option value="fars">فارس</option>
+  <option value="hormozgan">هرمزگان</option>
+  <option value="bushehr">بوشهر</option>
+  <option value="kohgiluyeh-boyer-ahmad">کهگیلویه و بویراحمد</option>
+  <option value="chaharmahal-bakhtiari">چهارمحال و بختیاری</option>
 </optgroup>
 <optgroup label="مناطق شرقی">
-<option value="kerman">کرمان</option>
-<option value="sistan-baluchestan">سیستان و بلوچستان</option>
-<option value="razavi-khorasan">خراسان رضوی</option>
-<option value="south-khorasan">خراسان جنوبی</option>
-<option value="north-khorasan">خراسان شمالی</option>
+  <option value="kerman">کرمان</option>
+  <option value="sistan-baluchestan">سیستان و بلوچستان</option>
+  <option value="razavi-khorasan">خراسان رضوی</option>
+  <option value="south-khorasan">خراسان جنوبی</option>
+  <option value="north-khorasan">خراسان شمالی</option>
 </optgroup>
 </select>
 <div class="multiselect-hint mt-2">
@@ -2083,17 +2082,7 @@ body { background-color: #121212; color: #e0e0e0; }
           </div>
           <div class="col-md-6 mb-3">
             <label class="form-label">استان</label>
-            <select class="form-select" id="editProvince">
-              <option value="">انتخاب کنید</option>
-              <option value="tehran">تهران</option>
-              <option value="alborz">البرز</option>
-              <option value="esfahan">اصفهان</option>
-              <option value="fars">فارس</option>
-              <option value="khorasan">خراسان رضوی</option>
-              <option value="mazandaran">مازندران</option>
-              <option value="gilan">گیلان</option>
-              <option value="khuzestan">خوزستان</option>
-            </select>
+           <input type="text" class="form-control" id="editProvince" placeholder="مثال: تهران">
           </div>
           <div class="col-md-6 mb-3">
             <label class="form-label">شهر</label>
@@ -2175,6 +2164,7 @@ body { background-color: #121212; color: #e0e0e0; }
             <label class="form-label">روش ترجیحی قرارداد</label>
             <select class="form-select" id="editContractMethod">
               <option value="">انتخاب کنید</option>
+              <option value="kiloyi">کیلویی</option>
               <option value="fixed">مقطوع</option>
               <option value="per_meter">مترمربع/مترطول</option>
               <option value="percentage">درصدی</option>
@@ -2408,22 +2398,11 @@ body { background-color: #121212; color: #e0e0e0; }
 <div class="col-6 col-md-4">
 <div class="form-check">
 <input class="form-check-input" type="checkbox" id="projectInterior" name="projectType">
-<label class="form-check-label" for="projectInterior">دکوراسیون داخلی</label>
+ <label class="form-check-label" for="projectOther">سایر</label>
 </div>
 </div>
 </div>
 <div class="invalid-feedback">لطفاً حداقل یک نوع پروژه را انتخاب کنید</div>
-</div>
-<div class="col-md-6 mb-3">
-<label for="projectBudget" class="form-label">بودجه تقریبی پروژه (تومان)</label>
-<select class="form-select" id="projectBudget">
-<option value="">-- انتخاب کنید --</option>
-<option value="under100">زیر ۱۰۰ میلیون</option>
-<option value="100-500">۱۰۰ تا ۵۰۰ میلیون</option>
-<option value="500-1000">۵۰۰ میلیون تا ۱ میلیارد</option>
-<option value="1-5">۱ تا ۵ میلیارد</option>
-<option value="5+">بالای ۵ میلیارد</option>
-</select>
 </div>
 <div class="col-md-6 mb-3">
 <label for="projectTimeline" class="form-label">زمانبندی مورد نظر</label>
@@ -2760,6 +2739,7 @@ body { background-color: #121212; color: #e0e0e0; }
 <select class="form-select" id="contractMethod">
 <option value="">-- انتخاب کنید --</option>
 <option value="fixed">مقطوع</option>
+<option value="kiloyi">کیلویی</option>
 <option value="per_meter">مترمربع/مترطول</option>
 <option value="percentage">درصدی</option>
 <option value="hybrid">ترکیبی</option>
@@ -3147,43 +3127,45 @@ option.text = year;
 yearSelect.appendChild(option);
 }
 }
-
 addProjectToEdit() {
-const container = document.getElementById('editProjectsContainer');
-if (!container) return;
+  const container = document.getElementById('editProjectsContainer');
+  if (!container) return;
 
-const projectCount = container.children.length + 1;
+  const projectCount = container.children.length + 1;
+  if (projectCount > 5) {
+    this.showToast('حداکثر ۵ پروژه می‌توانید اضافه کنید.', 'error');
+    return;
+  }
 
-const projectDiv = document.createElement('div');
-projectDiv.className = 'card mb-3 project-card';
-projectDiv.innerHTML = `
-<div class="card-body">
-<div class="d-flex justify-content-between align-items-center mb-3">
-<h6 class="card-title mb-0">پروژه ${projectCount}</h6>
-<button type="button" class="btn btn-sm btn-outline-danger" onclick="this.closest('.project-card').remove()">
-<i class="bi bi-trash"></i>
-</button>
-</div>
-<div class="row">
-<div class="col-md-4 mb-3">
-<label class="form-label">نام پروژه</label>
-<input type="text" class="form-control" name="editProjectName[]">
-</div>
-<div class="col-md-4 mb-3">
-<label class="form-label">سال تحویل</label>
-<input type="text" class="form-control" name="editProjectYear[]">
-</div>
-<div class="col-md-4 mb-3">
-<label class="form-label">مشتری</label>
-<input type="text" class="form-control" name="editProjectClient[]">
-</div>
-</div>
-</div>
-`;
+  const projectDiv = document.createElement('div');
+  projectDiv.className = 'card mb-3 project-card';
+  projectDiv.innerHTML = `
+  <div class="card-body">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h6 class="card-title mb-0">پروژه ${projectCount}</h6>
+      <button type="button" class="btn btn-sm btn-outline-danger" onclick="this.closest('.project-card').remove()">
+        <i class="bi bi-trash"></i>
+      </button>
+    </div>
+    <div class="row">
+      <div class="col-md-4 mb-3">
+        <label class="form-label">نام پروژه</label>
+        <input type="text" class="form-control" name="editProjectName[]">
+      </div>
+      <div class="col-md-4 mb-3">
+        <label class="form-label">سال تحویل</label>
+        <input type="text" class="form-control" name="editProjectYear[]" placeholder="مثال: 1402">
+      </div>
+      <div class="col-md-4 mb-3">
+        <label class="form-label">مشتری</label>
+        <input type="text" class="form-control" name="editProjectClient[]" placeholder="نام شرکت یا شخص">
+      </div>
+    </div>
+  </div>
+  `;
 
-container.appendChild(projectDiv);
+  container.appendChild(projectDiv);
 }
-
 enableProfileEdit() {
 const viewMode = document.getElementById('profileViewMode');
 const editMode = document.getElementById('profileEditMode');
@@ -5087,6 +5069,7 @@ if (index === 0) {
 section.style.display = 'block';
 } else {
 section.style.display = 'none';
+  localStorage.removeItem('contractor_form_temp');
 }
 });
 this.updateProgressBar();
@@ -5512,17 +5495,29 @@ this.showPage('home');
 showAdminLogin() {
 this.showPage('adminLogin');
 }
-
-showAdminMessages() {
-if (!this.isAdmin) {
-this.showToast('برای دسترسی به پنل مدیریت باید وارد شوید', 'error');
-this.showAdminLogin();
-return;
+async showAdminMessages() {
+  if (!this.isAdmin) {
+    this.showToast('برای دسترسی به پنل مدیریت باید وارد شوید', 'error');
+    this.showAdminLogin();
+    return;
+  }
+  
+  // بررسی کنید کاربر واقعاً ادمین است
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('role')
+    .eq('user_id', this.userData.id)
+    .single();
+    
+  if (profile?.role !== 'admin') {
+    this.showToast('شما دسترسی ادمین ندارید', 'error');
+    this.isAdmin = false;
+    return;
+  }
+  
+  this.showPage('adminMessages');
+  setTimeout(() => this.loadAdminStats(), 100);
 }
-this.showPage('adminMessages');
-setTimeout(() => this.loadAdminStats(), 100);
-}
-
 loadAdminStats() {
 if (!this.isAdmin) return;
 setTimeout(() => {
