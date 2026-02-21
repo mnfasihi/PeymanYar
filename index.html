@@ -1295,26 +1295,75 @@ body { background-color: #121212; color: #e0e0e0; }
 <option value="formwork">اکیپ قالب‌بندی</option>
 <option value="rebar">اکیپ آرماتوربندی</option>
 <option value="concrete_execution">پیمانکار اجرای بتن</option>
+<option value="grouting">پیمانکار گروت‌ریزی</option>
 <option value="welding">پیمانکار جوشکاری سازه</option>
 <option value="coating">پیمانکار رنگ و پوشش صنعتی</option>
 <option value="excavation">پیمانکار خاکبرداری و پایدارسازی</option>
 <option value="foundation">پیمانکار فونداسیون و ابنیه</option>
+<option value="site_development">پیمانکار محوطه‌سازی</option>
 <option value="civil_works">پیمانکار Civil Works صنعتی</option>
-<option value="equipment_rental">پیمانکار اجاره ماشین‌آلات صنعتی</option>
+<option value="special_structures">پیمانکار سازه‌های خاص</option>
+<option value="support_teams">اکیپ‌های پشتیبان</option>
+<option value="equipment_rental">پیمانکار اجاره ماشین‌آلات</option>
+<option value="industrial_flooring">پیمانکار کف‌سازی صنعتی</option>
+<option value="cutting_coring">پیمانکار برش و کرگیری</option>
+<option value="waterproofing">پیمانکار آب‌بندی</option>
+<option value="seismic_retrofit">پیمانکار مقاوم‌سازی</option>
+<option value="special_concrete">پیمانکار بتن‌های خاص</option>
+<option value="precast">پیمانکار سازه‌های پیش‌ساخته</option>
+<option value="tunneling">پیمانکار تونل و حفاری</option>
 </select>
 </div>
 <div class="col-md-6">
 <label for="searchLocation" class="form-label">موقعیت جغرافیایی</label>
-<select class="form-select" id="searchLocation">
-<option value="">همه استان‌ها</option>
+<select class="form-select" id="searchLocation" multiple style="height: 200px;">
+<optgroup label="مناطق مرکزی">
+<option value="all">✅ کل ایران</option>
 <option value="tehran">تهران</option>
-<option value="esfahan">اصفهان</option>
-<option value="khorasan">خراسان رضوی</option>
-<option value="fars">فارس</option>
 <option value="alborz">البرز</option>
 <option value="qom">قم</option>
 <option value="markazi">مرکزی</option>
+<option value="qazvin">قزوین</option>
+<option value="esfahan">اصفهان</option>
+<option value="yazd">یزد</option>
+<option value="semnan">سمنان</option>
+</optgroup>
+<optgroup label="مناطق شمالی">
+<option value="gilan">گیلان</option>
+<option value="mazandaran">مازندران</option>
+<option value="golestan">گلستان</option>
+<option value="ardabil">اردبیل</option>
+<option value="zanjan">زنجان</option>
+</optgroup>
+<optgroup label="مناطق غربی">
+<option value="west-azerbaijan">آذربایجان غربی</option>
+<option value="east-azerbaijan">آذربایجان شرقی</option>
+<option value="kurdistan">کردستان</option>
+<option value="hamadan">همدان</option>
+<option value="kermanshah">کرمانشاه</option>
+<option value="ilam">ایلام</option>
+<option value="lorestan">لرستان</option>
+</optgroup>
+<optgroup label="مناطق جنوبی">
+<option value="khuzestan">خوزستان</option>
+<option value="fars">فارس</option>
+<option value="hormozgan">هرمزگان</option>
+<option value="bushehr">بوشهر</option>
+<option value="kohgiluyeh-boyer-ahmad">کهگیلویه و بویراحمد</option>
+<option value="chaharmahal-bakhtiari">چهارمحال و بختیاری</option>
+</optgroup>
+<optgroup label="مناطق شرقی">
+<option value="kerman">کرمان</option>
+<option value="sistan-baluchestan">سیستان و بلوچستان</option>
+<option value="razavi-khorasan">خراسان رضوی</option>
+<option value="south-khorasan">خراسان جنوبی</option>
+<option value="north-khorasan">خراسان شمالی</option>
+</optgroup>
 </select>
+<div class="multiselect-hint mt-2">
+<i class="bi bi-info-circle me-1"></i>
+برای انتخاب چند استان، کلید Ctrl را نگه دارید.
+</div>
 </div>
 <div class="col-md-6">
 <label for="searchExperience" class="form-label">حداقل سابقه کار (سال)</label>
@@ -1761,82 +1810,469 @@ body { background-color: #121212; color: #e0e0e0; }
 </div>
 </div>
 
-<!-- صفحه پروفایل کاربری -->
+<!-- صفحه پروفایل کاربری پیشرفته -->
 <div id="profile" class="page-section" role="main" aria-label="صفحه پروفایل">
 <div class="container page-header">
-<div style="max-width: 800px; margin: 0 auto;">
-<div class="card-peymanyar">
-<div class="d-flex justify-content-between align-items-center mb-4">
-<h2 class="section-title" style="margin-bottom: 0;">👤 پروفایل کاربری</h2>
-<button class="btn btn-primary" onclick="enableProfileEdit()">
-<i class="bi bi-pencil me-2"></i>ویرایش پروفایل
-</button>
-</div>
-<div id="profileViewMode">
-<div class="text-center mb-4">
-<div class="user-avatar" id="profileAvatar">?</div>
-<h3 class="mt-3" id="profileDisplayName">کاربر</h3>
-<p class="text-muted" id="profileDisplayEmail">ایمیل</p>
-</div>
-<div class="row">
-<div class="col-md-6 mb-3">
-<div class="border rounded p-3">
-<small class="text-muted d-block">نوع حساب</small>
-<strong id="profileDisplayType">-</strong>
-</div>
-</div>
-<div class="col-md-6 mb-3">
-<div class="border rounded p-3">
-<small class="text-muted d-block">تلفن همراه</small>
-<strong id="profileDisplayMobile">-</strong>
-</div>
-</div>
-<div class="col-md-6 mb-3">
-<div class="border rounded p-3">
-<small class="text-muted d-block">نام شرکت</small>
-<strong id="profileDisplayCompany">-</strong>
-</div>
-</div>
-<div class="col-12 mb-3">
-<div class="border rounded p-3">
-<small class="text-muted d-block">آدرس</small>
-<strong id="profileDisplayAddress">-</strong>
-</div>
-</div>
-</div>
-</div>
-<div id="profileEditMode" style="display: none;">
-<form id="profileEditForm">
-<div class="row">
-<div class="col-md-6 mb-3">
-<label class="form-label">نام و نام خانوادگی</label>
-<input type="text" class="form-control" id="editFullName">
-</div>
-<div class="col-md-6 mb-3">
-<label class="form-label">تلفن همراه</label>
-<input type="tel" class="form-control" id="editMobile" pattern="09[0-9]{9}">
-</div>
-<div class="col-md-6 mb-3">
-<label class="form-label">ایمیل</label>
-<input type="email" class="form-control" id="editEmail" readonly disabled>
-<small class="text-muted">ایمیل قابل تغییر نیست</small>
-</div>
-<div class="col-md-6 mb-3">
-<label class="form-label">نام شرکت</label>
-<input type="text" class="form-control" id="editCompany">
-</div>
-<div class="col-12 mb-3">
-<label class="form-label">آدرس</label>
-<textarea class="form-control" id="editAddress" rows="3"></textarea>
-</div>
-</div>
-<div class="d-flex gap-2 justify-content-end">
-<button type="button" class="btn btn-secondary" onclick="cancelProfileEdit()">انصراف</button>
-<button type="submit" class="btn btn-primary" onclick="saveProfileChanges()">ذخیره تغییرات</button>
-</div>
-</form>
-</div>
-</div>
+<div style="max-width: 1000px; margin: 0 auto;">
+  
+  <!-- هدر پروفایل با دکمه خروج -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="section-title" style="margin-bottom: 0;">👤 پروفایل کاربری</h2>
+    <div>
+      <button class="btn btn-primary me-2" onclick="enableProfileEdit()">
+        <i class="bi bi-pencil me-2"></i>ویرایش پروفایل
+      </button>
+      <button class="btn btn-danger" onclick="logout()">
+        <i class="bi bi-box-arrow-right me-2"></i>خروج
+      </button>
+    </div>
+  </div>
+
+  <!-- کارت اصلی پروفایل -->
+  <div class="card-peymanyar">
+    
+    <!-- ======== حالت نمایش ======== -->
+    <div id="profileViewMode">
+      
+      <!-- آواتار و اطلاعات پایه -->
+      <div class="text-center mb-4">
+        <div class="user-avatar" id="profileAvatar">?</div>
+        <h3 class="mt-3" id="profileDisplayName">کاربر</h3>
+        <p class="text-muted" id="profileDisplayEmail">ایمیل</p>
+        <div id="profileVerificationBadge"></div>
+      </div>
+
+      <!-- اطلاعات پایه -->
+      <div class="row mt-4">
+        <div class="col-12">
+          <h5 class="border-bottom pb-2 mb-3">
+            <i class="bi bi-person-badge me-2"></i>اطلاعات پایه
+          </h5>
+        </div>
+        <div class="col-md-6 mb-3">
+          <div class="border rounded p-3">
+            <small class="text-muted d-block">نوع حساب</small>
+            <strong id="profileDisplayType">-</strong>
+          </div>
+        </div>
+        <div class="col-md-6 mb-3">
+          <div class="border rounded p-3">
+            <small class="text-muted d-block">نوع شخصیت</small>
+            <strong id="profileDisplayAccountType">-</strong>
+          </div>
+        </div>
+        <div class="col-md-6 mb-3">
+          <div class="border rounded p-3">
+            <small class="text-muted d-block">نام و نام خانوادگی / نام شرکت</small>
+            <strong id="profileDisplayFullName">-</strong>
+          </div>
+        </div>
+        <div class="col-md-6 mb-3">
+          <div class="border rounded p-3">
+            <small class="text-muted d-block">کد ملی / شناسه ملی</small>
+            <strong id="profileDisplayNationalId">-</strong>
+          </div>
+        </div>
+      </div>
+
+      <!-- اطلاعات تماس -->
+      <div class="row mt-3">
+        <div class="col-12">
+          <h5 class="border-bottom pb-2 mb-3">
+            <i class="bi bi-telephone me-2"></i>اطلاعات تماس
+          </h5>
+        </div>
+        <div class="col-md-6 mb-3">
+          <div class="border rounded p-3">
+            <small class="text-muted d-block">تلفن همراه</small>
+            <strong id="profileDisplayMobile">-</strong>
+          </div>
+        </div>
+        <div class="col-md-6 mb-3">
+          <div class="border rounded p-3">
+            <small class="text-muted d-block">تلفن ثابت</small>
+            <strong id="profileDisplayPhone">-</strong>
+          </div>
+        </div>
+        <div class="col-12 mb-3">
+          <div class="border rounded p-3">
+            <small class="text-muted d-block">آدرس</small>
+            <strong id="profileDisplayAddress">-</strong>
+          </div>
+        </div>
+      </div>
+
+      <!-- اطلاعات شرکت (برای شخص حقوقی) -->
+      <div id="profileCompanyFields" style="display: none;">
+        <div class="row mt-3">
+          <div class="col-12">
+            <h5 class="border-bottom pb-2 mb-3">
+              <i class="bi bi-building me-2"></i>اطلاعات شرکت
+            </h5>
+          </div>
+          <div class="col-md-6 mb-3">
+            <div class="border rounded p-3">
+              <small class="text-muted d-block">نام شرکت</small>
+              <strong id="profileDisplayCompanyName">-</strong>
+            </div>
+          </div>
+          <div class="col-md-6 mb-3">
+            <div class="border rounded p-3">
+              <small class="text-muted d-block">شماره ثبت</small>
+              <strong id="profileDisplayRegistrationNo">-</strong>
+            </div>
+          </div>
+          <div class="col-md-6 mb-3">
+            <div class="border rounded p-3">
+              <small class="text-muted d-block">نوع فعالیت</small>
+              <strong id="profileDisplayCompanyType">-</strong>
+            </div>
+          </div>
+          <div class="col-md-6 mb-3">
+            <div class="border rounded p-3">
+              <small class="text-muted d-block">وبسایت</small>
+              <strong id="profileDisplayWebsite">-</strong>
+            </div>
+          </div>
+          <div class="col-12 mb-3">
+            <div class="border rounded p-3">
+              <small class="text-muted d-block">توضیحات شرکت</small>
+              <strong id="profileDisplayCompanyDesc">-</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- اطلاعات تخصصی (فقط برای پیمانکاران) -->
+      <div id="contractorProfileFields" style="display: none;">
+        <div class="row mt-3">
+          <div class="col-12">
+            <h5 class="border-bottom pb-2 mb-3">
+              <i class="bi bi-tools me-2"></i>اطلاعات تخصصی
+            </h5>
+          </div>
+          <div class="col-md-6 mb-3">
+            <div class="border rounded p-3">
+              <small class="text-muted d-block">تخصص اصلی</small>
+              <strong id="profileDisplayMainExpertise">-</strong>
+            </div>
+          </div>
+          <div class="col-md-6 mb-3">
+            <div class="border rounded p-3">
+              <small class="text-muted d-block">سال شروع فعالیت</small>
+              <strong id="profileDisplayStartYear">-</strong>
+            </div>
+          </div>
+          <div class="col-md-6 mb-3">
+            <div class="border rounded p-3">
+              <small class="text-muted d-block">تعداد نیروی انسانی</small>
+              <strong id="profileDisplayTeamSize">-</strong>
+            </div>
+          </div>
+          <div class="col-md-6 mb-3">
+            <div class="border rounded p-3">
+              <small class="text-muted d-block">محدوده جغرافیایی</small>
+              <strong id="profileDisplayWorkArea">-</strong>
+            </div>
+          </div>
+          <div class="col-md-6 mb-3">
+            <div class="border rounded p-3">
+              <small class="text-muted d-block">روش ترجیحی قرارداد</small>
+              <strong id="profileDisplayContractMethod">-</strong>
+            </div>
+          </div>
+          <div class="col-md-6 mb-3">
+            <div class="border rounded p-3">
+              <small class="text-muted d-block">بیمه مسئولیت</small>
+              <strong id="profileDisplayInsurance">-</strong>
+            </div>
+          </div>
+          <div class="col-12 mb-3">
+            <div class="border rounded p-3">
+              <small class="text-muted d-block">تجهیزات و ماشین‌آلات</small>
+              <strong id="profileDisplayEquipment">-</strong>
+            </div>
+          </div>
+        </div>
+
+        <!-- پروژه‌های نمونه -->
+        <div class="row mt-4">
+          <div class="col-12">
+            <h6 class="border-bottom pb-2 mb-3">
+              <i class="bi bi-images me-2"></i>پروژه‌های نمونه
+            </h6>
+            <div id="profileDisplayProjects" class="row"></div>
+          </div>
+        </div>
+
+        <!-- مدارک و گواهینامه‌ها -->
+        <div class="row mt-4">
+          <div class="col-12">
+            <h6 class="border-bottom pb-2 mb-3">
+              <i class="bi bi-file-earmark-text me-2"></i>مدارک و گواهینامه‌ها
+            </h6>
+            <div id="profileDisplayDocuments" class="d-flex flex-wrap gap-2"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- وضعیت تأیید (برای پیمانکاران) -->
+      <div id="profileVerificationStatus" class="mt-4 p-3 bg-light rounded" style="display: none;">
+        <div class="d-flex align-items-center">
+          <i class="bi bi-shield-check fs-4 me-3"></i>
+          <div>
+            <strong>وضعیت تأیید:</strong>
+            <span id="profileVerificationText">در انتظار بررسی</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ======== حالت ویرایش ======== -->
+    <div id="profileEditMode" style="display: none;">
+      <form id="profileEditForm">
+        
+        <!-- اطلاعات پایه -->
+        <div class="row">
+          <div class="col-12">
+            <h5 class="border-bottom pb-2 mb-3">
+              <i class="bi bi-person-badge me-2"></i>اطلاعات پایه
+            </h5>
+          </div>
+          <div class="col-md-6 mb-3">
+            <label class="form-label">نام و نام خانوادگی</label>
+            <input type="text" class="form-control" id="editFullName">
+          </div>
+          <div class="col-md-6 mb-3">
+            <label class="form-label">کد ملی / شناسه ملی</label>
+            <input type="text" class="form-control" id="editNationalId">
+          </div>
+          <div class="col-md-6 mb-3">
+            <label class="form-label">ایمیل</label>
+            <input type="email" class="form-control" id="editEmail" readonly disabled>
+            <small class="text-muted">ایمیل قابل تغییر نیست</small>
+          </div>
+          <div class="col-md-6 mb-3">
+            <label class="form-label">تاریخ تولد / تأسیس</label>
+            <input type="text" class="form-control" id="editBirthDate" placeholder="مثال: 1360/01/01">
+          </div>
+        </div>
+
+        <!-- اطلاعات تماس -->
+        <div class="row mt-3">
+          <div class="col-12">
+            <h5 class="border-bottom pb-2 mb-3">
+              <i class="bi bi-telephone me-2"></i>اطلاعات تماس
+            </h5>
+          </div>
+          <div class="col-md-6 mb-3">
+            <label class="form-label">تلفن همراه</label>
+            <input type="tel" class="form-control" id="editMobile" pattern="09[0-9]{9}">
+          </div>
+          <div class="col-md-6 mb-3">
+            <label class="form-label">تلفن ثابت</label>
+            <input type="tel" class="form-control" id="editPhone">
+          </div>
+          <div class="col-12 mb-3">
+            <label class="form-label">آدرس</label>
+            <textarea class="form-control" id="editAddress" rows="3"></textarea>
+          </div>
+          <div class="col-md-6 mb-3">
+            <label class="form-label">کدپستی</label>
+            <input type="text" class="form-control" id="editPostalCode">
+          </div>
+          <div class="col-md-6 mb-3">
+            <label class="form-label">استان</label>
+            <select class="form-select" id="editProvince">
+              <option value="">انتخاب کنید</option>
+              <option value="tehran">تهران</option>
+              <option value="alborz">البرز</option>
+              <option value="esfahan">اصفهان</option>
+              <option value="fars">فارس</option>
+              <option value="khorasan">خراسان رضوی</option>
+              <option value="mazandaran">مازندران</option>
+              <option value="gilan">گیلان</option>
+              <option value="khuzestan">خوزستان</option>
+            </select>
+          </div>
+          <div class="col-md-6 mb-3">
+            <label class="form-label">شهر</label>
+            <input type="text" class="form-control" id="editCity">
+          </div>
+        </div>
+
+        <!-- اطلاعات شرکت (برای شخص حقوقی) -->
+        <div id="editCompanyFields" class="row mt-3" style="display: none;">
+          <div class="col-12">
+            <h5 class="border-bottom pb-2 mb-3">
+              <i class="bi bi-building me-2"></i>اطلاعات شرکت
+            </h5>
+          </div>
+          <div class="col-md-6 mb-3">
+            <label class="form-label">نام شرکت</label>
+            <input type="text" class="form-control" id="editCompanyName">
+          </div>
+          <div class="col-md-6 mb-3">
+            <label class="form-label">شماره ثبت</label>
+            <input type="text" class="form-control" id="editRegistrationNo">
+          </div>
+          <div class="col-md-6 mb-3">
+            <label class="form-label">نوع فعالیت</label>
+            <select class="form-select" id="editCompanyType">
+              <option value="">انتخاب کنید</option>
+              <option value="building_contracting">پیمانکاری ساختمان</option>
+              <option value="road_transportation">راه و ترابری</option>
+              <option value="water_sewage">آب و فاضلاب</option>
+              <option value="oil_gas">نفت و گاز</option>
+              <option value="industrial">صنعتی</option>
+              <option value="investment">سرمایه‌گذاری</option>
+            </select>
+          </div>
+          <div class="col-md-6 mb-3">
+            <label class="form-label">وبسایت</label>
+            <input type="url" class="form-control" id="editWebsite">
+          </div>
+          <div class="col-12 mb-3">
+            <label class="form-label">توضیحات شرکت</label>
+            <textarea class="form-control" id="editCompanyDesc" rows="3"></textarea>
+          </div>
+        </div>
+
+        <!-- اطلاعات تخصصی (برای پیمانکاران) -->
+        <div id="editContractorFields" class="row mt-3" style="display: none;">
+          <div class="col-12">
+            <h5 class="border-bottom pb-2 mb-3">
+              <i class="bi bi-tools me-2"></i>اطلاعات تخصصی
+            </h5>
+          </div>
+          <div class="col-md-6 mb-3">
+            <label class="form-label">تخصص اصلی</label>
+            <select class="form-select" id="editMainExpertise">
+              <option value="">-- انتخاب کنید --</option>
+              <option value="steel_fabrication">پیمانکار ساخت اسکلت فلزی</option>
+              <option value="steel_installation">پیمانکار نصب اسکلت فلزی</option>
+              <option value="formwork">اکیپ قالب‌بندی</option>
+              <option value="rebar">اکیپ آرماتوربندی</option>
+              <option value="concrete_execution">پیمانکار اجرای بتن</option>
+              <option value="grouting">پیمانکار گروت‌ریزی</option>
+              <option value="welding">پیمانکار جوشکاری سازه</option>
+              <option value="coating">پیمانکار رنگ و پوشش صنعتی</option>
+              <option value="excavation">پیمانکار خاکبرداری</option>
+              <option value="foundation">پیمانکار فونداسیون</option>
+              <option value="site_development">پیمانکار محوطه‌سازی</option>
+              <option value="special_structures">پیمانکار سازه‌های خاص</option>
+            </select>
+          </div>
+          <div class="col-md-6 mb-3">
+            <label class="form-label">سال شروع فعالیت</label>
+            <select class="form-select" id="editStartYear"></select>
+          </div>
+          <div class="col-md-6 mb-3">
+            <label class="form-label">تعداد نیروی انسانی ثابت</label>
+            <input type="number" class="form-control" id="editTeamSize" min="0">
+          </div>
+          <div class="col-md-6 mb-3">
+            <label class="form-label">روش ترجیحی قرارداد</label>
+            <select class="form-select" id="editContractMethod">
+              <option value="">انتخاب کنید</option>
+              <option value="fixed">مقطوع</option>
+              <option value="per_meter">مترمربع/مترطول</option>
+              <option value="percentage">درصدی</option>
+              <option value="hybrid">ترکیبی</option>
+            </select>
+          </div>
+          <div class="col-md-6 mb-3">
+            <label class="form-label">بیمه مسئولیت</label>
+            <select class="form-select" id="editInsurance">
+              <option value="">انتخاب کنید</option>
+              <option value="yes">دارم</option>
+              <option value="no">ندارم</option>
+            </select>
+          </div>
+          <div id="editInsuranceExpiryField" class="col-md-6 mb-3" style="display: none;">
+            <label class="form-label">تاریخ انقضا بیمه</label>
+            <input type="date" class="form-control" id="editInsuranceExpiry">
+          </div>
+          <div class="col-12 mb-3">
+            <label class="form-label">تجهیزات و ماشین‌آلات</label>
+            <textarea class="form-control" id="editEquipment" rows="3" placeholder="دستگاه جوش، جرثقیل، ..."></textarea>
+          </div>
+          <div class="col-12 mb-3">
+            <label class="form-label">محدوده جغرافیایی فعالیت</label>
+            <select class="form-select" id="editWorkArea" multiple style="height: 150px;">
+              <optgroup label="مناطق مرکزی">
+                <option value="tehran">تهران</option>
+                <option value="alborz">البرز</option>
+                <option value="qom">قم</option>
+                <option value="markazi">مرکزی</option>
+                <option value="esfahan">اصفهان</option>
+                <option value="yazd">یزد</option>
+              </optgroup>
+              <optgroup label="مناطق شمالی">
+                <option value="gilan">گیلان</option>
+                <option value="mazandaran">مازندران</option>
+                <option value="golestan">گلستان</option>
+              </optgroup>
+              <optgroup label="مناطق جنوبی">
+                <option value="khuzestan">خوزستان</option>
+                <option value="fars">فارس</option>
+                <option value="hormozgan">هرمزگان</option>
+                <option value="bushehr">بوشهر</option>
+              </optgroup>
+              <optgroup label="مناطق شرقی">
+                <option value="kerman">کرمان</option>
+                <option value="razavi-khorasan">خراسان رضوی</option>
+                <option value="south-khorasan">خراسان جنوبی</option>
+              </optgroup>
+              <optgroup label="مناطق غربی">
+                <option value="kermanshah">کرمانشاه</option>
+                <option value="kurdistan">کردستان</option>
+                <option value="lorestan">لرستان</option>
+              </optgroup>
+            </select>
+            <small class="text-muted">Ctrl را نگه دارید برای انتخاب چند گزینه</small>
+          </div>
+        </div>
+
+        <!-- پروژه‌های نمونه (برای پیمانکاران) -->
+        <div id="editProjectsSection" class="row mt-4" style="display: none;">
+          <div class="col-12">
+            <h6 class="border-bottom pb-2 mb-3">
+              <i class="bi bi-images me-2"></i>پروژه‌های نمونه
+            </h6>
+            <div id="editProjectsContainer"></div>
+            <button type="button" class="btn btn-sm btn-outline-primary mt-2" onclick="addProjectToEdit()">
+              <i class="bi bi-plus-circle me-1"></i>افزودن پروژه جدید
+            </button>
+          </div>
+        </div>
+
+        <!-- مدارک (برای پیمانکاران) -->
+        <div id="editDocumentsSection" class="row mt-4" style="display: none;">
+          <div class="col-12">
+            <h6 class="border-bottom pb-2 mb-3">
+              <i class="bi bi-file-earmark-text me-2"></i>مدارک و گواهینامه‌ها
+            </h6>
+            <div class="upload-box" id="docUploadAreaEdit">
+              <i class="bi bi-cloud-arrow-up" style="font-size: 2rem;"></i>
+              <p>فایل‌های جدید را اینجا رها کنید یا کلیک کنید</p>
+              <small class="text-muted">پروانه کسب، گواهی صلاحیت، HSE و ...</small>
+              <input type="file" class="d-none" id="documentUploadEdit" multiple accept=".pdf,.jpg,.png">
+            </div>
+            <div id="editFileList" class="mt-2"></div>
+          </div>
+        </div>
+
+        <!-- دکمه‌های فرم -->
+        <div class="d-flex gap-2 justify-content-end mt-4">
+          <button type="button" class="btn btn-secondary" onclick="cancelProfileEdit()">انصراف</button>
+          <button type="submit" class="btn btn-primary" onclick="saveProfileChanges()">
+            <i class="bi bi-check-circle me-1"></i>ذخیره تغییرات
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
 </div>
 </div>
 </div>
@@ -2526,71 +2962,415 @@ if (contractorTerms) contractorTerms.checked = true;
 this.closeTermsModal();
 }
 
-// ===== توابع پروفایل =====
-loadProfile() {
-if (!this.userData) {
+// ===== توابع پروفایل پیشرفته =====
+async loadFullProfile() {
+if (!this.userData || !this.userData.id) {
 this.showToast('لطفاً وارد شوید', 'error');
 this.showPage('login');
 return;
 }
 
-// پر کردن حالت نمایش
-document.getElementById('profileDisplayName').textContent = this.userData.name || 'کاربر';
-document.getElementById('profileDisplayEmail').textContent = this.userData.email || '-';
-document.getElementById('profileDisplayMobile').textContent = this.userData.mobile || '-';
-document.getElementById('profileDisplayCompany').textContent = this.userData.company || '-';
-document.getElementById('profileDisplayAddress').textContent = this.userData.address || '-';
-document.getElementById('profileDisplayType').textContent = this.userData.type === 'employer' ? 'کارفرما' : 'پیمانکار';
+try {
+const { data: profile, error } = await supabase
+.from('profiles')
+.select('*')
+.eq('user_id', this.userData.id)
+.single();
+
+if (error && error.code !== 'PGRST116') {
+console.error('خطا در دریافت پروفایل:', error);
+}
+
+const fullProfile = { ...this.userData, ...profile };
+this.displayFullProfile(fullProfile);
+  
+} catch (error) {
+console.error('خطا:', error);
+this.showToast('خطا در بارگذاری پروفایل', 'error');
+}
+}
+
+displayFullProfile(profile) {
+// اطلاعات پایه
+document.getElementById('profileDisplayName').textContent = profile.full_name || profile.company_name || 'کاربر';
+document.getElementById('profileDisplayEmail').textContent = profile.email || '-';
+document.getElementById('profileDisplayType').textContent = profile.user_type === 'employer' ? 'کارفرما' : 'پیمانکار';
+document.getElementById('profileDisplayAccountType').textContent = profile.account_type === 'individual' ? 'شخص حقیقی' : 'شخص حقوقی';
+document.getElementById('profileDisplayFullName').textContent = profile.full_name || profile.company_name || '-';
+document.getElementById('profileDisplayNationalId').textContent = profile.national_code || profile.company_id || '-';
+
+// اطلاعات تماس
+document.getElementById('profileDisplayMobile').textContent = profile.phone || '-';
+document.getElementById('profileDisplayPhone').textContent = profile.landline || '-';
+document.getElementById('profileDisplayAddress').textContent = profile.address || '-';
 
 // آواتار
-document.getElementById('profileAvatar').textContent = (this.userData.name || '?').charAt(0);
+const avatar = document.getElementById('profileAvatar');
+if (avatar) {
+avatar.textContent = (profile.full_name || profile.company_name || '?').charAt(0);
+}
 
-// پر کردن فرم ویرایش
-document.getElementById('editFullName').value = this.userData.name || '';
-document.getElementById('editMobile').value = this.userData.mobile || '';
-document.getElementById('editEmail').value = this.userData.email || '';
-document.getElementById('editCompany').value = this.userData.company || '';
-document.getElementById('editAddress').value = this.userData.address || '';
+// اطلاعات شرکت (اگر شخص حقوقی است)
+const companyFields = document.getElementById('profileCompanyFields');
+if (companyFields) {
+if (profile.account_type === 'company') {
+companyFields.style.display = 'block';
+document.getElementById('profileDisplayCompanyName').textContent = profile.company_name || '-';
+document.getElementById('profileDisplayRegistrationNo').textContent = profile.registration_no || '-';
+document.getElementById('profileDisplayCompanyType').textContent = profile.company_type || '-';
+document.getElementById('profileDisplayWebsite').textContent = profile.website || '-';
+document.getElementById('profileDisplayCompanyDesc').textContent = profile.company_description || '-';
+} else {
+companyFields.style.display = 'none';
+}
+}
 
-// حالت نمایش
-document.getElementById('profileViewMode').style.display = 'block';
-document.getElementById('profileEditMode').style.display = 'none';
+// اطلاعات پیمانکار
+const contractorFields = document.getElementById('contractorProfileFields');
+if (contractorFields) {
+if (profile.user_type === 'contractor') {
+contractorFields.style.display = 'block';
+document.getElementById('profileDisplayMainExpertise').textContent = profile.main_expertise || '-';
+document.getElementById('profileDisplayStartYear').textContent = profile.start_year || '-';
+document.getElementById('profileDisplayTeamSize').textContent = profile.team_size || '-';
+document.getElementById('profileDisplayWorkArea').textContent = profile.work_area ? profile.work_area.join('، ') : '-';
+document.getElementById('profileDisplayContractMethod').textContent = profile.contract_method || '-';
+document.getElementById('profileDisplayInsurance').textContent = profile.insurance === 'yes' ? 'دارد' : 'ندارد';
+document.getElementById('profileDisplayEquipment').textContent = profile.equipment || '-';
+
+this.displayProjects(profile.projects);
+this.displayDocuments(profile.documents);
+
+const verificationStatus = document.getElementById('profileVerificationStatus');
+if (verificationStatus && profile.verification_status) {
+verificationStatus.style.display = 'block';
+const statusText = {
+'pending': 'در انتظار بررسی',
+'verified': 'تأیید شده',
+'rejected': 'رد شده'
+}[profile.verification_status] || profile.verification_status;
+document.getElementById('profileVerificationText').textContent = statusText;
+}
+} else {
+contractorFields.style.display = 'none';
+const verificationStatus = document.getElementById('profileVerificationStatus');
+if (verificationStatus) verificationStatus.style.display = 'none';
+}
+}
+}
+
+displayProjects(projects) {
+const container = document.getElementById('profileDisplayProjects');
+if (!container) return;
+
+if (!projects || projects.length === 0) {
+container.innerHTML = '<p class="text-muted">پروژه‌ای ثبت نشده است.</p>';
+return;
+}
+
+container.innerHTML = projects.map(project => `
+<div class="col-md-6 mb-3">
+<div class="border rounded p-3">
+<h6>${project.name || 'بدون نام'}</h6>
+<small class="text-muted d-block">سال: ${project.year || '-'}</small>
+<small class="text-muted d-block">مشتری: ${project.client || '-'}</small>
+</div>
+</div>
+`).join('');
+}
+
+displayDocuments(documents) {
+const container = document.getElementById('profileDisplayDocuments');
+if (!container) return;
+
+if (!documents || documents.length === 0) {
+container.innerHTML = '<p class="text-muted">مدرکی آپلود نشده است.</p>';
+return;
+}
+
+container.innerHTML = documents.map(doc => `
+<span class="badge bg-light text-dark p-2">
+<i class="bi bi-file-earmark-text me-1"></i>${doc.name}
+</span>
+`).join('');
+}
+
+populateEditYears() {
+const yearSelect = document.getElementById('editStartYear');
+if (!yearSelect) return;
+
+yearSelect.innerHTML = '<option value="">انتخاب کنید</option>';
+for (let year = 1403; year >= 1350; year--) {
+const option = document.createElement('option');
+option.value = year;
+option.text = year;
+yearSelect.appendChild(option);
+}
+}
+
+addProjectToEdit() {
+const container = document.getElementById('editProjectsContainer');
+if (!container) return;
+
+const projectCount = container.children.length + 1;
+
+const projectDiv = document.createElement('div');
+projectDiv.className = 'card mb-3 project-card';
+projectDiv.innerHTML = `
+<div class="card-body">
+<div class="d-flex justify-content-between align-items-center mb-3">
+<h6 class="card-title mb-0">پروژه ${projectCount}</h6>
+<button type="button" class="btn btn-sm btn-outline-danger" onclick="this.closest('.project-card').remove()">
+<i class="bi bi-trash"></i>
+</button>
+</div>
+<div class="row">
+<div class="col-md-4 mb-3">
+<label class="form-label">نام پروژه</label>
+<input type="text" class="form-control" name="editProjectName[]">
+</div>
+<div class="col-md-4 mb-3">
+<label class="form-label">سال تحویل</label>
+<input type="text" class="form-control" name="editProjectYear[]">
+</div>
+<div class="col-md-4 mb-3">
+<label class="form-label">مشتری</label>
+<input type="text" class="form-control" name="editProjectClient[]">
+</div>
+</div>
+</div>
+`;
+
+container.appendChild(projectDiv);
 }
 
 enableProfileEdit() {
-document.getElementById('profileViewMode').style.display = 'none';
-document.getElementById('profileEditMode').style.display = 'block';
+const viewMode = document.getElementById('profileViewMode');
+const editMode = document.getElementById('profileEditMode');
+if (!viewMode || !editMode) return;
+
+viewMode.style.display = 'none';
+editMode.style.display = 'block';
+
+// پر کردن فرم ویرایش با اطلاعات فعلی
+if (document.getElementById('editFullName')) {
+document.getElementById('editFullName').value = this.userData?.full_name || this.userData?.name || '';
+}
+if (document.getElementById('editNationalId')) {
+document.getElementById('editNationalId').value = this.userData?.national_code || this.userData?.company_id || '';
+}
+if (document.getElementById('editEmail')) {
+document.getElementById('editEmail').value = this.userData?.email || '';
+}
+if (document.getElementById('editMobile')) {
+document.getElementById('editMobile').value = this.userData?.phone || this.userData?.mobile || '';
+}
+if (document.getElementById('editPhone')) {
+document.getElementById('editPhone').value = this.userData?.landline || '';
+}
+if (document.getElementById('editAddress')) {
+document.getElementById('editAddress').value = this.userData?.address || '';
+}
+if (document.getElementById('editPostalCode')) {
+document.getElementById('editPostalCode').value = this.userData?.postal_code || '';
+}
+if (document.getElementById('editProvince')) {
+document.getElementById('editProvince').value = this.userData?.province || '';
+}
+if (document.getElementById('editCity')) {
+document.getElementById('editCity').value = this.userData?.city || '';
+}
+
+this.populateEditYears();
+
+// نمایش فیلدهای مخصوص شرکت
+const companyFields = document.getElementById('editCompanyFields');
+if (companyFields) {
+if (this.userData?.account_type === 'company') {
+companyFields.style.display = 'flex';
+if (document.getElementById('editCompanyName')) {
+document.getElementById('editCompanyName').value = this.userData?.company_name || '';
+}
+if (document.getElementById('editRegistrationNo')) {
+document.getElementById('editRegistrationNo').value = this.userData?.registration_no || '';
+}
+if (document.getElementById('editCompanyType')) {
+document.getElementById('editCompanyType').value = this.userData?.company_type || '';
+}
+if (document.getElementById('editWebsite')) {
+document.getElementById('editWebsite').value = this.userData?.website || '';
+}
+if (document.getElementById('editCompanyDesc')) {
+document.getElementById('editCompanyDesc').value = this.userData?.company_description || '';
+}
+} else {
+companyFields.style.display = 'none';
+}
+}
+
+// نمایش فیلدهای مخصوص پیمانکار
+const contractorFields = document.getElementById('editContractorFields');
+const projectsSection = document.getElementById('editProjectsSection');
+const documentsSection = document.getElementById('editDocumentsSection');
+
+if (contractorFields && projectsSection && documentsSection) {
+if (this.userData?.user_type === 'contractor') {
+contractorFields.style.display = 'flex';
+projectsSection.style.display = 'block';
+documentsSection.style.display = 'block';
+
+if (document.getElementById('editMainExpertise')) {
+document.getElementById('editMainExpertise').value = this.userData?.main_expertise || '';
+}
+if (document.getElementById('editStartYear')) {
+document.getElementById('editStartYear').value = this.userData?.start_year || '';
+}
+if (document.getElementById('editTeamSize')) {
+document.getElementById('editTeamSize').value = this.userData?.team_size || '';
+}
+if (document.getElementById('editContractMethod')) {
+document.getElementById('editContractMethod').value = this.userData?.contract_method || '';
+}
+if (document.getElementById('editInsurance')) {
+document.getElementById('editInsurance').value = this.userData?.insurance || '';
+}
+if (document.getElementById('editEquipment')) {
+document.getElementById('editEquipment').value = this.userData?.equipment || '';
+}
+
+this.displayEditProjects(this.userData?.projects);
+} else {
+contractorFields.style.display = 'none';
+projectsSection.style.display = 'none';
+documentsSection.style.display = 'none';
+}
+}
+}
+
+displayEditProjects(projects) {
+const container = document.getElementById('editProjectsContainer');
+if (!container) return;
+
+container.innerHTML = '';
+
+if (projects && projects.length > 0) {
+projects.forEach((project, index) => {
+const projectDiv = document.createElement('div');
+projectDiv.className = 'card mb-3 project-card';
+projectDiv.innerHTML = `
+<div class="card-body">
+<div class="d-flex justify-content-between align-items-center mb-3">
+<h6 class="card-title mb-0">پروژه ${index + 1}</h6>
+<button type="button" class="btn btn-sm btn-outline-danger" onclick="this.closest('.project-card').remove()">
+<i class="bi bi-trash"></i>
+</button>
+</div>
+<div class="row">
+<div class="col-md-4 mb-3">
+<label class="form-label">نام پروژه</label>
+<input type="text" class="form-control" name="editProjectName[]" value="${project.name || ''}">
+</div>
+<div class="col-md-4 mb-3">
+<label class="form-label">سال تحویل</label>
+<input type="text" class="form-control" name="editProjectYear[]" value="${project.year || ''}">
+</div>
+<div class="col-md-4 mb-3">
+<label class="form-label">مشتری</label>
+<input type="text" class="form-control" name="editProjectClient[]" value="${project.client || ''}">
+</div>
+</div>
+</div>
+`;
+container.appendChild(projectDiv);
+});
+}
 }
 
 cancelProfileEdit() {
-document.getElementById('profileViewMode').style.display = 'block';
-document.getElementById('profileEditMode').style.display = 'none';
-// برگردوندن مقادیر اصلی
-this.loadProfile();
+const viewMode = document.getElementById('profileViewMode');
+const editMode = document.getElementById('profileEditMode');
+if (viewMode && editMode) {
+viewMode.style.display = 'block';
+editMode.style.display = 'none';
+}
+this.loadFullProfile();
 }
 
-saveProfileChanges() {
+async saveProfileChanges() {
 const updatedData = {
-name: document.getElementById('editFullName').value,
-mobile: document.getElementById('editMobile').value,
-company: document.getElementById('editCompany').value,
-address: document.getElementById('editAddress').value,
-email: this.userData.email,
-type: this.userData.type
+full_name: document.getElementById('editFullName')?.value,
+phone: document.getElementById('editMobile')?.value,
+landline: document.getElementById('editPhone')?.value,
+address: document.getElementById('editAddress')?.value,
+postal_code: document.getElementById('editPostalCode')?.value,
+province: document.getElementById('editProvince')?.value,
+city: document.getElementById('editCity')?.value,
+national_code: document.getElementById('editNationalId')?.value,
 };
 
-// اعتبارسنجی موبایل
-if (updatedData.mobile && !this.isValidMobile(updatedData.mobile)) {
+if (updatedData.phone && !this.isValidMobile(updatedData.phone)) {
 this.showToast('شماره موبایل نامعتبر است', 'error');
 return;
 }
 
-// ذخیره در localStorage
+if (this.userData?.account_type === 'company') {
+updatedData.company_name = document.getElementById('editCompanyName')?.value;
+updatedData.registration_no = document.getElementById('editRegistrationNo')?.value;
+updatedData.company_type = document.getElementById('editCompanyType')?.value;
+updatedData.website = document.getElementById('editWebsite')?.value;
+updatedData.company_description = document.getElementById('editCompanyDesc')?.value;
+}
+
+if (this.userData?.user_type === 'contractor') {
+updatedData.main_expertise = document.getElementById('editMainExpertise')?.value;
+updatedData.start_year = document.getElementById('editStartYear')?.value;
+updatedData.team_size = document.getElementById('editTeamSize')?.value;
+updatedData.contract_method = document.getElementById('editContractMethod')?.value;
+updatedData.insurance = document.getElementById('editInsurance')?.value;
+updatedData.equipment = document.getElementById('editEquipment')?.value;
+
+const projects = [];
+const projectNames = document.querySelectorAll('input[name="editProjectName[]"]');
+const projectYears = document.querySelectorAll('input[name="editProjectYear[]"]');
+const projectClients = document.querySelectorAll('input[name="editProjectClient[]"]');
+
+for (let i = 0; i < projectNames.length; i++) {
+if (projectNames[i].value || projectYears[i].value || projectClients[i].value) {
+projects.push({
+name: projectNames[i].value,
+year: projectYears[i].value,
+client: projectClients[i].value
+});
+}
+}
+updatedData.projects = projects;
+}
+
+try {
+const { error } = await supabase
+.from('profiles')
+.update(updatedData)
+.eq('user_id', this.userData.id);
+
+if (error) throw error;
+
 this.userData = { ...this.userData, ...updatedData };
 localStorage.setItem('peymanyar_user', JSON.stringify(this.userData));
 
 this.showToast('اطلاعات با موفقیت به‌روز شد', 'success');
-this.loadProfile();
+
+const viewMode = document.getElementById('profileViewMode');
+const editMode = document.getElementById('profileEditMode');
+if (viewMode && editMode) {
+viewMode.style.display = 'block';
+editMode.style.display = 'none';
+}
+
+this.loadFullProfile();
+
+} catch (error) {
+this.showToast('خطا در ذخیره اطلاعات: ' + error.message, 'error');
+}
 }
 // ===== پایان توابع پروفایل =====
 
@@ -2698,7 +3478,7 @@ this.dispatchPageChangeEvent(pageId);
 
 // اگر صفحه پروفایل است، اطلاعات را بارگذاری کن
 if (pageId === 'profile') {
-this.loadProfile();
+this.loadFullProfile();
 }
 }
 }
@@ -3062,15 +3842,15 @@ console.error('خطا در دریافت پروفایل:', profileError);
 this.userData = {
 id: data.user.id,
 email: data.user.email,
-name: profile?.full_name || profile?.company_name || 'کاربر',
-mobile: profile?.phone || '',
-company: profile?.company_name || '',
+full_name: profile?.full_name || profile?.company_name || 'کاربر',
+phone: profile?.phone || '',
+company_name: profile?.company_name || '',
 address: profile?.address || '',
-type: profile?.user_type || 'employer'
+user_type: profile?.user_type || 'employer',
+account_type: profile?.account_type || 'individual'
 };
 
 this.showToast('ورود موفقیت‌آمیز بود', 'success');
-this.updateNavigation();
 this.showPage('home');
 } catch (error) {
 this.showToast('ایمیل یا رمز عبور اشتباه است', 'error');
@@ -3305,29 +4085,91 @@ document.getElementById('employerSummary').innerHTML = summaryHtml;
 }
 }
 
+// تابع ثبت‌نام کارفرما
 async submitEmployerForm(e) {
 e.preventDefault();
+
+// بررسی اعتبارسنجی مرحله
 if (!this.validateEmployerStep(this.employerCurrentStep)) {
 return;
 }
+
+// بررسی پذیرش قوانین
 const terms = document.getElementById('employerTerms').checked;
 if (!terms) {
 this.showToast('لطفاً با قوانین و مقررات موافقت کنید.', 'error');
 return;
 }
+
+// دریافت اطلاعات فرم
 const accountType = document.getElementById('employerAccountType').value;
 const email = document.getElementById('employerEmail').value;
 const password = document.getElementById('employerPassword').value;
 const mobile = document.getElementById('employerMobile').value;
 const address = document.getElementById('employerAddress').value;
 
+// غیرفعال کردن دکمه ثبت‌نام
+const submitBtn = document.getElementById('employerSubmitBtn');
+const originalText = submitBtn.innerHTML;
+submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>در حال ثبت‌نام...';
+submitBtn.disabled = true;
+
 try {
-// ثبت‌نام در Supabase Auth
-const { data: authData, error: authError } = await supabase.auth.signUp({
+// ثبت‌نام در Supabase Auth با مکانیزم retry
+let retries = 3;
+let authData, authError;
+let attempt = 0;
+
+while (retries > 0) {
+attempt++;
+try {
+const result = await supabase.auth.signUp({
 email,
 password
 });
-if (authError) throw authError;
+
+authData = result.data;
+authError = result.error;
+
+if (!authError) {
+break; // موفقیت آمیز
+}
+
+// اگر خطای rate limit (429) یا خطای 400 بود
+if (authError.status === 429 || authError.status === 400) {
+retries--;
+if (retries > 0) {
+this.showToast(`تلاش مجدد... (${attempt}/3)`, 'info');
+// منتظر بمان و دوباره تلاش کن (مدت انتظار افزایشی)
+await new Promise(resolve => setTimeout(resolve, 2000 * attempt));
+}
+} else {
+// خطای دیگر - ادامه نده
+break;
+}
+} catch (err) {
+retries--;
+if (retries > 0) {
+await new Promise(resolve => setTimeout(resolve, 2000));
+} else {
+throw err;
+}
+}
+}
+
+if (authError) {
+if (authError.status === 429) {
+throw new Error('محدودیت ثبت‌نام موقتاً اعمال شده. لطفاً ۵ دقیقه بعد تلاش کنید.');
+} else if (authError.status === 400) {
+throw new Error('ایمیل نامعتبر است یا قبلاً ثبت‌نام شده است.');
+} else {
+throw authError;
+}
+}
+
+if (!authData || !authData.user) {
+throw new Error('خطا در ثبت‌نام. لطفاً مجدداً تلاش کنید.');
+}
 
 // آماده‌سازی اطلاعات پروفایل
 const profileData = {
@@ -3341,10 +4183,13 @@ created_at: new Date().toISOString()
 };
 
 if (accountType === 'individual') {
-profileData.full_name = document.getElementById('employerFullName').value;
+profileData.full_name = document.getElementById('employerFullName')?.value;
+profileData.national_code = document.getElementById('employerNationalCode')?.value;
 } else {
-profileData.company_name = document.getElementById('employerCompanyName').value;
-profileData.company_id = document.getElementById('employerCompanyId').value;
+profileData.company_name = document.getElementById('employerCompanyName')?.value;
+profileData.company_id = document.getElementById('employerCompanyId')?.value;
+profileData.registration_no = document.getElementById('employerRegistrationNo')?.value;
+profileData.company_type = document.getElementById('employerCompanyType')?.value;
 }
 
 // ذخیره پروفایل
@@ -3352,12 +4197,38 @@ const { error: profileError } = await supabase
 .from('profiles')
 .insert([profileData]);
 
-if (profileError) throw profileError;
+if (profileError) {
+// اگر پروفایل ذخیره نشد، کاربر ایجاد شده را پاک کن
+await supabase.auth.admin.deleteUser(authData.user.id);
+throw profileError;
+}
 
 this.showToast('ثبت‌نام کارفرما با موفقیت انجام شد!', 'success');
+
+// ذخیره اطلاعات کاربر
+this.userData = {
+id: authData.user.id,
+email,
+full_name: profileData.full_name || profileData.company_name,
+phone: mobile,
+address,
+user_type: 'employer',
+account_type: accountType
+};
+localStorage.setItem('peymanyar_user', JSON.stringify(this.userData));
+
+// رفتن به صفحه اصلی
+setTimeout(() => {
 this.showPage('home');
+}, 1500);
+
 } catch (error) {
+console.error('خطای ثبت‌نام:', error);
 this.showToast('خطا در ثبت‌نام: ' + error.message, 'error');
+} finally {
+// فعال کردن مجدد دکمه
+submitBtn.innerHTML = originalText;
+submitBtn.disabled = false;
 }
 }
 
@@ -3765,25 +4636,93 @@ document.getElementById('summaryContent').innerHTML = summaryHtml;
 document.getElementById('formSummary').style.display = 'block';
 }
 
+// تابع ثبت‌نام پیمانکار
 async submitContractorForm(e) {
 e.preventDefault();
+
+// بررسی اعتبارسنجی مرحله
 if (!this.validateContractorStep(this.contractorCurrentStep)) {
 return;
 }
+
+// بررسی پذیرش قوانین
+const terms = document.getElementById('contractorTerms').checked;
+if (!terms) {
+this.showToast('لطفاً با قوانین و مقررات موافقت کنید.', 'error');
+return;
+}
+
+// دریافت اطلاعات فرم
 const accountType = document.getElementById('accountType').value;
 const email = document.getElementById('contractorEmail').value;
 const password = document.getElementById('contractorPassword').value;
 const mobile = document.getElementById('mobile').value;
 const contactPerson = document.getElementById('contactPerson').value;
 const mainExpertise = document.getElementById('mainExpertise').value;
+const phone = document.getElementById('phone')?.value || '';
+
+// غیرفعال کردن دکمه ثبت‌نام
+const submitBtn = document.getElementById('submitBtn');
+const originalText = submitBtn.innerHTML;
+submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>در حال ثبت‌نام...';
+submitBtn.disabled = true;
 
 try {
-// ثبت‌نام در Supabase Auth
-const { data: authData, error: authError } = await supabase.auth.signUp({
+// ثبت‌نام در Supabase Auth با مکانیزم retry
+let retries = 3;
+let authData, authError;
+let attempt = 0;
+
+while (retries > 0) {
+attempt++;
+try {
+const result = await supabase.auth.signUp({
 email,
 password
 });
-if (authError) throw authError;
+
+authData = result.data;
+authError = result.error;
+
+if (!authError) {
+break; // موفقیت آمیز
+}
+
+// اگر خطای rate limit (429) یا خطای 400 بود
+if (authError.status === 429 || authError.status === 400) {
+retries--;
+if (retries > 0) {
+this.showToast(`تلاش مجدد... (${attempt}/3)`, 'info');
+// منتظر بمان و دوباره تلاش کن (مدت انتظار افزایشی)
+await new Promise(resolve => setTimeout(resolve, 2000 * attempt));
+}
+} else {
+// خطای دیگر - ادامه نده
+break;
+}
+} catch (err) {
+retries--;
+if (retries > 0) {
+await new Promise(resolve => setTimeout(resolve, 2000));
+} else {
+throw err;
+}
+}
+}
+
+if (authError) {
+if (authError.status === 429) {
+throw new Error('محدودیت ثبت‌نام موقتاً اعمال شده. لطفاً ۵ دقیقه بعد تلاش کنید.');
+} else if (authError.status === 400) {
+throw new Error('ایمیل نامعتبر است یا قبلاً ثبت‌نام شده است.');
+} else {
+throw authError;
+}
+}
+
+if (!authData || !authData.user) {
+throw new Error('خطا در ثبت‌نام. لطفاً مجدداً تلاش کنید.');
+}
 
 // آماده‌سازی اطلاعات پروفایل
 const profileData = {
@@ -3792,6 +4731,7 @@ email,
 user_type: 'contractor',
 account_type: accountType,
 phone: mobile,
+landline: phone,
 contact_person: contactPerson,
 main_expertise: mainExpertise,
 verification_status: 'pending',
@@ -3800,10 +4740,11 @@ created_at: new Date().toISOString()
 };
 
 if (accountType === 'individual') {
-profileData.full_name = document.getElementById('fullName').value;
+profileData.full_name = document.getElementById('fullName')?.value;
+profileData.national_code = document.getElementById('nationalCode')?.value;
 } else {
-profileData.company_name = document.getElementById('companyName').value;
-profileData.company_id = document.getElementById('companyId').value;
+profileData.company_name = document.getElementById('companyName')?.value;
+profileData.company_id = document.getElementById('companyId')?.value;
 }
 
 // ذخیره پروفایل
@@ -3811,12 +4752,37 @@ const { error: profileError } = await supabase
 .from('profiles')
 .insert([profileData]);
 
-if (profileError) throw profileError;
+if (profileError) {
+// اگر پروفایل ذخیره نشد، کاربر ایجاد شده را پاک کن
+await supabase.auth.admin.deleteUser(authData.user.id);
+throw profileError;
+}
 
 this.showToast('ثبت‌نام پیمانکار با موفقیت انجام شد!', 'success');
+
+// ذخیره اطلاعات کاربر
+this.userData = {
+id: authData.user.id,
+email,
+full_name: profileData.full_name || profileData.company_name,
+phone: mobile,
+user_type: 'contractor',
+account_type: accountType
+};
+localStorage.setItem('peymanyar_user', JSON.stringify(this.userData));
+
+// رفتن به صفحه اصلی
+setTimeout(() => {
 this.showPage('home');
+}, 1500);
+
 } catch (error) {
+console.error('خطای ثبت‌نام:', error);
 this.showToast('خطا در ثبت‌نام: ' + error.message, 'error');
+} finally {
+// فعال کردن مجدد دکمه
+submitBtn.innerHTML = originalText;
+submitBtn.disabled = false;
 }
 }
 
@@ -3959,23 +4925,41 @@ return div.innerHTML;
 performSearch() {
 const keyword = document.getElementById('searchKeyword').value;
 const specialty = document.getElementById('searchSpecialty').value;
-const location = document.getElementById('searchLocation').value;
+const locationSelect = document.getElementById('searchLocation');
+const selectedLocations = Array.from(locationSelect.selectedOptions).map(opt => opt.value);
 const experience = document.getElementById('searchExperience').value;
+
+// نتایج نمونه با اطلاعات کامل‌تر
 const results = [
-{ id: 1, name: 'شرکت سازه‌گستر', location: 'تهران', specialty: 'پیمانکار ساخت اسکلت فلزی', rating: 4.5, reviews: 12, experience: 15, verified: true },
-{ id: 2, name: 'بتن‌کاران برتر', location: 'اصفهان', specialty: 'پیمانکار اجرای بتن', rating: 4.2, reviews: 8, experience: 8, verified: true },
-{ id: 3, name: 'جوشکاران حرفه‌ای', location: 'مشهد', specialty: 'پیمانکار جوشکاری سازه', rating: 4.7, reviews: 15, experience: 12, verified: true },
-{ id: 4, name: 'اسکلت‌سازان نوین', location: 'البرز', specialty: 'پیمانکار نصب اسکلت فلزی', rating: 4.8, reviews: 20, experience: 18, verified: true },
-{ id: 5, name: 'خاکبرداری ایمن', location: 'تهران', specialty: 'پیمانکار خاکبرداری و پایدارسازی', rating: 4.3, reviews: 6, experience: 10, verified: true },
-{ id: 6, name: 'رنگ‌آمیز صنعت', location: 'اصفهان', specialty: 'پیمانکار رنگ و پوشش صنعتی', rating: 4.6, reviews: 9, experience: 7, verified: true }
+{ id: 1, name: 'شرکت سازه‌گستر', location: ['tehran', 'alborz'], specialty: 'steel_fabrication', rating: 4.5, reviews: 12, experience: 15, verified: true },
+{ id: 2, name: 'بتن‌کاران برتر', location: ['esfahan', 'tehran'], specialty: 'concrete_execution', rating: 4.2, reviews: 8, experience: 8, verified: true },
+{ id: 3, name: 'جوشکاران حرفه‌ای', location: ['razavi-khorasan'], specialty: 'welding', rating: 4.7, reviews: 15, experience: 12, verified: true },
+{ id: 4, name: 'اسکلت‌سازان نوین', location: ['alborz'], specialty: 'steel_installation', rating: 4.8, reviews: 20, experience: 18, verified: true },
+{ id: 5, name: 'خاکبرداری ایمن', location: ['tehran', 'alborz'], specialty: 'excavation', rating: 4.3, reviews: 6, experience: 10, verified: true },
+{ id: 6, name: 'رنگ‌آمیز صنعت', location: ['esfahan', 'fars'], specialty: 'coating', rating: 4.6, reviews: 9, experience: 7, verified: true },
+{ id: 7, name: 'آب‌بندی پارس', location: ['khuzestan', 'fars'], specialty: 'waterproofing', rating: 4.4, reviews: 11, experience: 9, verified: true },
+{ id: 8, name: 'مقاوم‌سازان', location: ['tehran'], specialty: 'seismic_retrofit', rating: 4.9, reviews: 18, experience: 20, verified: true }
 ];
+
 const filteredResults = results.filter(result => {
+// فیلتر بر اساس کلمه کلیدی
 if (keyword && !result.name.includes(keyword) && !result.specialty.includes(keyword)) return false;
-if (specialty && !result.specialty.includes(specialty)) return false;
-if (location && !result.location.includes(location)) return false;
+
+// فیلتر بر اساس تخصص
+if (specialty && result.specialty !== specialty) return false;
+
+// فیلتر بر اساس موقعیت جغرافیایی (پشتیبانی از چند استان)
+if (selectedLocations.length > 0 && !selectedLocations.includes('all')) {
+const hasLocation = result.location.some(loc => selectedLocations.includes(loc));
+if (!hasLocation) return false;
+}
+
+// فیلتر بر اساس سابقه کار
 if (experience && result.experience < parseInt(experience)) return false;
+
 return true;
 });
+
 this.displaySearchResults(filteredResults);
 }
 
@@ -4074,7 +5058,6 @@ this.showToast('این قابلیت در نسخه کامل پیاده‌سازی
 async logout() {
 await supabase.auth.signOut();
 this.userData = null;
-this.updateNavigation();
 this.showPage('home');
 this.showToast('با موفقیت خارج شدید', 'success');
 }
@@ -4089,10 +5072,6 @@ const saved = localStorage.getItem('peymanyar_user');
 if (saved) {
 this.userData = JSON.parse(saved);
 }
-}
-
-updateNavigation() {
-// این تابع برای به‌روزرسانی منو بر اساس وضعیت ورود
 }
 
 setupIntersectionObserver() {
