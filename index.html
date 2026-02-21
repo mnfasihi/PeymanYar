@@ -4209,81 +4209,131 @@ async submitEmployerForm(e) {
       }
     }
 
-    if (!success) {
-      throw new Error('محدودیت ثبت‌نام موقتاً اعمال شده. لطفاً ۱۰ دقیقه بعد تلاش کنید.');
-    }
-
-    if (!authData || !authData.user) {
-      throw new Error('خطا در ثبت‌نام. لطفاً مجدداً تلاش کنید.');
-    }
-setupContractorForm() {
-this.populateYearSelect('startYear', 1350, 1403);
-document.getElementById('accountType').addEventListener('change', () => this.updateContractorFields());
-document.getElementById('mainExpertise').addEventListener('change', () => this.updateSubExpertise());
-document.getElementById('workArea').addEventListener('change', (e) => this.handleWorkAreaSelection(e));
-document.getElementById('radius').addEventListener('input', (e) => {
-document.getElementById('radiusValue').textContent = e.target.value + ' کیلومتر';
-});
-document.getElementById('areaUnit').addEventListener('change', () => this.updateAreaUnitLabel());
-document.getElementById('docUploadArea').addEventListener('click', () => {
-document.getElementById('documentUpload').click();
-});
-document.getElementById('documentUpload').addEventListener('change', (e) => this.handleFileUpload(e));
-document.getElementById('addProject').addEventListener('click', () => this.addProject());
-document.getElementById('insurance').addEventListener('change', (e) => {
-const expiryField = document.getElementById('insuranceExpiryField');
-if (e.target.value === 'yes') {
-expiryField.style.display = 'block';
-expiryField.classList.add('show');
-} else {
-expiryField.style.display = 'none';
-expiryField.classList.remove('show');
+ if (!success) {
+  throw new Error('محدودیت ثبت‌نام موقتاً اعمال شده. لطفاً ۱۰ دقیقه بعد تلاش کنید.');
 }
-});
-document.getElementById('nextBtn').addEventListener('click', () => this.nextContractorStep());
-document.getElementById('prevBtn').addEventListener('click', () => this.prevContractorStep());
-document.getElementById('contractorForm').addEventListener('submit', (e) => this.submitContractorForm(e));
-this.updateContractorFields();
-this.updateContractorNavigation();
+
+if (!authData || !authData.user) {
+  throw new Error('خطا در ثبت‌نام. لطفاً مجدداً تلاش کنید.');
+}
+
+// ادامه کد ثبت‌نام کارفرما...
+// ... (بقیه کد تابع submitEmployerForm که باید کامل شود)
+
+} catch (error) {
+  console.error('خطای ثبت‌نام:', error);
+  this.showToast('خطا در ثبت‌نام: ' + error.message, 'error');
+} finally {
+  submitBtn.innerHTML = originalText;
+  submitBtn.disabled = false;
+}
+} // پایان تابع submitEmployerForm
+
+// ========== شروع توابع پیمانکار ==========
+
+setupContractorForm() {
+  this.populateYearSelect('startYear', 1350, 1403);
+  document.getElementById('accountType').addEventListener('change', () => this.updateContractorFields());
+  document.getElementById('mainExpertise').addEventListener('change', () => this.updateSubExpertise());
+  document.getElementById('workArea').addEventListener('change', (e) => this.handleWorkAreaSelection(e));
+  document.getElementById('radius').addEventListener('input', (e) => {
+    document.getElementById('radiusValue').textContent = e.target.value + ' کیلومتر';
+  });
+  document.getElementById('areaUnit').addEventListener('change', () => this.updateAreaUnitLabel());
+  document.getElementById('docUploadArea').addEventListener('click', () => {
+    document.getElementById('documentUpload').click();
+  });
+  document.getElementById('documentUpload').addEventListener('change', (e) => this.handleFileUpload(e));
+  document.getElementById('addProject').addEventListener('click', () => this.addProject());
+  document.getElementById('insurance').addEventListener('change', (e) => {
+    const expiryField = document.getElementById('insuranceExpiryField');
+    if (e.target.value === 'yes') {
+      expiryField.style.display = 'block';
+      expiryField.classList.add('show');
+    } else {
+      expiryField.style.display = 'none';
+      expiryField.classList.remove('show');
+    }
+  });
+  document.getElementById('nextBtn').addEventListener('click', () => this.nextContractorStep());
+  document.getElementById('prevBtn').addEventListener('click', () => this.prevContractorStep());
+  document.getElementById('contractorForm').addEventListener('submit', (e) => this.submitContractorForm(e));
+  this.updateContractorFields();
+  this.updateContractorNavigation();
 }
 
 updateContractorFields() {
-const accountType = document.getElementById('accountType').value;
-const dynamicFields = document.getElementById('dynamicFields');
-if (!dynamicFields) return;
-dynamicFields.innerHTML = '';
-if (accountType === 'individual') {
-dynamicFields.innerHTML = `
-<div class="row">
-<div class="col-md-6 mb-3">
-<label for="fullName" class="form-label required">نام و نام خانوادگی</label>
-<input type="text" class="form-control" id="fullName" required>
-<div class="invalid-feedback">لطفاً نام و نام خانوادگی را وارد کنید</div>
-</div>
-<div class="col-md-6 mb-3">
-<label for="nationalCode" class="form-label required">کد ملی</label>
-<input type="text" class="form-control" id="nationalCode" required maxlength="10">
-<div class="invalid-feedback">لطفاً کد ملی معتبر وارد کنید</div>
-</div>
-</div>
-<div class="row">
-<div class="col-md-6 mb-3">
-<label for="contractorEmail" class="form-label required">ایمیل</label>
-<input type="email" class="form-control" id="contractorEmail" required>
-<div class="invalid-feedback">لطفاً ایمیل معتبر وارد کنید</div>
-</div>
-<div class="col-md-6 mb-3">
-<label for="contractorPassword" class="form-label required">رمز عبور</label>
-<input type="password" class="form-control" id="contractorPassword" required>
-<div class="invalid-feedback">لطفاً رمز عبور را وارد کنید</div>
-</div>
-<div class="col-md-6 mb-3">
-<label for="contractorConfirmPassword" class="form-label required">تکرار رمز عبور</label>
-<input type="password" class="form-control" id="contractorConfirmPassword" required>
-<div class="invalid-feedback">لطفاً تکرار رمز عبور را وارد کنید</div>
-</div>
-</div>
-`;
+  const accountType = document.getElementById('accountType').value;
+  const dynamicFields = document.getElementById('dynamicFields');
+  if (!dynamicFields) return;
+  dynamicFields.innerHTML = '';
+  
+  if (accountType === 'individual') {
+    dynamicFields.innerHTML = `
+    <div class="row">
+      <div class="col-md-6 mb-3">
+        <label for="fullName" class="form-label required">نام و نام خانوادگی</label>
+        <input type="text" class="form-control" id="fullName" required>
+        <div class="invalid-feedback">لطفاً نام و نام خانوادگی را وارد کنید</div>
+      </div>
+      <div class="col-md-6 mb-3">
+        <label for="nationalCode" class="form-label required">کد ملی</label>
+        <input type="text" class="form-control" id="nationalCode" required maxlength="10">
+        <div class="invalid-feedback">لطفاً کد ملی معتبر وارد کنید</div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-6 mb-3">
+        <label for="contractorEmail" class="form-label required">ایمیل</label>
+        <input type="email" class="form-control" id="contractorEmail" required>
+        <div class="invalid-feedback">لطفاً ایمیل معتبر وارد کنید</div>
+      </div>
+      <div class="col-md-6 mb-3">
+        <label for="contractorPassword" class="form-label required">رمز عبور</label>
+        <input type="password" class="form-control" id="contractorPassword" required>
+        <div class="invalid-feedback">لطفاً رمز عبور را وارد کنید</div>
+      </div>
+      <div class="col-md-6 mb-3">
+        <label for="contractorConfirmPassword" class="form-label required">تکرار رمز عبور</label>
+        <input type="password" class="form-control" id="contractorConfirmPassword" required>
+        <div class="invalid-feedback">لطفاً تکرار رمز عبور را وارد کنید</div>
+      </div>
+    </div>
+    `;
+  } else if (accountType === 'company') {
+    dynamicFields.innerHTML = `
+    <div class="row">
+      <div class="col-md-6 mb-3">
+        <label for="companyName" class="form-label required">نام شرکت/مؤسسه</label>
+        <input type="text" class="form-control" id="companyName" required>
+        <div class="invalid-feedback">لطفاً نام شرکت را وارد کنید</div>
+      </div>
+      <div class="col-md-6 mb-3">
+        <label for="companyId" class="form-label required">شناسه ملی شرکت</label>
+        <input type="text" class="form-control" id="companyId" required>
+        <div class="invalid-feedback">لطفاً شناسه ملی شرکت را وارد کنید</div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-6 mb-3">
+        <label for="contractorEmail" class="form-label required">ایمیل</label>
+        <input type="email" class="form-control" id="contractorEmail" required>
+        <div class="invalid-feedback">لطفاً ایمیل معتبر وارد کنید</div>
+      </div>
+      <div class="col-md-6 mb-3">
+        <label for="contractorPassword" class="form-label required">رمز عبور</label>
+        <input type="password" class="form-control" id="contractorPassword" required>
+        <div class="invalid-feedback">لطفاً رمز عبور را وارد کنید</div>
+      </div>
+      <div class="col-md-6 mb-3">
+        <label for="contractorConfirmPassword" class="form-label required">تکرار رمز عبور</label>
+        <input type="password" class="form-control" id="contractorConfirmPassword" required>
+        <div class="invalid-feedback">لطفاً تکرار رمز عبور را وارد کنید</div>
+      </div>
+    </div>
+    `;
+  }
+}
 } else if (accountType === 'company') {
 dynamicFields.innerHTML = `
 <div class="row">
