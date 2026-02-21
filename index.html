@@ -918,6 +918,51 @@ background: #f8f9fa;
 border-radius: 8px;
 padding: 15px;
 }
+.user-avatar {
+width: 80px;
+height: 80px;
+border-radius: 50%;
+background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+color: white;
+display: flex;
+align-items: center;
+justify-content: center;
+font-size: 2rem;
+font-weight: bold;
+margin: 0 auto;
+}
+.modal-content {
+border-radius: var(--border-radius-lg);
+border: none;
+}
+.modal-header {
+background: var(--gradient-primary);
+color: white;
+border-radius: var(--border-radius-lg) var(--border-radius-lg) 0 0;
+}
+.modal-header .btn-close {
+filter: brightness(0) invert(1);
+}
+.toast {
+position: fixed;
+top: 20px;
+left: 20px;
+z-index: 9999;
+min-width: 250px;
+}
+.skip-to-content {
+position: absolute;
+top: -40px;
+right: 0;
+background: var(--primary-color);
+color: white;
+padding: 8px 16px;
+text-decoration: none;
+z-index: 9999;
+}
+.skip-to-content:focus {
+top: 0;
+}
 @media (max-width: 768px) {
 .assistant-container { bottom: 20px; left: 20px; }
 .assistant-window { width: calc(100vw - 40px); height: 70vh; }
@@ -978,6 +1023,41 @@ body { background-color: #121212; color: #e0e0e0; }
 </style>
 </head>
 <body>
+<!-- مودال قوانین و مقررات -->
+<div class="modal fade" id="termsModal" tabindex="-1" aria-labelledby="termsModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="termsModalLabel">قوانین و مقررات پیمان‌یار</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="بستن"></button>
+      </div>
+      <div class="modal-body">
+        <h6>۱. قوانین عمومی</h6>
+        <p>استفاده از خدمات پلتفرم پیمان‌یار به معنای پذیرش کامل قوانین و مقررات زیر می‌باشد.</p>
+        
+        <h6>۲. ثبت‌نام و حساب کاربری</h6>
+        <p>کاربران موظفند اطلاعات صحیح و کامل در هنگام ثبت‌نام ارائه دهند. مسئولیت هرگونه اطلاعات نادرست بر عهده کاربر می‌باشد.</p>
+        
+        <h6>۳. حریم خصوصی</h6>
+        <p>اطلاعات کاربران نزد پیمان‌یار محفوظ بوده و بدون رضایت کاربر در اختیار اشخاص ثالث قرار نخواهد گرفت.</p>
+        
+        <h6>۴. قوانین قراردادها</h6>
+        <p>پیمان‌یار صرفاً یک پلتفرم ارتباطی است و مسئولیتی در قبال قراردادهای منعقد شده بین کارفرمایان و پیمانکاران ندارد.</p>
+        
+        <h6>۵. حق لغو عضویت</h6>
+        <p>پیمان‌یار این حق را برای خود محفوظ می‌دارد در صورت مشاهده تخلف، حساب کاربری را بدون اطلاع قبلی مسدود نماید.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">بستن</button>
+        <button type="button" class="btn btn-primary" onclick="acceptTerms()">پذیرش قوانین</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- کانتینر toast برای نمایش پیام‌ها -->
+<div id="toastContainer" style="position: fixed; top: 20px; left: 20px; z-index: 9999;"></div>
+
 <div class="assistant-container" role="complementary" aria-label="دستیار هوشمند">
 <div id="assistantWindow" class="assistant-window" aria-hidden="true" aria-label="پنجره دستیار هوشمند">
 <div class="assistant-header">
@@ -1042,7 +1122,7 @@ body { background-color: #121212; color: #e0e0e0; }
 <span class="d-none d-md-inline">حساب کاربری</span>
 </a>
 <ul class="dropdown-menu" aria-labelledby="userMenuDropdown">
-<li><a class="dropdown-item" href="#" onclick="showPage('dashboard')">پنل کاربری</a></li>
+<li><a class="dropdown-item" href="#" onclick="showPage('profile')">پنل کاربری</a></li>
 <li><a class="dropdown-item" href="#" onclick="showLogin()">ورود</a></li>
 <li><hr class="dropdown-divider"></li>
 <li><a class="dropdown-item" href="#" onclick="showEmployerRegistration()">ثبت‌نام کارفرما</a></li>
@@ -1060,6 +1140,8 @@ body { background-color: #121212; color: #e0e0e0; }
 </div>
 </div>
 </nav>
+
+<!-- صفحه اصلی -->
 <div id="home" class="page-section active" role="main" aria-label="صفحه اصلی">
 <section class="hero-section" aria-label="بخش معرفی" style="padding-top: 100px;">
 <div class="container">
@@ -1130,7 +1212,7 @@ body { background-color: #121212; color: #e0e0e0; }
 <div class="col-md-4 mb-4">
 <div class="card-peymanyar text-center">
 <div class="stat-icon mb-4">
-<i class="bi bi-shield-check" aria-hidden="true"></i>
+<i class="bi bi-shield-check" aria-hidden="true" style="font-size: 3rem; color: var(--primary-color);"></i>
 </div>
 <h4 class="mb-3">اعتبارسنجی هوشمند</h4>
 <p class="text-muted">بررسی کامل مدارک و سوابق پیمانکاران توسط تیم تخصصی</p>
@@ -1139,7 +1221,7 @@ body { background-color: #121212; color: #e0e0e0; }
 <div class="col-md-4 mb-4">
 <div class="card-peymanyar text-center">
 <div class="stat-icon mb-4">
-<i class="bi bi-search-heart" aria-hidden="true"></i>
+<i class="bi bi-search-heart" aria-hidden="true" style="font-size: 3rem; color: var(--primary-color);"></i>
 </div>
 <h4 class="mb-3">جستجوی پیشرفته</h4>
 <p class="text-muted">یافتن پیمانکار مناسب با فیلترهای متنوع و هوشمند</p>
@@ -1148,7 +1230,7 @@ body { background-color: #121212; color: #e0e0e0; }
 <div class="col-md-4 mb-4">
 <div class="card-peymanyar text-center">
 <div class="stat-icon mb-4">
-<i class="bi bi-chat-dots" aria-hidden="true"></i>
+<i class="bi bi-chat-dots" aria-hidden="true" style="font-size: 3rem; color: var(--primary-color);"></i>
 </div>
 <h4 class="mb-3">پشتیبانی ۲۴/۷</h4>
 <p class="text-muted">دستیار هوشمند و تیم پشتیبانی همیشه در دسترس</p>
@@ -1158,6 +1240,8 @@ body { background-color: #121212; color: #e0e0e0; }
 </div>
 </section>
 </div>
+
+<!-- صفحه ویژگی‌ها -->
 <div id="features" class="page-section" role="main" aria-label="صفحه ویژگی‌ها">
 <div class="container page-header">
 <h2 class="section-title mb-4">ویژگی‌های پلتفرم پیمان‌یار</h2>
@@ -1190,6 +1274,8 @@ body { background-color: #121212; color: #e0e0e0; }
 </div>
 </div>
 </div>
+
+<!-- صفحه جستجو -->
 <div id="search" class="page-section" role="main" aria-label="صفحه جستجوی پیمانکار">
 <div class="container page-header">
 <h2 class="section-title mb-4">جستجوی پیشرفته پیمانکاران</h2>
@@ -1251,6 +1337,8 @@ body { background-color: #121212; color: #e0e0e0; }
 <div class="search-results-grid" id="searchResults"></div>
 </div>
 </div>
+
+<!-- صفحه پروژه‌ها -->
 <div id="projects" class="page-section" role="main" aria-label="صفحه پروژه‌ها">
 <div class="container page-header">
 <h2 class="section-title mb-4">پروژه‌های فعال</h2>
@@ -1294,6 +1382,8 @@ body { background-color: #121212; color: #e0e0e0; }
 </div>
 </div>
 </div>
+
+<!-- صفحه پیام‌یار -->
 <div id="messages" class="page-section" role="main" aria-label="صفحه پیام‌یار">
 <div class="container page-header">
 <div class="messaging-page">
@@ -1354,6 +1444,8 @@ body { background-color: #121212; color: #e0e0e0; }
 </div>
 </div>
 </div>
+
+<!-- صفحه بلاگ -->
 <div id="blog" class="page-section" role="main" aria-label="صفحه بلاگ">
 <div class="container page-header">
 <h2 class="section-title mb-4">مقالات و مطالب آموزشی</h2>
@@ -1440,6 +1532,8 @@ body { background-color: #121212; color: #e0e0e0; }
 </div>
 </div>
 </div>
+
+<!-- صفحه ورود -->
 <div id="login" class="page-section" role="main" aria-label="صفحه ورود">
 <div class="container page-header">
 <div class="row justify-content-center">
@@ -1490,6 +1584,8 @@ body { background-color: #121212; color: #e0e0e0; }
 </div>
 </div>
 </div>
+
+<!-- صفحه فراموشی رمز عبور -->
 <div id="forgotPassword" class="page-section" role="main" aria-label="صفحه بازیابی رمز عبور">
 <div class="container page-header">
 <div class="row justify-content-center">
@@ -1522,6 +1618,8 @@ body { background-color: #121212; color: #e0e0e0; }
 </div>
 </div>
 </div>
+
+<!-- صفحه ورود ادمین -->
 <div id="adminLogin" class="page-section" role="main" aria-label="صفحه ورود ادمین">
 <div class="container page-header">
 <div class="row justify-content-center">
@@ -1561,6 +1659,8 @@ body { background-color: #121212; color: #e0e0e0; }
 </div>
 </div>
 </div>
+
+<!-- صفحه پنل مدیریت -->
 <div id="adminMessages" class="page-section" role="main" aria-label="پنل مدیریت پیام‌یار">
 <div class="container page-header">
 <div class="d-flex justify-content-between align-items-center mb-4">
@@ -1660,7 +1760,8 @@ body { background-color: #121212; color: #e0e0e0; }
 </div>
 </div>
 </div>
-<!-- صفحه پروفایل کاربر -->
+
+<!-- صفحه پروفایل کاربری -->
 <div id="profile" class="page-section" role="main" aria-label="صفحه پروفایل">
 <div class="container page-header">
 <div style="max-width: 800px; margin: 0 auto;">
@@ -1673,7 +1774,7 @@ body { background-color: #121212; color: #e0e0e0; }
 </div>
 <div id="profileViewMode">
 <div class="text-center mb-4">
-<div class="user-avatar" style="width: 100px; height: 100px; font-size: 2.5rem; margin: 0 auto;" id="profileAvatar">?</div>
+<div class="user-avatar" id="profileAvatar">?</div>
 <h3 class="mt-3" id="profileDisplayName">کاربر</h3>
 <p class="text-muted" id="profileDisplayEmail">ایمیل</p>
 </div>
@@ -1731,7 +1832,7 @@ body { background-color: #121212; color: #e0e0e0; }
 </div>
 <div class="d-flex gap-2 justify-content-end">
 <button type="button" class="btn btn-secondary" onclick="cancelProfileEdit()">انصراف</button>
-<button type="submit" class="btn btn-primary">ذخیره تغییرات</button>
+<button type="submit" class="btn btn-primary" onclick="saveProfileChanges()">ذخیره تغییرات</button>
 </div>
 </form>
 </div>
@@ -1739,6 +1840,8 @@ body { background-color: #121212; color: #e0e0e0; }
 </div>
 </div>
 </div>
+
+<!-- صفحه ثبت‌نام کارفرما -->
 <div id="employerRegistration" class="page-section" role="main" aria-label="صفحه ثبت‌نام کارفرما">
 <div class="registration-page">
 <div class="container mt-5 pt-5">
@@ -1771,13 +1874,6 @@ body { background-color: #121212; color: #e0e0e0; }
 </div>
 </div>
 <div id="employerDynamicFields"></div>
-<div class="row">
-<div class="col-md-6 mb-3">
-<label for="employerEmail" class="form-label required">ایمیل</label>
-<input type="email" class="form-control" id="employerEmail" required>
-<div class="invalid-feedback">لطفاً یک ایمیل معتبر وارد کنید</div>
-</div>
-</div>
 </div>
 <div class="form-section" id="employerSection2" style="display: none;">
 <h5><i class="bi bi-building me-2"></i>اطلاعات تماس و شرکت</h5>
@@ -1922,7 +2018,7 @@ body { background-color: #121212; color: #e0e0e0; }
 <div class="col-12 mb-3">
 <div class="form-check">
 <input class="form-check-input" type="checkbox" id="employerTerms" required>
-<label class="form-check-label" for="employerTerms">با <a href="#" class="text-primary">قوانین و مقررات</a> پیمان‌یار موافقم</label>
+<label class="form-check-label" for="employerTerms">با <a href="#" class="text-primary" onclick="showTermsModal()">قوانین و مقررات</a> پیمان‌یار موافقم</label>
 <div class="invalid-feedback">لطفاً قوانین و مقررات را بپذیرید</div>
 </div>
 </div>
@@ -1951,6 +2047,8 @@ body { background-color: #121212; color: #e0e0e0; }
 </div>
 </div>
 </div>
+
+<!-- صفحه ثبت‌نام پیمانکار -->
 <div id="contractorRegistration" class="page-section" role="main" aria-label="صفحه ثبت‌نام پیمانکار">
 <div class="registration-page">
 <div class="container mt-5 pt-5">
@@ -2052,7 +2150,7 @@ body { background-color: #121212; color: #e0e0e0; }
 </div>
 <div class="col-md-6 mb-3">
 <label class="form-label">زیرحوزه‌های تخصصی</label>
-<div id="subExpertiseContainer"><div class="form-text">پس از انتخاب تخصص اصلی، زیرحوزه‌ها ظاهر می‌شوند.</div></div>
+<div id="subExpertiseContainer"><div class="form-text">برای مشاهده زیرحوزه‌ها، ابتدا تخصص اصلی را انتخاب کنید.</div></div>
 </div>
 <div class="col-12 mb-4">
 <div class="project-scale-row">
@@ -2166,7 +2264,7 @@ body { background-color: #121212; color: #e0e0e0; }
 <div class="col-12 mb-4">
 <label class="form-label">مدارک و گواهینامه‌ها</label>
 <div class="upload-box" id="docUploadArea" role="button" tabindex="0" aria-label="آپلود مدارک">
-<i class="bi bi-cloud-arrow-up"></i>
+<i class="bi bi-cloud-arrow-up" style="font-size: 2rem;"></i>
 <p>فایل‌های خود را اینجا رها کنید یا برای انتخاب کلیک کنید</p>
 <small class="text-muted">پروانه کسب، گواهی صلاحیت، HSE و ... (حداکثر ۵ فایل)</small>
 <input type="file" class="d-none" id="documentUpload" multiple accept=".pdf,.jpg,.png">
@@ -2253,15 +2351,15 @@ body { background-color: #121212; color: #e0e0e0; }
 </select>
 </div>
 </div>
- <div class="col-12 mb-3">
-        <div class="form-check">
-            <input class="form-check-input" type="checkbox" id="contractorTerms" required>
-            <label class="form-check-label" for="contractorTerms">
-                <a href="#" onclick="event.preventDefault(); app.showTermsModal()" class="text-primary">قوانین و مقررات</a> را مطالعه کرده‌ام و می‌پذیرم
-            </label>
-            <div class="invalid-feedback">لطفاً قوانین و مقررات را بپذیرید</div>
-        </div>
-    </div>
+<div class="col-12 mb-3">
+<div class="form-check">
+<input class="form-check-input" type="checkbox" id="contractorTerms" required>
+<label class="form-check-label" for="contractorTerms">
+<a href="#" onclick="event.preventDefault(); showTermsModal()" class="text-primary">قوانین و مقررات</a> را مطالعه کرده‌ام و می‌پذیرم
+</label>
+<div class="invalid-feedback">لطفاً قوانین و مقررات را بپذیرید</div>
+</div>
+</div>
 <div class="summary-box" id="formSummary" style="display: none;">
 <h6><i class="bi bi-eye me-1"></i>پیش‌نمایش پروفایل شما</h6>
 <div id="summaryContent" class="mt-2"></div>
@@ -2280,86 +2378,12 @@ body { background-color: #121212; color: #e0e0e0; }
 </div>
 </form>
 </div>
-<!-- صفحه پروفایل کاربر -->
-<div id="profile" class="page-section" role="main" aria-label="صفحه پروفایل">
-<div class="container page-header">
-<div style="max-width: 800px; margin: 0 auto;">
-<div class="card-peymanyar">
-<div class="d-flex justify-content-between align-items-center mb-4">
-<h2 class="section-title" style="margin-bottom: 0;">👤 پروفایل کاربری</h2>
-<button class="btn btn-primary" onclick="enableProfileEdit()">
-<i class="bi bi-pencil me-2"></i>ویرایش پروفایل
-</button>
-</div>
-<div id="profileViewMode">
-<div class="text-center mb-4">
-<div class="user-avatar" style="width: 100px; height: 100px; font-size: 2.5rem; margin: 0 auto;" id="profileAvatar">?</div>
-<h3 class="mt-3" id="profileDisplayName">کاربر</h3>
-<p class="text-muted" id="profileDisplayEmail">ایمیل</p>
-</div>
-<div class="row">
-<div class="col-md-6 mb-3">
-<div class="border rounded p-3">
-<small class="text-muted d-block">نوع حساب</small>
-<strong id="profileDisplayType">-</strong>
-</div>
-</div>
-<div class="col-md-6 mb-3">
-<div class="border rounded p-3">
-<small class="text-muted d-block">تلفن همراه</small>
-<strong id="profileDisplayMobile">-</strong>
-</div>
-</div>
-<div class="col-md-6 mb-3">
-<div class="border rounded p-3">
-<small class="text-muted d-block">نام شرکت</small>
-<strong id="profileDisplayCompany">-</strong>
-</div>
-</div>
-<div class="col-12 mb-3">
-<div class="border rounded p-3">
-<small class="text-muted d-block">آدرس</small>
-<strong id="profileDisplayAddress">-</strong>
-</div>
-</div>
-</div>
-</div>
-<div id="profileEditMode" style="display: none;">
-<form id="profileEditForm">
-<div class="row">
-<div class="col-md-6 mb-3">
-<label class="form-label">نام و نام خانوادگی</label>
-<input type="text" class="form-control" id="editFullName">
-</div>
-<div class="col-md-6 mb-3">
-<label class="form-label">تلفن همراه</label>
-<input type="tel" class="form-control" id="editMobile" pattern="09[0-9]{9}">
-</div>
-<div class="col-md-6 mb-3">
-<label class="form-label">ایمیل</label>
-<input type="email" class="form-control" id="editEmail" readonly disabled>
-<small class="text-muted">ایمیل قابل تغییر نیست</small>
-</div>
-<div class="col-md-6 mb-3">
-<label class="form-label">نام شرکت</label>
-<input type="text" class="form-control" id="editCompany">
-</div>
-<div class="col-12 mb-3">
-<label class="form-label">آدرس</label>
-<textarea class="form-control" id="editAddress" rows="3"></textarea>
-</div>
-</div>
-<div class="d-flex gap-2 justify-content-end">
-<button type="button" class="btn btn-secondary" onclick="cancelProfileEdit()">انصراف</button>
-<button type="submit" class="btn btn-primary">ذخیره تغییرات</button>
-</div>
-</form>
-</div>
 </div>
 </div>
 </div>
 </div>
 
+<!-- فوتر -->
 <footer class="footer" role="contentinfo">
 <div class="container">
 <div class="row">
@@ -2427,8 +2451,17 @@ body { background-color: #121212; color: #e0e0e0; }
 </div>
 </div>
 </footer>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<script>
+<script type="module">
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+
+const supabaseUrl = 'https://fycyznoykgxpaatjsawi.supabase.co'
+const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ5Y3l6bm95a2d4cGFhdGpzYXdpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE2MDM0MjYsImV4cCI6MjA4NzE3OTQyNn0.fZQfDuaUW6jxQOF0be8eaK16mD-lHfPnyYht-0ryQSQ'
+
+const supabase = createClient(supabaseUrl, supabaseAnonKey)
+window.supabase = supabase
+
 'use strict';
 class PeymanyarApp {
 constructor() {
@@ -2447,12 +2480,42 @@ this.adminToken = null;
 this.adminEmail = null;
 this.init();
 }
+
+init() {
+this.setupEventListeners();
+this.setupForms();
+this.setupAssistant();
+this.animateCounters();
+this.setupAccessibility();
+this.loadUserData();
+this.setupMessagingSystem();
+this.setupHeroSlider();
+this.setupAdminSystem();
+this.setupLoginForms();
+}
+
+setupEventListeners() {
+window.addEventListener('popstate', (e) => {
+if (e.state && e.state.page) {
+this.showPage(e.state.page, false);
+}
+});
+document.addEventListener('keydown', (e) => {
+if (e.key === 'Escape') {
+this.closeAllModals();
+}
+});
+this.setupIntersectionObserver();
+}
+
 showTermsModal() {
-document.getElementById('termsModal').style.display = 'flex';
+const termsModal = new bootstrap.Modal(document.getElementById('termsModal'));
+termsModal.show();
 }
 
 closeTermsModal() {
-document.getElementById('termsModal').style.display = 'none';
+const termsModal = bootstrap.Modal.getInstance(document.getElementById('termsModal'));
+if (termsModal) termsModal.hide();
 }
 
 acceptTerms() {
@@ -2531,49 +2594,28 @@ this.loadProfile();
 }
 // ===== پایان توابع پروفایل =====
 
-init() {
-this.setupEventListeners();
-this.setupForms();
-this.setupAssistant();
-this.animateCounters();
-this.setupAccessibility();
-this.loadUserData();
-this.setupMessagingSystem();
-this.setupHeroSlider();
-this.setupAdminSystem();
-this.setupLoginForms();
-}
-setupEventListeners() {
-window.addEventListener('popstate', (e) => {
-if (e.state && e.state.page) {
-this.showPage(e.state.page, false);
-}
-});
-document.addEventListener('keydown', (e) => {
-if (e.key === 'Escape') {
-this.closeAllModals();
-}
-});
-this.setupIntersectionObserver();
-}
 setupForms() {
 this.setupEmployerForm();
 this.setupContractorForm();
 this.setupValidation();
 }
+
 setupAssistant() {
 this.loadAssistantMessages();
 this.setupAssistantEvents();
 }
+
 setupMessagingSystem() {
 window.PeymanYar = function() {
-showMessagesResult("تابع PeymanYar با موفقیت فراخوانی شد!<br>این تابع اصلی سیستم پیام‌یار است.");
+this.showMessagesResult("تابع PeymanYar با موفقیت فراخوانی شد!<br>این تابع اصلی سیستم پیام‌یار است.");
 };
 }
+
 setupAccessibility() {
 this.setupFocusTrap();
 this.addSkipToContentLink();
 }
+
 setupHeroSlider() {
 this.heroSlides = document.querySelectorAll('.hero-slide');
 this.heroSlideDots = document.querySelectorAll('.hero-slide-dot');
@@ -2595,26 +2637,31 @@ this.startHeroSlider();
 }
 }
 }
+
 startHeroSlider() {
 this.stopHeroSlider();
 this.heroSlideInterval = setInterval(() => {
 this.nextHeroSlide();
 }, 10000);
 }
+
 stopHeroSlider() {
 if (this.heroSlideInterval) {
 clearInterval(this.heroSlideInterval);
 this.heroSlideInterval = null;
 }
 }
+
 nextHeroSlide() {
 this.heroSlideIndex = (this.heroSlideIndex + 1) % this.heroSlides.length;
 this.updateHeroSlider();
 }
+
 goToHeroSlide(index) {
 this.heroSlideIndex = index;
 this.updateHeroSlider();
 }
+
 updateHeroSlider() {
 this.heroSlides.forEach(slide => {
 slide.classList.remove('active');
@@ -2629,6 +2676,7 @@ if (this.heroSlideDots[this.heroSlideIndex]) {
 this.heroSlideDots[this.heroSlideIndex].classList.add('active');
 }
 }
+
 showPage(pageId, pushState = true) {
 document.querySelectorAll('.page-section').forEach(page => {
 page.classList.remove('active');
@@ -2647,8 +2695,14 @@ history.pushState({ page: pageId }, '', `#${pageId}`);
 this.currentPage = pageId;
 this.updateActiveLinks(pageId);
 this.dispatchPageChangeEvent(pageId);
+
+// اگر صفحه پروفایل است، اطلاعات را بارگذاری کن
+if (pageId === 'profile') {
+this.loadProfile();
 }
 }
+}
+
 updateActiveLinks(pageId) {
 document.querySelectorAll('.nav-link').forEach(link => {
 link.classList.remove('active');
@@ -2660,31 +2714,38 @@ activeLink.classList.add('active');
 activeLink.setAttribute('aria-current', 'page');
 }
 }
+
 dispatchPageChangeEvent(pageId) {
 const event = new CustomEvent('pageChanged', { detail: { pageId } });
 window.dispatchEvent(event);
 }
+
 showMainPage() {
 this.showPage('home');
 }
+
 showLogin() {
 this.showPage('login');
 }
+
 showForgotPassword() {
 this.showPage('forgotPassword');
 }
+
 showMessagesResult(content) {
 const resultElement = document.getElementById('messagesResult');
 if (resultElement) {
 resultElement.innerHTML = content;
 }
 }
+
 showMessagesLoading(show) {
 const loadingElement = document.getElementById('messagesLoading');
 if (loadingElement) {
 loadingElement.style.display = show ? 'block' : 'none';
 }
 }
+
 analyzeMessages() {
 this.showMessagesLoading(true);
 setTimeout(() => {
@@ -2702,6 +2763,7 @@ this.showMessagesResult(`
 this.showMessagesLoading(false);
 }, 1500);
 }
+
 sendGroupMessage() {
 this.showMessagesLoading(true);
 setTimeout(() => {
@@ -2718,6 +2780,7 @@ this.showMessagesResult(`
 this.showMessagesLoading(false);
 }, 2000);
 }
+
 searchMessages() {
 this.showMessagesLoading(true);
 setTimeout(() => {
@@ -2740,6 +2803,7 @@ this.showMessagesResult(`
 this.showMessagesLoading(false);
 }, 1800);
 }
+
 showStatistics() {
 this.showMessagesLoading(true);
 setTimeout(() => {
@@ -2764,6 +2828,7 @@ this.showMessagesResult(`
 this.showMessagesLoading(false);
 }, 1200);
 }
+
 openSettings() {
 this.showMessagesResult(`
 <strong>⚙️ تنظیمات سیستم</strong><br><br>
@@ -2780,6 +2845,7 @@ this.showMessagesResult(`
 <button class="btn-messages" onclick="app.exportMessagesData()">خروجی گرفتن</button>
 `);
 }
+
 syncData() {
 this.showMessagesLoading(true);
 setTimeout(() => {
@@ -2797,6 +2863,7 @@ this.showMessagesResult(`
 this.showMessagesLoading(false);
 }, 2500);
 }
+
 cleanupStorage() {
 this.showMessagesLoading(true);
 setTimeout(() => {
@@ -2814,6 +2881,7 @@ this.showMessagesResult(`
 this.showMessagesLoading(false);
 }, 3000);
 }
+
 showHelp() {
 this.showMessagesResult(`
 <strong>📚 راهنمای استفاده از پیام‌یار</strong><br><br>
@@ -2836,6 +2904,7 @@ this.showMessagesResult(`
 <em>نسخه: ۲.۰.۱ - آخرین به‌روزرسانی: فروردین ۱۴۰۳</em>
 `);
 }
+
 changeMessagesTheme() {
 const messagingPage = document.querySelector('.messaging-page');
 if (messagingPage) {
@@ -2844,9 +2913,11 @@ messagingPage.style.color = '#e0e0e0';
 }
 this.showMessagesResult('تم سیستم پیام‌یار به حالت تاریک تغییر کرد.');
 }
+
 resetMessagesSettings() {
 this.showMessagesResult('تنظیمات سیستم پیام‌یار به حالت پیش‌فرض بازنشانی شدند.');
 }
+
 exportMessagesData() {
 this.showMessagesLoading(true);
 setTimeout(() => {
@@ -2854,6 +2925,7 @@ this.showMessagesResult('داده‌های سیستم پیام‌یار با ف�
 this.showMessagesLoading(false);
 }, 1500);
 }
+
 toggleAssistant() {
 const assistantWindow = document.getElementById('assistantWindow');
 const toggleBtn = document.querySelector('.assistant-toggle');
@@ -2871,6 +2943,7 @@ document.getElementById('assistantInput')?.focus();
 }, 100);
 }
 }
+
 sendAssistantMessage() {
 const input = document.getElementById('assistantInput');
 const message = input.value.trim();
@@ -2881,6 +2954,7 @@ setTimeout(() => {
 this.generateAssistantResponse(message);
 }, 1000);
 }
+
 addAssistantMessage(role, content) {
 const container = document.getElementById('assistantMessages');
 const messageDiv = document.createElement('div');
@@ -2891,6 +2965,7 @@ container.scrollTop = container.scrollHeight;
 this.assistantMessages.push({ role, content, timestamp: new Date().toISOString() });
 this.saveAssistantMessages();
 }
+
 generateAssistantResponse(userMessage) {
 const responses = {
 'ثبت نام': 'برای ثبت‌نام می‌توانید از منوی بالا روی دکمه "ثبت‌نام کارفرما" یا "ثبت‌نام پیمانکار" کلیک کنید.',
@@ -2913,6 +2988,7 @@ break;
 }
 this.addAssistantMessage('assistant', response);
 }
+
 loadAssistantMessages() {
 const saved = localStorage.getItem('peymanyar_assistant_messages');
 if (saved) {
@@ -2922,9 +2998,11 @@ this.renderAssistantMessages();
 this.addAssistantMessage('assistant', 'سلام! 👋 من دستیار هوشمند پیمان‌یار هستم. چطور می‌تونم کمکتون کنم؟');
 }
 }
+
 saveAssistantMessages() {
 localStorage.setItem('peymanyar_assistant_messages', JSON.stringify(this.assistantMessages.slice(-50)));
 }
+
 renderAssistantMessages() {
 const container = document.getElementById('assistantMessages');
 container.innerHTML = '';
@@ -2935,12 +3013,14 @@ messageDiv.innerHTML = `<div class="message-bubble">${this.sanitizeHTML(msg.cont
 container.appendChild(messageDiv);
 });
 }
+
 markAssistantAsRead() {
 const badge = document.getElementById('assistantNotification');
 if (badge) {
 badge.style.display = 'none';
 }
 }
+
 setupLoginForms() {
 const loginForm = document.getElementById('loginForm');
 if (loginForm) {
@@ -2957,6 +3037,7 @@ this.handleForgotPassword();
 });
 }
 }
+
 async handleLogin() {
 const email = document.getElementById('loginEmail').value;
 const password = document.getElementById('loginPassword').value;
@@ -2978,10 +3059,14 @@ if (profileError && profileError.code !== 'PGRST116') {
 console.error('خطا در دریافت پروفایل:', profileError);
 }
 
-this.currentUser = {
+this.userData = {
 id: data.user.id,
 email: data.user.email,
-...profile
+name: profile?.full_name || profile?.company_name || 'کاربر',
+mobile: profile?.phone || '',
+company: profile?.company_name || '',
+address: profile?.address || '',
+type: profile?.user_type || 'employer'
 };
 
 this.showToast('ورود موفقیت‌آمیز بود', 'success');
@@ -2991,6 +3076,7 @@ this.showPage('home');
 this.showToast('ایمیل یا رمز عبور اشتباه است', 'error');
 }
 }
+
 handleForgotPassword() {
 const email = document.getElementById('forgotEmail')?.value || '';
 if (!email) {
@@ -3002,6 +3088,7 @@ setTimeout(() => {
 this.showPage('login');
 }, 2000);
 }
+
 togglePasswordVisibility(id) {
 const input = document.getElementById(id);
 if (input.type === 'password') {
@@ -3010,6 +3097,7 @@ input.type = 'text';
 input.type = 'password';
 }
 }
+
 setupEmployerForm() {
 const accountTypeSelect = document.getElementById('employerAccountType');
 if (accountTypeSelect) {
@@ -3020,6 +3108,7 @@ document.getElementById('employerNextBtn').addEventListener('click', () => this.
 document.getElementById('employerPrevBtn').addEventListener('click', () => this.prevEmployerStep());
 document.getElementById('employerForm').addEventListener('submit', (e) => this.submitEmployerForm(e));
 }
+
 updateEmployerFields() {
 const accountType = document.getElementById('employerAccountType').value;
 const dynamicFields = document.getElementById('employerDynamicFields');
@@ -3094,6 +3183,7 @@ dynamicFields.innerHTML = `
 if (companyFields) companyFields.style.display = 'block';
 }
 }
+
 nextEmployerStep() {
 if (this.validateEmployerStep(this.employerCurrentStep)) {
 if (this.employerCurrentStep < this.employerTotalSteps) {
@@ -3105,6 +3195,7 @@ this.updateEmployerSummary();
 }
 }
 }
+
 prevEmployerStep() {
 if (this.employerCurrentStep > 1) {
 document.getElementById(`employerSection${this.employerCurrentStep}`).style.display = 'none';
@@ -3113,8 +3204,11 @@ document.getElementById(`employerSection${this.employerCurrentStep}`).style.disp
 this.updateEmployerNavigation();
 }
 }
+
 validateEmployerStep(step) {
 let isValid = true;
+this.clearValidationErrors();
+
 switch(step) {
 case 1:
 const accountType = document.getElementById('employerAccountType').value;
@@ -3127,7 +3221,9 @@ if (!email || !this.isValidEmail(email)) {
 this.showValidationError('employerEmail', 'لطفاً ایمیل معتبر وارد کنید');
 isValid = false;
 }
+if (!isValid) return false;
 break;
+
 case 2:
 const mobile = document.getElementById('employerMobile').value;
 const address = document.getElementById('employerAddress').value;
@@ -3139,17 +3235,21 @@ if (!address) {
 this.showValidationError('employerAddress', 'لطفاً آدرس را وارد کنید');
 isValid = false;
 }
+if (!isValid) return false;
 break;
+
 case 3:
 const projectTypes = document.querySelectorAll('input[name="projectType"]:checked');
 if (projectTypes.length === 0) {
 this.showValidationError('projectResidential', 'لطفاً حداقل یک نوع پروژه انتخاب کنید');
 isValid = false;
 }
+if (!isValid) return false;
 break;
 }
 return isValid;
 }
+
 updateEmployerNavigation() {
 const prevBtn = document.getElementById('employerPrevBtn');
 const nextBtn = document.getElementById('employerNextBtn');
@@ -3167,6 +3267,7 @@ nextBtn.style.display = 'block';
 submitBtn.style.display = 'none';
 }
 }
+
 updateEmployerSummary() {
 if (this.employerCurrentStep === 4) {
 const accountType = document.getElementById('employerAccountType').value;
@@ -3203,6 +3304,7 @@ const summaryHtml = `
 document.getElementById('employerSummary').innerHTML = summaryHtml;
 }
 }
+
 async submitEmployerForm(e) {
 e.preventDefault();
 if (!this.validateEmployerStep(this.employerCurrentStep)) {
@@ -3258,6 +3360,7 @@ this.showPage('home');
 this.showToast('خطا در ثبت‌نام: ' + error.message, 'error');
 }
 }
+
 setupContractorForm() {
 this.populateYearSelect('startYear', 1350, 1403);
 document.getElementById('accountType').addEventListener('change', () => this.updateContractorFields());
@@ -3288,6 +3391,7 @@ document.getElementById('contractorForm').addEventListener('submit', (e) => this
 this.updateContractorFields();
 this.updateContractorNavigation();
 }
+
 updateContractorFields() {
 const accountType = document.getElementById('accountType').value;
 const dynamicFields = document.getElementById('dynamicFields');
@@ -3359,10 +3463,12 @@ dynamicFields.innerHTML = `
 `;
 }
 }
+
 updateSubExpertise() {
 const mainExpertise = document.getElementById('mainExpertise').value;
 const subContainer = document.getElementById('subExpertiseContainer');
 if (!subContainer) return;
+
 const subExpertises = {
 'steel_fabrication': ['ساخت اسکلت فلزی صنعتی', 'ساخت اسکلت فلزی ساختمانی', 'ساخت سوله', 'ساخت پایپرک'],
 'steel_installation': ['نصاب سوله', 'نصاب اسکلت فلزی ساختمانی', 'نصاب سازه های صنعتی', 'نصاب پایپرک', 'نصاب هندریل و لدر', 'نصاب کارهای سبک'],
@@ -3370,9 +3476,10 @@ const subExpertises = {
 'concrete_execution': [],
 'support_teams': ['اکیپ نقشه برداری', 'اکیپ کنترل کیفیت', 'اکیپ ایمنی صنعتی']
 };
+
 if (mainExpertise && subExpertises[mainExpertise]) {
 const subs = subExpertises[mainExpertise];
-if (subs.length > 0) {
+if (subs && subs.length > 0) {
 let html = '<div class="row g-2">';
 subs.forEach((sub, index) => {
 html += `
@@ -3390,9 +3497,10 @@ subContainer.innerHTML = html;
 subContainer.innerHTML = '<div class="form-text">این تخصص زیرحوزه‌ای ندارد.</div>';
 }
 } else {
-subContainer.innerHTML = '<div class="form-text">برای این تخصص، زیرحوزه‌ای تعریف نشده است.</div>';
+subContainer.innerHTML = '<div class="form-text">برای مشاهده زیرحوزه‌ها، ابتدا تخصص اصلی را انتخاب کنید.</div>';
 }
 }
+
 updateAreaUnitLabel() {
 const areaUnit = document.getElementById('areaUnit').value;
 const formText = document.querySelector('.project-scale-row .form-text');
@@ -3404,6 +3512,7 @@ formText.textContent = 'برای پروژه‌های حجمی و بتنی';
 }
 }
 }
+
 handleWorkAreaSelection(e) {
 const select = e.target;
 const options = Array.from(select.options);
@@ -3422,6 +3531,7 @@ allOption.disabled = true;
 }
 }
 }
+
 handleFileUpload(e) {
 const files = e.target.files;
 const fileList = document.getElementById('fileList');
@@ -3447,6 +3557,7 @@ fileList.appendChild(fileItem);
 });
 this.showAutoSaveStatus('مدارک با موفقیت آپلود شدند.', 'success');
 }
+
 removeFile(index) {
 const input = document.getElementById('documentUpload');
 const files = Array.from(input.files);
@@ -3456,6 +3567,7 @@ files.forEach(file => dt.items.add(file));
 input.files = dt.files;
 this.handleFileUpload({ target: input });
 }
+
 addProject() {
 const container = document.getElementById('projectContainer');
 const projectCount = container.children.length + 1;
@@ -3500,6 +3612,7 @@ const yearSelect = projectDiv.querySelector('select[name="projectYear[]"]');
 this.populateYearSelect(yearSelect, 1380, 1403);
 this.showAutoSaveStatus('پروژه جدید اضافه شد.', 'success');
 }
+
 removeProject(button) {
 const projectCard = button.closest('.project-card');
 if (projectCard && document.getElementById('projectContainer').children.length > 1) {
@@ -3509,6 +3622,7 @@ this.showAutoSaveStatus('پروژه حذف شد.', 'success');
 this.showToast('حداقل یک پروژه باید وجود داشته باشد.', 'error');
 }
 }
+
 nextContractorStep() {
 if (this.validateContractorStep(this.contractorCurrentStep)) {
 if (this.contractorCurrentStep < this.contractorTotalSteps) {
@@ -3524,6 +3638,7 @@ this.updateContractorSummary();
 }
 }
 }
+
 prevContractorStep() {
 if (this.contractorCurrentStep > 1) {
 document.getElementById(`section${this.contractorCurrentStep}`).style.display = 'none';
@@ -3534,9 +3649,9 @@ this.updateStepIndicator();
 this.updateContractorNavigation();
 }
 }
+
 validateContractorStep(step) {
 let isValid = true;
-// اول همه خطاهای قبلی رو پاک کن
 this.clearValidationErrors();
 
 switch(step) {
@@ -3556,11 +3671,9 @@ if (!mobile || !this.isValidMobile(mobile)) {
 this.showValidationError('mobile', 'لطفاً شماره موبایل معتبر وارد کنید');
 isValid = false;
 }
-// اگه اعتبارسنجی failed شد، از رفتن به مرحله بعد جلوگیری کن
-if (!isValid) {
-return false;
-}
+if (!isValid) return false;
 break;
+
 case 2:
 const mainExpertise = document.getElementById('mainExpertise').value;
 const workArea = document.getElementById('workArea');
@@ -3573,15 +3686,18 @@ if (selectedAreas.length === 0) {
 this.showValidationError('workArea', 'لطفاً حداقل یک محدوده جغرافیایی انتخاب کنید');
 isValid = false;
 }
+if (!isValid) return false;
 break;
 }
 return isValid;
 }
+
 updateProgressBar() {
 const progress = (this.contractorCurrentStep / this.contractorTotalSteps) * 100;
 document.getElementById('progressBarFill').style.width = progress + '%';
 document.getElementById('progressBarFill').setAttribute('aria-valuenow', progress);
 }
+
 updateStepIndicator() {
 for (let i = 1; i <= this.contractorTotalSteps; i++) {
 const step = document.getElementById(`step${i}`);
@@ -3592,6 +3708,7 @@ step.classList.remove('active');
 }
 }
 }
+
 updateContractorNavigation() {
 const prevBtn = document.getElementById('prevBtn');
 const nextBtn = document.getElementById('nextBtn');
@@ -3609,6 +3726,7 @@ nextBtn.style.display = 'block';
 submitBtn.style.display = 'none';
 }
 }
+
 updateContractorSummary() {
 const accountType = document.getElementById('accountType').value;
 let name = '';
@@ -3646,6 +3764,7 @@ const summaryHtml = `
 document.getElementById('summaryContent').innerHTML = summaryHtml;
 document.getElementById('formSummary').style.display = 'block';
 }
+
 async submitContractorForm(e) {
 e.preventDefault();
 if (!this.validateContractorStep(this.contractorCurrentStep)) {
@@ -3700,6 +3819,7 @@ this.showPage('home');
 this.showToast('خطا در ثبت‌نام: ' + error.message, 'error');
 }
 }
+
 showEmployerRegistration() {
 this.showPage('employerRegistration');
 this.employerCurrentStep = 1;
@@ -3715,6 +3835,7 @@ document.getElementById('employerForm').reset();
 this.updateEmployerFields();
 this.clearValidationErrors();
 }
+
 showContractorRegistration() {
 this.showPage('contractorRegistration');
 this.contractorCurrentStep = 1;
@@ -3743,6 +3864,7 @@ opt.selected = false;
 });
 document.getElementById('formSummary').style.display = 'none';
 }
+
 populateYearSelect(selectId, startYear, endYear) {
 let selectElement;
 if (typeof selectId === 'string') {
@@ -3761,6 +3883,7 @@ option.text = year;
 selectElement.appendChild(option);
 }
 }
+
 showAutoSaveStatus(message, type = 'success') {
 const statusElement = document.getElementById('autoSaveStatus');
 if (statusElement) {
@@ -3772,6 +3895,7 @@ statusElement.className = 'auto-save-status';
 }, 3000);
 }
 }
+
 showValidationError(fieldId, message) {
 const field = document.getElementById(fieldId);
 if (field) {
@@ -3787,6 +3911,7 @@ feedback.style.display = 'block';
 field.scrollIntoView({ behavior: 'smooth', block: 'center' });
 }
 }
+
 clearValidationErrors() {
 document.querySelectorAll('.is-invalid').forEach(field => {
 field.classList.remove('is-invalid');
@@ -3795,6 +3920,7 @@ document.querySelectorAll('.invalid-feedback').forEach(feedback => {
 feedback.style.display = 'none';
 });
 }
+
 setupValidation() {
 const emailInputs = document.querySelectorAll('input[type="email"]');
 emailInputs.forEach(input => {
@@ -3813,19 +3939,23 @@ this.showValidationError(input.id, 'لطفاً شماره موبایل معتب�
 });
 });
 }
+
 isValidEmail(email) {
 const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 return re.test(email);
 }
+
 isValidMobile(mobile) {
 const re = /^09[0-9]{9}$/;
 return re.test(mobile);
 }
+
 sanitizeHTML(text) {
 const div = document.createElement('div');
 div.textContent = text;
 return div.innerHTML;
 }
+
 performSearch() {
 const keyword = document.getElementById('searchKeyword').value;
 const specialty = document.getElementById('searchSpecialty').value;
@@ -3848,6 +3978,7 @@ return true;
 });
 this.displaySearchResults(filteredResults);
 }
+
 displaySearchResults(results) {
 const container = document.getElementById('searchResults');
 if (results.length === 0) {
@@ -3886,6 +4017,7 @@ ${this.generateStars(result.rating)}
 </div>
 `).join('');
 }
+
 generateStars(rating) {
 let stars = '';
 const fullStars = Math.floor(rating);
@@ -3896,12 +4028,15 @@ const remaining = 5 - fullStars - (hasHalfStar ? 1 : 0);
 for (let i = 0; i < remaining; i++) stars += '<i class="bi bi-star text-warning"></i>';
 return stars;
 }
+
 viewContractorProfile(id) {
 this.showToast(`پروفایل پیمانکار ${id} در حال بارگذاری...`, 'info');
 }
+
 contactContractor(id) {
 this.showToast(`ارتباط با پیمانکار ${id} برقرار شد`, 'success');
 }
+
 animateCounters() {
 const counters = document.querySelectorAll('.stat-value[data-count]');
 const observer = new IntersectionObserver((entries) => {
@@ -3916,6 +4051,7 @@ observer.unobserve(counter);
 }, { threshold: 0.5 });
 counters.forEach(counter => observer.observe(counter));
 }
+
 animateCounter(element, target) {
 let count = 0;
 const increment = target / 50;
@@ -3925,31 +4061,40 @@ count += increment;
 element.textContent = Math.ceil(count).toLocaleString('fa-IR');
 requestAnimationFrame(step);
 } else {
-element.textContent = target.toLocaleString('fa-IR');
+element.textContent = target.toLocaleString('fa-IR') + (element.getAttribute('data-count') === '98' ? '٪' : '');
 }
 };
 requestAnimationFrame(step);
 }
+
 createNewProject() {
 this.showToast('این قابلیت در نسخه کامل پیاده‌سازی می‌شود', 'info');
 }
+
 async logout() {
 await supabase.auth.signOut();
-this.currentUser = null;
+this.userData = null;
 this.updateNavigation();
 this.showPage('home');
 this.showToast('با موفقیت خارج شدید', 'success');
 }
+
 saveUserData(data) {
 this.userData = data;
 localStorage.setItem('peymanyar_user', JSON.stringify(data));
 }
+
 loadUserData() {
 const saved = localStorage.getItem('peymanyar_user');
 if (saved) {
 this.userData = JSON.parse(saved);
 }
 }
+
+updateNavigation() {
+// این تابع برای به‌روزرسانی منو بر اساس وضعیت ورود
+}
+
 setupIntersectionObserver() {
 const observer = new IntersectionObserver((entries) => {
 entries.forEach(entry => {
@@ -3962,6 +4107,7 @@ document.querySelectorAll('.card-peymanyar').forEach(card => {
 observer.observe(card);
 });
 }
+
 setupFocusTrap() {
 const modals = document.querySelectorAll('.modal');
 modals.forEach(modal => {
@@ -3985,6 +4131,7 @@ e.preventDefault();
 });
 });
 }
+
 addSkipToContentLink() {
 const skipLink = document.createElement('a');
 skipLink.href = '#main-content';
@@ -3995,37 +4142,39 @@ skipLink.addEventListener('focus', () => { skipLink.style.top = '0'; });
 skipLink.addEventListener('blur', () => { skipLink.style.top = '-40px'; });
 document.body.prepend(skipLink);
 }
+
 setupAssistantEvents() {
-document.getElementById('assistantInput').addEventListener('keypress', (e) => {
+const input = document.getElementById('assistantInput');
+if (input) {
+input.addEventListener('keypress', (e) => {
 if (e.key === 'Enter') this.sendAssistantMessage();
 });
+}
 document.addEventListener('keydown', (e) => {
 if (e.key === 'Escape') {
 const assistantWindow = document.getElementById('assistantWindow');
-if (assistantWindow.classList.contains('active')) {
+if (assistantWindow && assistantWindow.classList.contains('active')) {
 this.toggleAssistant();
 }
 }
 });
 }
+
 closeAllModals() {
 document.querySelectorAll('.modal').forEach(modal => {
 const bsModal = bootstrap.Modal.getInstance(modal);
 if (bsModal) bsModal.hide();
 });
 const assistantWindow = document.getElementById('assistantWindow');
-if (assistantWindow.classList.contains('active')) {
+if (assistantWindow && assistantWindow.classList.contains('active')) {
 this.toggleAssistant();
 }
 }
+
 showToast(message, type = 'info') {
-const toastContainer = document.getElementById('toastContainer') || (() => {
-const container = document.createElement('div');
-container.id = 'toastContainer';
-container.style.cssText = 'position: fixed; top: 20px; left: 20px; z-index: 9999;';
-document.body.appendChild(container);
-return container;
-})();
+const toastContainer = document.getElementById('toastContainer');
+if (!toastContainer) return;
+
 const toast = document.createElement('div');
 toast.className = `toast align-items-center text-bg-${type} border-0`;
 toast.setAttribute('role', 'alert');
@@ -4042,6 +4191,7 @@ const bsToast = new bootstrap.Toast(toast, { animation: true, autohide: true, de
 bsToast.show();
 toast.addEventListener('hidden.bs.toast', () => { toast.remove(); });
 }
+
 setupAdminSystem() {
 this.checkAdminStatus();
 const adminLoginForm = document.getElementById('adminLoginForm');
@@ -4052,6 +4202,7 @@ this.adminLogin();
 });
 }
 }
+
 checkAdminStatus() {
 const adminToken = localStorage.getItem('peymanyar_admin_token');
 const adminEmail = localStorage.getItem('peymanyar_admin_email');
@@ -4062,12 +4213,15 @@ this.adminEmail = adminEmail;
 this.showAdminControls();
 }
 }
+
 showAdminControls() {
 document.querySelectorAll('.admin-only').forEach(link => { link.style.display = 'block'; });
 }
+
 hideAdminControls() {
 document.querySelectorAll('.admin-only').forEach(link => { link.style.display = 'none'; });
 }
+
 adminLogin() {
 const email = document.getElementById('adminEmail')?.value || '';
 const password = document.getElementById('adminPassword')?.value || '';
@@ -4087,6 +4241,7 @@ this.showAdminControls();
 this.showToast('ایمیل یا رمز عبور نامعتبر است', 'error');
 }
 }
+
 adminLogout() {
 localStorage.removeItem('peymanyar_admin_token');
 localStorage.removeItem('peymanyar_admin_email');
@@ -4097,9 +4252,11 @@ this.hideAdminControls();
 this.showToast('از پنل مدیریت خارج شدید', 'success');
 this.showPage('home');
 }
+
 showAdminLogin() {
 this.showPage('adminLogin');
 }
+
 showAdminMessages() {
 if (!this.isAdmin) {
 this.showToast('برای دسترسی به پنل مدیریت باید وارد شوید', 'error');
@@ -4107,8 +4264,9 @@ this.showAdminLogin();
 return;
 }
 this.showPage('adminMessages');
-this.loadAdminStats();
+setTimeout(() => this.loadAdminStats(), 100);
 }
+
 loadAdminStats() {
 if (!this.isAdmin) return;
 setTimeout(() => {
@@ -4118,6 +4276,7 @@ if (document.getElementById('adminStorageUsed')) document.getElementById('adminS
 if (document.getElementById('adminSystemHealth')) document.getElementById('adminSystemHealth').textContent = '100%';
 }, 100);
 }
+
 adminAnalyzeMessages() {
 this.showAdminLoading(true);
 setTimeout(() => {
@@ -4126,6 +4285,7 @@ this.showAdminResult(result);
 this.showAdminLoading(false);
 }, 2000);
 }
+
 adminSendBroadcast() {
 this.showAdminLoading(true);
 setTimeout(() => {
@@ -4134,6 +4294,7 @@ this.showAdminResult(result);
 this.showAdminLoading(false);
 }, 1000);
 }
+
 adminAdvancedSearch() {
 this.showAdminLoading(true);
 setTimeout(() => {
@@ -4142,6 +4303,7 @@ this.showAdminResult(result);
 this.showAdminLoading(false);
 }, 1000);
 }
+
 adminSystemStats() {
 this.showAdminLoading(true);
 setTimeout(() => {
@@ -4150,6 +4312,7 @@ this.showAdminResult(result);
 this.showAdminLoading(false);
 }, 1500);
 }
+
 adminSystemSettings() {
 this.showAdminLoading(true);
 setTimeout(() => {
@@ -4158,6 +4321,7 @@ this.showAdminResult(result);
 this.showAdminLoading(false);
 }, 1000);
 }
+
 adminUserManagement() {
 this.showAdminLoading(true);
 setTimeout(() => {
@@ -4166,6 +4330,7 @@ this.showAdminResult(result);
 this.showAdminLoading(false);
 }, 1500);
 }
+
 adminAdvancedCleanup() {
 this.showAdminLoading(true);
 setTimeout(() => {
@@ -4174,6 +4339,7 @@ this.showAdminResult(result);
 this.showAdminLoading(false);
 }, 1000);
 }
+
 executeCleanup() {
 this.showAdminLoading(true);
 setTimeout(() => {
@@ -4181,6 +4347,7 @@ this.showAdminResult('<strong>✅ پاکسازی با موفقیت انجام ش
 this.showAdminLoading(false);
 }, 3000);
 }
+
 adminViewLogs() {
 this.showAdminLoading(true);
 setTimeout(() => {
@@ -4189,15 +4356,18 @@ this.showAdminResult(result);
 this.showAdminLoading(false);
 }, 1000);
 }
+
 showAdminLoading(show) {
 const loadingElement = document.getElementById('adminMessagesLoading');
 if (loadingElement) loadingElement.style.display = show ? 'block' : 'none';
 }
+
 showAdminResult(content) {
 const resultElement = document.getElementById('adminMessagesResult');
 if (resultElement) resultElement.innerHTML = content;
 }
 }
+
 let app;
 document.addEventListener('DOMContentLoaded', () => {
 app = new PeymanyarApp();
@@ -4208,6 +4378,7 @@ const notification = document.getElementById('assistantNotification');
 if (notification) notification.style.display = 'flex';
 }, 2000);
 });
+
 window.showPage = (pageId) => app?.showPage(pageId);
 window.showMainPage = () => app?.showMainPage();
 window.showLogin = () => app?.showLogin();
@@ -4245,13 +4416,13 @@ window.adminAdvancedCleanup = () => app?.adminAdvancedCleanup();
 window.adminViewLogs = () => app?.adminViewLogs();
 window.executeCleanup = () => app?.executeCleanup();
 window.togglePasswordVisibility = (id) => app?.togglePasswordVisibility(id);
-window.app = app;
 window.showTermsModal = () => app?.showTermsModal();
 window.closeTermsModal = () => app?.closeTermsModal();
 window.acceptTerms = () => app?.acceptTerms();
 window.enableProfileEdit = () => app?.enableProfileEdit();
 window.cancelProfileEdit = () => app?.cancelProfileEdit();
 window.saveProfileChanges = () => app?.saveProfileChanges();
+window.app = app;
 </script>
 </body>
 </html>
