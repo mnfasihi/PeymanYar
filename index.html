@@ -4124,7 +4124,7 @@ const summaryHtml = `
 document.getElementById('employerSummary').innerHTML = summaryHtml;
 }
 }
-// خط 5318 - تابع submitEmployerForm (جایگزین کن)
+// خط 5318 - تابع submitEmployerForm (کامل و اصلاح شده)
 async submitEmployerForm(e) {
   e.preventDefault();
 
@@ -4183,7 +4183,7 @@ async submitEmployerForm(e) {
         if (authError.status === 429) {
           retries--;
           if (retries > 0) {
-            const waitTime = Math.pow(2, attempt) * 1000; // exponential backoff
+            const waitTime = Math.pow(2, attempt) * 1000;
             this.showToast(`محدودیت ثبت‌نام. تلاش مجدد در ${waitTime/1000} ثانیه...`, 'warning');
             await new Promise(resolve => setTimeout(resolve, waitTime));
           }
@@ -4209,24 +4209,77 @@ async submitEmployerForm(e) {
       }
     }
 
- if (!success) {
-  throw new Error('محدودیت ثبت‌نام موقتاً اعمال شده. لطفاً ۱۰ دقیقه بعد تلاش کنید.');
-}
+    if (!success) {
+      throw new Error('محدودیت ثبت‌نام موقتاً اعمال شده. لطفاً ۱۰ دقیقه بعد تلاش کنید.');
+    }
 
-if (!authData || !authData.user) {
-  throw new Error('خطا در ثبت‌نام. لطفاً مجدداً تلاش کنید.');
-}
+    if (!authData || !authData.user) {
+      throw new Error('خطا در ثبت‌نام. لطفاً مجدداً تلاش کنید.');
+    }
 
-// ادامه کد ثبت‌نام کارفرما...
-// ... (بقیه کد تابع submitEmployerForm که باید کامل شود)
+    // آماده‌سازی اطلاعات پروفایل کارفرما
+    const profileData = {
+      user_id: authData.user.id,
+      email,
+      user_type: 'employer',
+      account_type: accountType,
+      phone: mobile,
+      address: address,
+      created_at: new Date().toISOString(),
+      terms_accepted_at: terms ? new Date().toISOString() : null,
+      terms_version: '1.0'
+    };
 
-} catch (error) {
-  console.error('خطای ثبت‌نام:', error);
-  this.showToast('خطا در ثبت‌نام: ' + error.message, 'error');
-} finally {
-  submitBtn.innerHTML = originalText;
-  submitBtn.disabled = false;
-}
+    if (accountType === 'individual') {
+      profileData.full_name = document.getElementById('employerFullName')?.value;
+      profileData.national_code = document.getElementById('employerNationalCode')?.value;
+    } else {
+      profileData.company_name = document.getElementById('employerCompanyName')?.value;
+      profileData.company_id = document.getElementById('employerCompanyId')?.value;
+      profileData.registration_no = document.getElementById('employerRegistrationNo')?.value;
+      profileData.company_type = document.getElementById('employerCompanyType')?.value;
+      profileData.website = document.getElementById('employerCompanyWebsite')?.value;
+      profileData.company_description = document.getElementById('employerCompanyDescription')?.value;
+    }
+
+    // ذخیره پروفایل کارفرما
+    const { error: profileError } = await supabase
+      .from('profiles')
+      .insert([profileData]);
+
+    if (profileError) {
+      try {
+        await supabase.auth.admin.deleteUser(authData.user.id);
+      } catch (deleteError) {
+        console.error('خطا در حذف کاربر:', deleteError);
+      }
+      throw profileError;
+    }
+
+    this.showToast('ثبت‌نام کارفرما با موفقیت انجام شد!', 'success');
+
+    this.userData = {
+      id: authData.user.id,
+      email,
+      full_name: profileData.full_name || profileData.company_name,
+      phone: mobile,
+      user_type: 'employer',
+      account_type: accountType,
+      terms_accepted: true
+    };
+    localStorage.setItem('peymanyar_user', JSON.stringify(this.userData));
+
+    setTimeout(() => {
+      this.showPage('home');
+    }, 1500);
+
+  } catch (error) {
+    console.error('خطای ثبت‌نام:', error);
+    this.showToast('خطا در ثبت‌نام: ' + error.message, 'error');
+  } finally {
+    submitBtn.innerHTML = originalText;
+    submitBtn.disabled = false;
+  }
 } // پایان تابع submitEmployerForm
 
 // ========== شروع توابع پیمانکار ==========
@@ -4334,40 +4387,7 @@ updateContractorFields() {
     `;
   }
 }
-} else if (accountType === 'company') {
-dynamicFields.innerHTML = `
-<div class="row">
-<div class="col-md-6 mb-3">
-<label for="companyName" class="form-label required">نام شرکت/مؤسسه</label>
-<input type="text" class="form-control" id="companyName" required>
-<div class="invalid-feedback">لطفاً نام شرکت را وارد کنید</div>
-</div>
-<div class="col-md-6 mb-3">
-<label for="companyId" class="form-label required">شناسه ملی شرکت</label>
-<input type="text" class="form-control" id="companyId" required>
-<div class="invalid-feedback">لطفاً شناسه ملی شرکت را وارد کنید</div>
-</div>
-</div>
-<div class="row">
-<div class="col-md-6 mb-3">
-<label for="contractorEmail" class="form-label required">ایمیل</label>
-<input type="email" class="form-control" id="contractorEmail" required>
-<div class="invalid-feedback">لطفاً ایمیل معتبر وارد کنید</div>
-</div>
-<div class="col-md-6 mb-3">
-<label for="contractorPassword" class="form-label required">رمز عبور</label>
-<input type="password" class="form-control" id="contractorPassword" required>
-<div class="invalid-feedback">لطفاً رمز عبور را وارد کنید</div>
-</div>
-<div class="col-md-6 mb-3">
-<label for="contractorConfirmPassword" class="form-label required">تکرار رمز عبور</label>
-<input type="password" class="form-control" id="contractorConfirmPassword" required>
-<div class="invalid-feedback">لطفاً تکرار رمز عبور را وارد کنید</div>
-</div>
-</div>
-`;
-}
-}
+
 // تابع ثبت‌نام پیمانکار
 async submitContractorForm(e) {
   e.preventDefault();
