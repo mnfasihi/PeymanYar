@@ -4216,7 +4216,6 @@ async submitEmployerForm(e) {
     if (!authData || !authData.user) {
       throw new Error('خطا در ثبت‌نام. لطفاً مجدداً تلاش کنید.');
     }
-}
 setupContractorForm() {
 this.populateYearSelect('startYear', 1350, 1403);
 document.getElementById('accountType').addEventListener('change', () => this.updateContractorFields());
