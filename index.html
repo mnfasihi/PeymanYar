@@ -2633,10 +2633,12 @@ showPage(pageId, pushState = true) {
 document.querySelectorAll('.page-section').forEach(page => {
 page.classList.remove('active');
 page.setAttribute('aria-hidden', 'true');
+page.style.display = 'none';
 });
 const targetPage = document.getElementById(pageId);
 if (targetPage) {
 targetPage.classList.add('active');
+targetPage.style.display = 'block';
 targetPage.setAttribute('aria-hidden', 'false');
 window.scrollTo({ top: 0, behavior: 'smooth' });
 if (pushState) {
