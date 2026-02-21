@@ -4622,33 +4622,31 @@ document.getElementById('formSummary').style.display = 'block';
 }
 
 // تابع ثبت‌نام پیمانکار
-// خط 5723 - تابع submitContractorForm (جایگزین کن)
-async submitContractorForm(e) {
+// خط 5318 - تابع submitEmployerForm
+async submitEmployerForm(e) {
   e.preventDefault();
 
   // بررسی اعتبارسنجی مرحله
-  if (!this.validateContractorStep(this.contractorCurrentStep)) {
+  if (!this.validateEmployerStep(this.employerCurrentStep)) {
     return;
   }
 
   // بررسی پذیرش قوانین
-  const terms = document.getElementById('contractorTerms').checked;
+  const terms = document.getElementById('employerTerms').checked;
   if (!terms) {
     this.showToast('لطفاً با قوانین و مقررات موافقت کنید.', 'error');
     return;
   }
 
   // دریافت اطلاعات فرم
-  const accountType = document.getElementById('accountType').value;
-  const email = document.getElementById('contractorEmail').value;
-  const password = document.getElementById('contractorPassword').value;
-  const mobile = document.getElementById('mobile').value;
-  const contactPerson = document.getElementById('contactPerson').value;
-  const mainExpertise = document.getElementById('mainExpertise').value;
-  const phone = document.getElementById('phone')?.value || '';
+  const accountType = document.getElementById('employerAccountType').value;
+  const email = document.getElementById('employerEmail').value;
+  const password = document.getElementById('employerPassword').value;
+  const mobile = document.getElementById('employerMobile').value;
+  const address = document.getElementById('employerAddress').value;
 
   // غیرفعال کردن دکمه ثبت‌نام
-  const submitBtn = document.getElementById('submitBtn');
+  const submitBtn = document.getElementById('employerSubmitBtn');
   const originalText = submitBtn.innerHTML;
   submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>در حال ثبت‌نام...';
   submitBtn.disabled = true;
@@ -4683,7 +4681,7 @@ async submitContractorForm(e) {
         if (authError.status === 429) {
           retries--;
           if (retries > 0) {
-            const waitTime = Math.pow(2, attempt) * 1000; // exponential backoff
+            const waitTime = Math.pow(2, attempt) * 1000;
             this.showToast(`محدودیت ثبت‌نام. تلاش مجدد در ${waitTime/1000} ثانیه...`, 'warning');
             await new Promise(resolve => setTimeout(resolve, waitTime));
           }
@@ -4716,6 +4714,69 @@ async submitContractorForm(e) {
     if (!authData || !authData.user) {
       throw new Error('خطا در ثبت‌نام. لطفاً مجدداً تلاش کنید.');
     }
+
+    // آماده‌سازی اطلاعات پروفایل
+    const profileData = {
+      user_id: authData.user.id,
+      email,
+      user_type: 'employer',
+      account_type: accountType,
+      phone: mobile,
+      address,
+      created_at: new Date().toISOString(),
+      terms_accepted_at: terms ? new Date().toISOString() : null,
+      terms_version: '1.0'
+    };
+
+    if (accountType === 'individual') {
+      profileData.full_name = document.getElementById('employerFullName')?.value;
+      profileData.national_code = document.getElementById('employerNationalCode')?.value;
+    } else {
+      profileData.company_name = document.getElementById('employerCompanyName')?.value;
+      profileData.company_id = document.getElementById('employerCompanyId')?.value;
+      profileData.registration_no = document.getElementById('employerRegistrationNo')?.value;
+      profileData.company_type = document.getElementById('employerCompanyType')?.value;
+    }
+
+    // ذخیره پروفایل
+    const { error: profileError } = await supabase
+      .from('profiles')
+      .insert([profileData]);
+
+    if (profileError) {
+      try {
+        await supabase.auth.admin.deleteUser(authData.user.id);
+      } catch (deleteError) {
+        console.error('خطا در حذف کاربر:', deleteError);
+      }
+      throw profileError;
+    }
+
+    this.showToast('ثبت‌نام کارفرما با موفقیت انجام شد!', 'success');
+
+    this.userData = {
+      id: authData.user.id,
+      email,
+      full_name: profileData.full_name || profileData.company_name,
+      phone: mobile,
+      address,
+      user_type: 'employer',
+      account_type: accountType,
+      terms_accepted: true
+    };
+    localStorage.setItem('peymanyar_user', JSON.stringify(this.userData));
+
+    setTimeout(() => {
+      this.showPage('home');
+    }, 1500);
+
+  } catch (error) {
+    console.error('خطای ثبت‌نام:', error);
+    this.showToast('خطا در ثبت‌نام: ' + error.message, 'error');
+  } finally {
+    submitBtn.innerHTML = originalText;
+    submitBtn.disabled = false;
+  }
 }
 showEmployerRegistration() {
 this.showPage('employerRegistration');
