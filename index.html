@@ -5694,7 +5694,7 @@ async loadRealStats() {
       .select('*', { count: 'exact', head: true })
       .eq('user_type', 'employer');
     
-    // آمار پروژه - اگه جدول نبود، 0 در نظر بگیر
+    // آمار واقعی پروژه‌ها
     let realProjects = 0;
     try {
       const { count } = await supabase
@@ -5705,10 +5705,10 @@ async loadRealStats() {
       realProjects = 0;
     }
 
-    // مقدار پایه (برای نمایش)
-    const BASE_CONTRACTORS = 1250;  // پیمانکار پایه
-    const BASE_EMPLOYERS = 320;     // کارفرمای پایه
-    const BASE_PROJECTS = 540;      // پروژه پایه
+    // مقدار پایه (Base) - برای نمایش اولیه
+    const BASE_CONTRACTORS = 150;   // پیمانکار پایه
+    const BASE_EMPLOYERS = 100;     // کارفرمای پایه
+    const BASE_PROJECTS = 75;       // پروژه پایه
     const BASE_SATISFACTION = 98;   // رضایت پایه
 
     // محاسبه مقادیر نهایی (پایه + واقعی)
@@ -5716,46 +5716,98 @@ async loadRealStats() {
     const totalEmployers = BASE_EMPLOYERS + (realEmployers || 0);
     const totalProjects = BASE_PROJECTS + (realProjects || 0);
     
-    // آپدیت المان‌ها با انیمیشن
+    // آپدیت المان‌ها
     const contractorElement = document.querySelector('.stat-value[data-count="1250"]');
     const employerElement = document.querySelector('.stat-value[data-count="320"]');
     const projectElement = document.querySelector('.stat-value[data-count="540"]');
     const satisfactionElement = document.querySelector('.stat-value[data-count="98"]');
     
     if (contractorElement) {
-      this.animateCounter(contractorElement, totalContractors);
+      contractorElement.textContent = totalContractors.toLocaleString('fa-IR');
     }
     
     if (employerElement) {
-      this.animateCounter(employerElement, totalEmployers);
+      employerElement.textContent = totalEmployers.toLocaleString('fa-IR');
     }
     
     if (projectElement) {
-      this.animateCounter(projectElement, totalProjects);
+      projectElement.textContent = totalProjects.toLocaleString('fa-IR');
     }
     
     if (satisfactionElement) {
-      this.animateCounter(satisfactionElement, BASE_SATISFACTION);
+      satisfactionElement.textContent = BASE_SATISFACTION + '٪';
     }
     
   } catch (error) {
     console.error('خطا در دریافت آمار:', error);
-    // در صورت خطا، مقادیر پایه رو نشون بده
-    this.showBaseStats();
+    // در صورت خطا، فقط مقادیر پایه رو نشون بده
+    const contractorElement = document.querySelector('.stat-value[data-count="1250"]');
+    const employerElement = document.querySelector('.stat-value[data-count="320"]');
+    const projectElement = document.querySelector('.stat-value[data-count="540"]');
+    const satisfactionElement = document.querySelector('.stat-value[data-count="98"]');
+    
+    if (contractorElement) contractorElement.textContent = '150';
+    if (employerElement) employerElement.textContent = '100';
+    if (projectElement) projectElement.textContent = '75';
+    if (satisfactionElement) satisfactionElement.textContent = '98٪';
   }
 }
 
-showBaseStats() {
-  const contractorElement = document.querySelector('.stat-value[data-count="1250"]');
-  const employerElement = document.querySelector('.stat-value[data-count="320"]');
-  const projectElement = document.querySelector('.stat-value[data-count="540"]');
-  const satisfactionElement = document.querySelector('.stat-value[data-count="98"]');
+// ===== تابع آمار پنل مدیریت (واقعی) =====
+async loadAdminStats() {
+  if (!this.isAdmin) return;
   
-  if (contractorElement) this.animateCounter(contractorElement, 1250);
-  if (employerElement) this.animateCounter(employerElement, 320);
-  if (projectElement) this.animateCounter(projectElement, 540);
-  if (satisfactionElement) this.animateCounter(satisfactionElement, 98);
-}
+  try {
+    // آمار واقعی کاربران
+    const { count: totalUsers } = await supabase
+      .from('profiles')
+      .select('*', { count: 'exact', head: true });
+    
+    // آمار واقعی پیام‌ها
+    let totalMessages = 0;
+    try {
+      const { count } = await supabase
+        .from('messages')
+        .select('*', { count: 'exact', head: true });
+      totalMessages = count || 0;
+    } catch (e) {
+      totalMessages = 0;
+    }
+    
+    // آمار واقعی پروژه‌ها
+    let totalProjects = 0;
+    try {
+      const { count } = await supabase
+        .from('projects')
+        .select('*', { count: 'exact', head: true });
+      totalProjects = count || 0;
+    } catch (e) {
+      totalProjects = 0;
+    }
+    
+    // محاسبه فضای ذخیره‌سازی (تقریبی)
+    const storageUsed = ((totalMessages * 0.5) + (totalUsers * 2) + (totalProjects * 1)).toFixed(1);
+    
+    // آپدیت المان‌ها
+    if (document.getElementById('adminTotalMessages')) {
+      document.getElementById('adminTotalMessages').textContent = totalMessages.toLocaleString('fa-IR');
+    }
+    
+    if (document.getElementById('adminActiveUsers')) {
+      document.getElementById('adminActiveUsers').textContent = totalUsers.toLocaleString('fa-IR');
+    }
+    
+    if (document.getElementById('adminStorageUsed')) {
+      document.getElementById('adminStorageUsed').textContent = storageUsed + ' MB';
+    }
+    
+    if (document.getElementById('adminSystemHealth')) {
+      document.getElementById('adminSystemHealth').textContent = '100%';
+    }
+    
+  } catch (error) {
+    console.error('خطا در بارگذاری آمار مدیریت:', error);
+  }
 }
 let app;
 document.addEventListener('DOMContentLoaded', () => {
