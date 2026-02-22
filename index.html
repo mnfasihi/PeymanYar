@@ -5479,28 +5479,15 @@ bsToast.show();
 toast.addEventListener('hidden.bs.toast', () => { toast.remove(); });
 }
 
+// ========== توابع مدیریت ==========
 setupAdminSystem() {
-this.checkAdminStatus();
-const adminLoginForm = document.getElementById('adminLoginForm');
-if (adminLoginForm) {
-adminLoginForm.addEventListener('submit', (e) => {
-e.preventDefault();
-this.adminLogin();
-});
-}
+  this.checkAdminStatus();
+  // حذف ایونت لیسنر قبلی برای adminLoginForm
 }
 
 async checkAdminStatus() {
-  const adminToken = localStorage.getItem('peymanyar_admin_token');
-  const adminEmail = localStorage.getItem('peymanyar_admin_email');
-  
-  if (adminToken && adminEmail) {
-    this.isAdmin = true;
-    this.adminToken = adminToken;
-    this.adminEmail = adminEmail;
-    this.showAdminControls();
-  } else if (this.userData && this.userData.id) {
-    // اگر کاربر لاگین کرده، بررسی کن که آیا ادمین است
+  // اگه کاربر لاگین کرده
+  if (this.userData && this.userData.id) {
     try {
       const { data: profile, error } = await supabase
         .from('profiles')
@@ -5511,9 +5498,11 @@ async checkAdminStatus() {
       if (!error && profile?.role === 'admin') {
         this.isAdmin = true;
         this.showAdminControls();
+        console.log('کاربر ادمین است');
       } else {
         this.isAdmin = false;
         this.hideAdminControls();
+        console.log('کاربر ادمین نیست');
       }
     } catch (error) {
       console.error('خطا در بررسی نقش کاربر:', error);
@@ -5526,19 +5515,28 @@ async checkAdminStatus() {
   }
 }
 
+showAdminControls() {
+  document.querySelectorAll('.admin-only').forEach(link => { 
+    link.style.display = 'block'; 
+  });
+}
+
+hideAdminControls() {
+  document.querySelectorAll('.admin-only').forEach(link => { 
+    link.style.display = 'none'; 
+  });
+}
+
 adminLogout() {
-localStorage.removeItem('peymanyar_admin_token');
-localStorage.removeItem('peymanyar_admin_email');
-this.isAdmin = false;
-this.adminToken = null;
-this.adminEmail = null;
-this.hideAdminControls();
-this.showToast('از پنل مدیریت خارج شدید', 'success');
-this.showPage('home');
+  this.isAdmin = false;
+  this.hideAdminControls();
+  this.showToast('از پنل مدیریت خارج شدید', 'success');
+  this.showPage('home');
 }
 
 showAdminLogin() {
-  this.showPage('adminLogin');
+  this.showToast('لطفاً با حساب کاربری ادمین وارد شوید', 'info');
+  this.showPage('login');
 }
 
 async showAdminMessages() {
@@ -5579,7 +5577,6 @@ async showAdminMessages() {
 }
 
 loadAdminStats() {
-  if (!this.isAdmin) return;
   setTimeout(() => {
     if (document.getElementById('adminTotalMessages')) 
       document.getElementById('adminTotalMessages').textContent = '12,845';
@@ -5682,7 +5679,6 @@ showAdminResult(content) {
   if (resultElement) resultElement.innerHTML = content;
 }
 }
-
 let app;
 document.addEventListener('DOMContentLoaded', () => {
 app = new PeymanyarApp();
