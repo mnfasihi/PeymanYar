@@ -2912,7 +2912,6 @@ this.setupAdminSystem();
 this.loadRealStats();
 this.setupLoginForms();
 this.setupPasswordValidation();
-this.loadRealStats();
 }
 
 setupEventListeners() {
@@ -5756,6 +5755,7 @@ showBaseStats() {
   if (employerElement) this.animateCounter(employerElement, 320);
   if (projectElement) this.animateCounter(projectElement, 540);
   if (satisfactionElement) this.animateCounter(satisfactionElement, 98);
+}
 }
 let app;
 document.addEventListener('DOMContentLoaded', () => {
