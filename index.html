@@ -5540,130 +5540,148 @@ this.showPage('home');
 }
 
 showAdminLogin() {
-this.showPage('adminLogin');
+  this.showPage('adminLogin');
 }
+
 async showAdminMessages() {
-  if (!this.isAdmin) {
-    this.showToast('برای دسترسی به پنل مدیریت باید وارد شوید', 'error');
-    this.showAdminLogin();
+  // اگه کاربر لاگین نکرده
+  if (!this.userData || !this.userData.id) {
+    this.showToast('لطفاً ابتدا وارد شوید', 'error');
+    this.showPage('login');
     return;
   }
   
-  // بررسی کنید کاربر واقعاً ادمین است
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('role')
-    .eq('user_id', this.userData.id)
-    .single();
+  try {
+    // بررسی نقش کاربر از دیتابیس
+    const { data: profile, error } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('user_id', this.userData.id)
+      .single();
     
-  if (profile?.role !== 'admin') {
-    this.showToast('شما دسترسی ادمین ندارید', 'error');
-    this.isAdmin = false;
-    return;
+    if (error) {
+      console.error('خطا در دریافت نقش کاربر:', error);
+      this.showToast('خطا در بررسی دسترسی', 'error');
+      return;
+    }
+    
+    // اگه کاربر ادمین بود
+    if (profile?.role === 'admin') {
+      this.isAdmin = true;
+      this.showPage('adminMessages');
+      setTimeout(() => this.loadAdminStats(), 100);
+    } else {
+      this.showToast('شما دسترسی ادمین ندارید', 'error');
+      this.showPage('home');
+    }
+  } catch (error) {
+    console.error('خطا:', error);
+    this.showToast('خطا در بررسی دسترسی', 'error');
   }
-  
-  this.showPage('adminMessages');
-  setTimeout(() => this.loadAdminStats(), 100);
 }
+
 loadAdminStats() {
-if (!this.isAdmin) return;
-setTimeout(() => {
-if (document.getElementById('adminTotalMessages')) document.getElementById('adminTotalMessages').textContent = '12,845';
-if (document.getElementById('adminActiveUsers')) document.getElementById('adminActiveUsers').textContent = '89';
-if (document.getElementById('adminStorageUsed')) document.getElementById('adminStorageUsed').textContent = '2.4 GB';
-if (document.getElementById('adminSystemHealth')) document.getElementById('adminSystemHealth').textContent = '100%';
-}, 100);
+  if (!this.isAdmin) return;
+  setTimeout(() => {
+    if (document.getElementById('adminTotalMessages')) 
+      document.getElementById('adminTotalMessages').textContent = '12,845';
+    if (document.getElementById('adminActiveUsers')) 
+      document.getElementById('adminActiveUsers').textContent = '89';
+    if (document.getElementById('adminStorageUsed')) 
+      document.getElementById('adminStorageUsed').textContent = '2.4 GB';
+    if (document.getElementById('adminSystemHealth')) 
+      document.getElementById('adminSystemHealth').textContent = '100%';
+  }, 100);
 }
 
 adminAnalyzeMessages() {
-this.showAdminLoading(true);
-setTimeout(() => {
-const result = '<strong>📊 تحلیل پیشرفته پیام‌ها انجام شد</strong><br><br><div class="row"><div class="col-md-6"><h6>📈 آمار کلی:</h6>• کل پیام‌ها: ۱۲,۸۴۵<br>• پیام‌های امروز: ۴۲۸<br>• کاربران فعال: ۸۹<br>• میانگین پاسخگویی: ۲.۴ دقیقه<br></div><div class="col-md-6"><h6>📊 تحلیل احساسات:</h6>• مثبت: ۸۵٪<br>• خنثی: ۱۲٪<br>• منفی: ۳٪<br>• موضوعات داغ: پروژه، قرارداد، پرداخت<br></div></div>';
-this.showAdminResult(result);
-this.showAdminLoading(false);
-}, 2000);
+  this.showAdminLoading(true);
+  setTimeout(() => {
+    const result = '<strong>📊 تحلیل پیشرفته پیام‌ها انجام شد</strong><br><br><div class="row"><div class="col-md-6"><h6>📈 آمار کلی:</h6>• کل پیام‌ها: ۱۲,۸۴۵<br>• پیام‌های امروز: ۴۲۸<br>• کاربران فعال: ۸۹<br>• میانگین پاسخگویی: ۲.۴ دقیقه<br></div><div class="col-md-6"><h6>📊 تحلیل احساسات:</h6>• مثبت: ۸۵٪<br>• خنثی: ۱۲٪<br>• منفی: ۳٪<br>• موضوعات داغ: پروژه، قرارداد، پرداخت<br></div></div>';
+    this.showAdminResult(result);
+    this.showAdminLoading(false);
+  }, 2000);
 }
 
 adminSendBroadcast() {
-this.showAdminLoading(true);
-setTimeout(() => {
-const result = '<strong>📨 ارسال پیام عمومی</strong><br><br><div class="alert alert-info"><i class="bi bi-info-circle me-2"></i>این ویژگی در نسخه کامل پیاده‌سازی می‌شود</div><p>در این بخش می‌توانید پیام‌های عمومی به تمام کاربران ارسال کنید.</p><button class="btn btn-primary" onclick="app.showToast(\'این قابلیت در حال توسعه است\', \'info\')">مشاهده جزئیات</button>';
-this.showAdminResult(result);
-this.showAdminLoading(false);
-}, 1000);
+  this.showAdminLoading(true);
+  setTimeout(() => {
+    const result = '<strong>📨 ارسال پیام عمومی</strong><br><br><div class="alert alert-info"><i class="bi bi-info-circle me-2"></i>این ویژگی در نسخه کامل پیاده‌سازی می‌شود</div><p>در این بخش می‌توانید پیام‌های عمومی به تمام کاربران ارسال کنید.</p><button class="btn btn-primary" onclick="app.showToast(\'این قابلیت در حال توسعه است\', \'info\')">مشاهده جزئیات</button>';
+    this.showAdminResult(result);
+    this.showAdminLoading(false);
+  }, 1000);
 }
 
 adminAdvancedSearch() {
-this.showAdminLoading(true);
-setTimeout(() => {
-const result = '<strong>🔍 جستجوی جامع</strong><br><br><p>در این بخش می‌توانید در تمام پیام‌های سیستم جستجوی پیشرفته انجام دهید.</p><div class="input-group mb-3"><input type="text" class="form-control" placeholder="جستجوی پیام‌ها..."><button class="btn btn-primary">جستجو</button></div>';
-this.showAdminResult(result);
-this.showAdminLoading(false);
-}, 1000);
+  this.showAdminLoading(true);
+  setTimeout(() => {
+    const result = '<strong>🔍 جستجوی جامع</strong><br><br><p>در این بخش می‌توانید در تمام پیام‌های سیستم جستجوی پیشرفته انجام دهید.</p><div class="input-group mb-3"><input type="text" class="form-control" placeholder="جستجوی پیام‌ها..."><button class="btn btn-primary">جستجو</button></div>';
+    this.showAdminResult(result);
+    this.showAdminLoading(false);
+  }, 1000);
 }
 
 adminSystemStats() {
-this.showAdminLoading(true);
-setTimeout(() => {
-const result = '<strong>📈 آمار کامل سیستم</strong><br><br><div class="row"><div class="col-md-6"><h6>👥 آمار کاربران:</h6>• کاربران کل: ۲,۱۵۴<br>• کاربران فعال: ۸۹<br>• کاربران جدید (امروز): ۱۲<br>• کاربران آنلاین: ۳۴<br></div><div class="col-md-6"><h6>💾 آمار سرور:</h6>• CPU استفاده شده: ۴۲٪<br>• حافظه استفاده شده: ۲.۴ GB<br>• پهنای‌باند: ۱۵۸ MB<br>• سلامت سیستم: ۱۰۰٪<br></div></div>';
-this.showAdminResult(result);
-this.showAdminLoading(false);
-}, 1500);
+  this.showAdminLoading(true);
+  setTimeout(() => {
+    const result = '<strong>📈 آمار کامل سیستم</strong><br><br><div class="row"><div class="col-md-6"><h6>👥 آمار کاربران:</h6>• کاربران کل: ۲,۱۵۴<br>• کاربران فعال: ۸۹<br>• کاربران جدید (امروز): ۱۲<br>• کاربران آنلاین: ۳۴<br></div><div class="col-md-6"><h6>💾 آمار سرور:</h6>• CPU استفاده شده: ۴۲٪<br>• حافظه استفاده شده: ۲.۴ GB<br>• پهنای‌باند: ۱۵۸ MB<br>• سلامت سیستم: ۱۰۰٪<br></div></div>';
+    this.showAdminResult(result);
+    this.showAdminLoading(false);
+  }, 1500);
 }
 
 adminSystemSettings() {
-this.showAdminLoading(true);
-setTimeout(() => {
-const result = '<strong>⚙️ تنظیمات سیستم</strong><br><br><p>در این بخش می‌توانید تنظیمات سیستم پیام‌یار را مدیریت کنید.</p><div class="form-check mb-2"><input class="form-check-input" type="checkbox" id="enableNotifications" checked><label class="form-check-label" for="enableNotifications">فعال‌سازی اعلان‌ها</label></div><div class="form-check mb-2"><input class="form-check-input" type="checkbox" id="enableAutoReply"><label class="form-check-label" for="enableAutoReply">پاسخ خودکار</label></div><button class="btn btn-primary mt-2">ذخیره تنظیمات</button>';
-this.showAdminResult(result);
-this.showAdminLoading(false);
-}, 1000);
+  this.showAdminLoading(true);
+  setTimeout(() => {
+    const result = '<strong>⚙️ تنظیمات سیستم</strong><br><br><p>در این بخش می‌توانید تنظیمات سیستم پیام‌یار را مدیریت کنید.</p><div class="form-check mb-2"><input class="form-check-input" type="checkbox" id="enableNotifications" checked><label class="form-check-label" for="enableNotifications">فعال‌سازی اعلان‌ها</label></div><div class="form-check mb-2"><input class="form-check-input" type="checkbox" id="enableAutoReply"><label class="form-check-label" for="enableAutoReply">پاسخ خودکار</label></div><button class="btn btn-primary mt-2">ذخیره تنظیمات</button>';
+    this.showAdminResult(result);
+    this.showAdminLoading(false);
+  }, 1000);
 }
 
 adminUserManagement() {
-this.showAdminLoading(true);
-setTimeout(() => {
-const result = '<strong>👥 مدیریت کاربران</strong><br><br><p>در این بخش می‌توانید کاربران سیستم را مدیریت کنید.</p><table class="table table-sm"><thead><tr><th>نام</th><th>نوع</th><th>وضعیت</th></tr></thead><tbody><tr><td>علی محمدی</td><td>کارفرما</td><td><span class="badge bg-success">فعال</span></td></tr><tr><td>شرکت سازه‌گستر</td><td>پیمانکار</td><td><span class="badge bg-success">فعال</span></td></tr></tbody></table>';
-this.showAdminResult(result);
-this.showAdminLoading(false);
-}, 1500);
+  this.showAdminLoading(true);
+  setTimeout(() => {
+    const result = '<strong>👥 مدیریت کاربران</strong><br><br><p>در این بخش می‌توانید کاربران سیستم را مدیریت کنید.</p><table class="table table-sm"><thead><tr><th>نام</th><th>نوع</th><th>وضعیت</th></tr></thead><tbody><tr><td>علی محمدی</td><td>کارفرما</td><td><span class="badge bg-success">فعال</span></td></tr><tr><td>شرکت سازه‌گستر</td><td>پیمانکار</td><td><span class="badge bg-success">فعال</span></td></tr></tbody></table>';
+    this.showAdminResult(result);
+    this.showAdminLoading(false);
+  }, 1500);
 }
 
 adminAdvancedCleanup() {
-this.showAdminLoading(true);
-setTimeout(() => {
-const result = '<strong>🧹 پاکسازی پیشرفته</strong><br><br><p>در این بخش می‌توانید داده‌های قدیمی سیستم را پاکسازی کنید.</p><div class="alert alert-warning"><i class="bi bi-exclamation-triangle me-2"></i>این عملیات قابل بازگشت نیست!</div><button class="btn btn-danger" onclick="app.executeCleanup()">اجرای پاکسازی</button>';
-this.showAdminResult(result);
-this.showAdminLoading(false);
-}, 1000);
+  this.showAdminLoading(true);
+  setTimeout(() => {
+    const result = '<strong>🧹 پاکسازی پیشرفته</strong><br><br><p>در این بخش می‌توانید داده‌های قدیمی سیستم را پاکسازی کنید.</p><div class="alert alert-warning"><i class="bi bi-exclamation-triangle me-2"></i>این عملیات قابل بازگشت نیست!</div><button class="btn btn-danger" onclick="app.executeCleanup()">اجرای پاکسازی</button>';
+    this.showAdminResult(result);
+    this.showAdminLoading(false);
+  }, 1000);
 }
 
 executeCleanup() {
-this.showAdminLoading(true);
-setTimeout(() => {
-this.showAdminResult('<strong>✅ پاکسازی با موفقیت انجام شد</strong><br><br>📉 <strong>نتایج پاکسازی:</strong><br>• پیام‌های حذف شده: ۱۲,۴۵۷ پیام<br>• فضای آزاد شده: ۳.۸ گیگابایت<br><em>سیستم با موفقیت بهینه‌سازی شد.</em>');
-this.showAdminLoading(false);
-}, 3000);
+  this.showAdminLoading(true);
+  setTimeout(() => {
+    this.showAdminResult('<strong>✅ پاکسازی با موفقیت انجام شد</strong><br><br>📉 <strong>نتایج پاکسازی:</strong><br>• پیام‌های حذف شده: ۱۲,۴۵۷ پیام<br>• فضای آزاد شده: ۳.۸ گیگابایت<br><em>سیستم با موفقیت بهینه‌سازی شد.</em>');
+    this.showAdminLoading(false);
+  }, 3000);
 }
 
 adminViewLogs() {
-this.showAdminLoading(true);
-setTimeout(() => {
-const result = '<strong>📚 گزارش‌های سیستم</strong><br><br><p>در این بخش می‌توانید گزارش‌های عملیاتی سیستم را مشاهده کنید.</p><div class="border rounded p-3"><div class="mb-2"><span class="badge bg-info">INFO</span><span class="ms-2">' + new Date().toLocaleString('fa-IR') + ' - سیستم راه‌اندازی شد</span></div><div class="mb-2"><span class="badge bg-success">USER</span><span class="ms-2">' + new Date().toLocaleString('fa-IR') + ' - کاربر جدید ثبت‌نام کرد</span></div></div>';
-this.showAdminResult(result);
-this.showAdminLoading(false);
-}, 1000);
+  this.showAdminLoading(true);
+  setTimeout(() => {
+    const result = '<strong>📚 گزارش‌های سیستم</strong><br><br><p>در این بخش می‌توانید گزارش‌های عملیاتی سیستم را مشاهده کنید.</p><div class="border rounded p-3"><div class="mb-2"><span class="badge bg-info">INFO</span><span class="ms-2">' + new Date().toLocaleString('fa-IR') + ' - سیستم راه‌اندازی شد</span></div><div class="mb-2"><span class="badge bg-success">USER</span><span class="ms-2">' + new Date().toLocaleString('fa-IR') + ' - کاربر جدید ثبت‌نام کرد</span></div></div>';
+    this.showAdminResult(result);
+    this.showAdminLoading(false);
+  }, 1000);
 }
 
 showAdminLoading(show) {
-const loadingElement = document.getElementById('adminMessagesLoading');
-if (loadingElement) loadingElement.style.display = show ? 'block' : 'none';
+  const loadingElement = document.getElementById('adminMessagesLoading');
+  if (loadingElement) loadingElement.style.display = show ? 'block' : 'none';
 }
 
 showAdminResult(content) {
-const resultElement = document.getElementById('adminMessagesResult');
-if (resultElement) resultElement.innerHTML = content;
-}
+  const resultElement = document.getElementById('adminMessagesResult');
+  if (resultElement) resultElement.innerHTML = content;
 }
 
 let app;
