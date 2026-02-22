@@ -5630,6 +5630,30 @@ async createProject() {
   document.getElementById('newProjectForm')?.reset();
 }
 
+// ===== توابع مدیریت userData =====
+saveUserData(data) {
+  this.userData = data;
+  localStorage.setItem('peymanyar_user', JSON.stringify(data));
+  console.log('User data saved:', data);
+}
+
+loadUserData() {
+  const saved = localStorage.getItem('peymanyar_user');
+  if (saved) {
+    try {
+      this.userData = JSON.parse(saved);
+      console.log('User data loaded:', this.userData);
+    } catch (e) {
+      console.error('خطا در لود user data:', e);
+      this.userData = null;
+      localStorage.removeItem('peymanyar_user');
+    }
+  } else {
+    console.log('No user data found in localStorage');
+    this.userData = null;
+  }
+}
+
 setupIntersectionObserver() {
 const observer = new IntersectionObserver((entries) => {
 entries.forEach(entry => {
