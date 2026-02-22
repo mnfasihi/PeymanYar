@@ -5378,60 +5378,84 @@ this.userData = null;
 this.showPage('home');
 this.showToast('با موفقیت خارج شدید', 'success');
 }
+// ===== توابع مدیریت پروژه‌ها =====
 async loadProjects() {
   const statusFilter = document.getElementById('projectFilterStatus')?.value || 'all';
   const searchTerm = document.getElementById('projectSearch')?.value || '';
   
-  // پروژه‌ها رو بگیر
-  let query = supabase
-    .from('projects')
-    .select('*')
-    .order('created_at', { ascending: false });
-  
-  if (statusFilter !== 'all') {
-    query = query.eq('status', statusFilter);
-  }
-  
-  if (searchTerm) {
-    query = query.or(`title.ilike.%${searchTerm}%,description.ilike.%${searchTerm}%`);
-  }
-  
-  const { data: projects, error } = await query;
-  
-  if (error) {
+  try {
+    // پروژه‌ها رو بگیر
+    let query = supabase
+      .from('projects')
+      .select('*')
+      .order('created_at', { ascending: false });
+    
+    if (statusFilter !== 'all') {
+      query = query.eq('status', statusFilter);
+    }
+    
+    if (searchTerm) {
+      query = query.or(`title.ilike.%${searchTerm}%,description.ilike.%${searchTerm}%`);
+    }
+    
+    const { data: projects, error } = await query;
+    
+    if (error) {
+      console.error('خطا:', error);
+      this.showToast('خطا در دریافت پروژه‌ها', 'error');
+      return;
+    }
+    
+    // حالا برای هر پروژه، اطلاعات کارفرما رو بگیر
+    const projectsWithEmployer = await Promise.all((projects || []).map(async (project) => {
+      try {
+        const { data: employer } = await supabase
+          .from('profiles')
+          .select('full_name, company_name')
+          .eq('user_id', project.employer_id)
+          .single();
+        
+        return {
+          ...project,
+          employer: employer || null
+        };
+      } catch (err) {
+        return {
+          ...project,
+          employer: null
+        };
+      }
+    }));
+    
+    this.displayProjects(projectsWithEmployer);
+    
+  } catch (error) {
     console.error('خطا:', error);
     this.showToast('خطا در دریافت پروژه‌ها', 'error');
-    return;
   }
-  
+}
+
 displayProjects(projects) {
   const container = document.getElementById('projectsList');
   if (!container) return;
   
   if (!projects || projects.length === 0) {
-    container.innerHTML = '<p>پروژه‌ای وجود ندارد</p>';
+    container.innerHTML = `
+      <div class="col-12">
+        <div class="card-peymanyar text-center py-5">
+          <i class="bi bi-folder-x display-4 text-muted mb-3"></i>
+          <h4>پروژه‌ای یافت نشد</h4>
+          <p class="text-muted">هنوز پروژه‌ای ثبت نشده است.</p>
+        </div>
+      </div>
+    `;
     return;
   }
   
   let html = '';
   projects.forEach(project => {
-    html += `
-      <div class="col-md-6 mb-4">
-        <div class="card-peymanyar">
-          <h5>${project.title}</h5>
-          <p>${project.description || ''}</p>
-          <small>کارفرما: ${project.employer_id}</small>
-        </div>
-      </div>
-    `;
-  });
-  
-  container.innerHTML = html;
-}
-  
-  let html = '';
-  projects.forEach(project => {
     const employerName = project.employer?.full_name || project.employer?.company_name || 'کارفرما';
+    
     const statusClass = {
       'open': 'bg-success',
       'in_progress': 'bg-primary',
@@ -5450,7 +5474,7 @@ displayProjects(projects) {
       <div class="col-md-6 mb-4">
         <div class="card-peymanyar h-100">
           <div class="d-flex justify-content-between align-items-start mb-3">
-            <h5 class="mb-0">${project.title}</h5>
+            <h5 class="mb-0">${project.title || 'بدون عنوان'}</h5>
             <span class="badge ${statusClass}">${statusText}</span>
           </div>
           <p class="text-muted mb-3">${project.description || 'توضیحاتی ثبت نشده'}</p>
@@ -5461,7 +5485,7 @@ displayProjects(projects) {
             ${project.timeline ? `<div class="mb-2"><i class="bi bi-clock me-2"></i>${this.getTimelineText(project.timeline)}</div>` : ''}
           </div>
           <div class="d-flex justify-content-between align-items-center mt-auto">
-            <small class="text-muted">${new Date(project.created_at).toLocaleDateString('fa-IR')}</small>
+            <small class="text-muted">${project.created_at ? new Date(project.created_at).toLocaleDateString('fa-IR') : ''}</small>
             <button class="btn btn-sm btn-outline-primary" onclick="app.viewProject(${project.id})">
               <i class="bi bi-eye me-1"></i>جزئیات
             </button>
@@ -5513,12 +5537,12 @@ showNewProjectModal() {
 }
 
 async createProject() {
-  const title = document.getElementById('projectTitle').value;
-  const description = document.getElementById('projectDescription').value;
-  const category = document.getElementById('projectCategory').value;
-  const budget = document.getElementById('projectBudget').value;
-  const location = document.getElementById('projectLocation').value;
-  const timeline = document.getElementById('projectTimeline').value;
+  const title = document.getElementById('projectTitle')?.value;
+  const description = document.getElementById('projectDescription')?.value;
+  const category = document.getElementById('projectCategory')?.value;
+  const budget = document.getElementById('projectBudget')?.value;
+  const location = document.getElementById('projectLocation')?.value;
+  const timeline = document.getElementById('projectTimeline')?.value;
   
   if (!title || !description) {
     this.showToast('لطفاً عنوان و توضیحات پروژه را وارد کنید', 'error');
@@ -5543,7 +5567,7 @@ async createProject() {
   
   if (error) {
     console.error('خطا در ایجاد پروژه:', error);
-    this.showToast('خطا در ایجاد پروژه', 'error');
+    this.showToast('خطا در ایجاد پروژه: ' + error.message, 'error');
     return;
   }
   
@@ -5551,17 +5575,16 @@ async createProject() {
   
   // بستن مودال
   const modal = bootstrap.Modal.getInstance(document.getElementById('newProjectModal'));
-  modal.hide();
+  if (modal) modal.hide();
   
   // ریست فرم
-  document.getElementById('newProjectForm').reset();
+  document.getElementById('newProjectForm')?.reset();
   
   // بارگذاری مجدد پروژه‌ها
   this.loadProjects();
 }
 
 viewProject(projectId) {
-  // این تابع رو بعداً برای صفحه جزئیات پروژه می‌نویسیم
   this.showToast(`مشاهده پروژه ${projectId}`, 'info');
 }
 
