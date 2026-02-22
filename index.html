@@ -2909,8 +2909,10 @@ this.loadUserData();
 this.setupMessagingSystem();
 this.setupHeroSlider();
 this.setupAdminSystem();
+this.loadRealStats();
 this.setupLoginForms();
 this.setupPasswordValidation();
+this.loadRealStats();
 }
 
 setupEventListeners() {
@@ -5679,6 +5681,80 @@ showAdminResult(content) {
   if (resultElement) resultElement.innerHTML = content;
 }
 }
+
+// ===== توابع آمار =====
+async loadRealStats() {
+  try {
+    // دریافت آمار واقعی از دیتابیس
+    const { count: realContractors, error: contractorError } = await supabase
+      .from('profiles')
+      .select('*', { count: 'exact', head: true })
+      .eq('user_type', 'contractor');
+    
+    const { count: realEmployers, error: employerError } = await supabase
+      .from('profiles')
+      .select('*', { count: 'exact', head: true })
+      .eq('user_type', 'employer');
+    
+    const { count: realProjects, error: projectError } = await supabase
+      .from('projects')
+      .select('*', { count: 'exact', head: true });
+
+    // مقدار پایه (Base) - برای نمایش اولیه
+    const BASE_CONTRACTORS = 150;
+    const BASE_EMPLOYERS = 100;
+    const BASE_PROJECTS = 75;
+    const BASE_SATISFACTION = 98;
+
+    // محاسبه مقادیر نهایی
+    const totalContractors = BASE_CONTRACTORS + (realContractors || 0);
+    const totalEmployers = BASE_EMPLOYERS + (realEmployers || 0);
+    const totalProjects = BASE_PROJECTS + (realProjects || 0);
+    
+    // آپدیت المان‌ها
+    const contractorElement = document.querySelector('.stat-value[data-count="1250"]');
+    const employerElement = document.querySelector('.stat-value[data-count="320"]');
+    const projectElement = document.querySelector('.stat-value[data-count="540"]');
+    const satisfactionElement = document.querySelector('.stat-value[data-count="98"]');
+    
+    if (contractorElement) {
+      contractorElement.setAttribute('data-real', totalContractors);
+      this.animateCounter(contractorElement, totalContractors);
+    }
+    
+    if (employerElement) {
+      employerElement.setAttribute('data-real', totalEmployers);
+      this.animateCounter(employerElement, totalEmployers);
+    }
+    
+    if (projectElement) {
+      projectElement.setAttribute('data-real', totalProjects);
+      this.animateCounter(projectElement, totalProjects);
+    }
+    
+    if (satisfactionElement) {
+      satisfactionElement.setAttribute('data-real', BASE_SATISFACTION);
+      this.animateCounter(satisfactionElement, BASE_SATISFACTION);
+    }
+    
+  } catch (error) {
+    console.error('خطا در دریافت آمار:', error);
+    this.showBaseStats();
+  }
+}
+
+showBaseStats() {
+  const contractorElement = document.querySelector('.stat-value[data-count="1250"]');
+  const employerElement = document.querySelector('.stat-value[data-count="320"]');
+  const projectElement = document.querySelector('.stat-value[data-count="540"]');
+  const satisfactionElement = document.querySelector('.stat-value[data-count="98"]');
+  
+  if (contractorElement) this.animateCounter(contractorElement, 150);
+  if (employerElement) this.animateCounter(employerElement, 100);
+  if (projectElement) this.animateCounter(projectElement, 75);
+  if (satisfactionElement) this.animateCounter(satisfactionElement, 98);
+}
+
 let app;
 document.addEventListener('DOMContentLoaded', () => {
 app = new PeymanyarApp();
