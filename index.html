@@ -5446,10 +5446,11 @@ async loadProjects() {
   const searchTerm = document.getElementById('projectSearch')?.value || '';
   
   try {
-    // پروژه‌ها رو بگیر
+    // فقط پروژه‌های تایید شده
     let query = supabase
       .from('projects')
       .select('*')
+      .eq('admin_approved', true)
       .order('created_at', { ascending: false });
     
     if (statusFilter !== 'all') {
@@ -5468,25 +5469,18 @@ async loadProjects() {
       return;
     }
     
-    // حالا برای هر پروژه، اطلاعات کارفرما رو بگیر
+    // اطلاعات کارفرما
     const projectsWithEmployer = await Promise.all((projects || []).map(async (project) => {
-      try {
-        const { data: employer } = await supabase
-          .from('profiles')
-          .select('full_name, company_name')
-          .eq('user_id', project.employer_id)
-          .single();
-        
-        return {
-          ...project,
-          employer: employer || null
-        };
-      } catch (err) {
-        return {
-          ...project,
-          employer: null
-        };
-      }
+      const { data: employer } = await supabase
+        .from('profiles')
+        .select('full_name, company_name')
+        .eq('user_id', project.employer_id)
+        .single();
+      
+      return {
+        ...project,
+        employer: employer || null
+      };
     }));
     
     this.displayProjects(projectsWithEmployer);
@@ -5611,7 +5605,8 @@ async createProject() {
     budget_range: budget || null,
     location: location || null,
     timeline: timeline || null,
-    status: 'open'
+    status: 'pending',
+    admin_approved: false
   };
   
   const { data, error } = await supabase
@@ -5625,7 +5620,7 @@ async createProject() {
     return;
   }
   
-  this.showToast('پروژه با موفقیت ایجاد شد', 'success');
+  this.showToast('پروژه شما با موفقیت ثبت و برای تایید ارسال شد', 'success');
   
   // بستن مودال
   const modal = bootstrap.Modal.getInstance(document.getElementById('newProjectModal'));
@@ -5633,25 +5628,6 @@ async createProject() {
   
   // ریست فرم
   document.getElementById('newProjectForm')?.reset();
-  
-  // بارگذاری مجدد پروژه‌ها
-  this.loadProjects();
-}
-
-viewProject(projectId) {
-  this.showToast(`مشاهده پروژه ${projectId}`, 'info');
-}
-
-saveUserData(data) {
-this.userData = data;
-localStorage.setItem('peymanyar_user', JSON.stringify(data));
-}
-
-loadUserData() {
-const saved = localStorage.getItem('peymanyar_user');
-if (saved) {
-this.userData = JSON.parse(saved);
-}
 }
 
 setupIntersectionObserver() {
