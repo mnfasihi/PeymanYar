@@ -4314,7 +4314,7 @@ document.getElementById('employerSummary').innerHTML = summaryHtml;
 }
 }
 
-// ===== تابع ثبت‌نام کارفرما (نسخه نهایی با مدیریت خطای ایمیل) =====
+// ===== تابع ثبت‌نام کارفرما (نسخه اصلاح شده) =====
 async submitEmployerForm(e) {
   e.preventDefault();
 
@@ -4340,6 +4340,7 @@ async submitEmployerForm(e) {
   submitBtn.disabled = true;
 
   try {
+    // ثبت‌نام در Supabase Auth
     const { data: authData, error: authError } = await supabase.auth.signUp({
       email,
       password,
@@ -4373,6 +4374,7 @@ async submitEmployerForm(e) {
           companyId = document.getElementById('employerCompanyId')?.value || '000000';
         }
         
+        // ذخیره اطلاعات کامل در profiles
         const { error: profileError } = await supabase
           .from('profiles')
           .insert([{
@@ -4405,7 +4407,7 @@ async submitEmployerForm(e) {
           terms_accepted: true
         };
         
-        localStorage.setItem('peymanyar_user', JSON.stringify(this.userData));
+        this.saveUserData(this.userData);
 
         setTimeout(() => {
           this.showPage('home');
@@ -4420,19 +4422,86 @@ async submitEmployerForm(e) {
       throw new Error('خطا در ثبت‌نام');
     }
 
+    // ثبت‌نام موفق - حالا اطلاعات کامل رو توی profiles ذخیره کن
+    let fullName = '';
+    let nationalCode = '';
+    let companyName = '';
+    let companyId = '';
+    
+    if (accountType === 'individual') {
+      fullName = document.getElementById('employerFullName')?.value || '';
+      nationalCode = document.getElementById('employerNationalCode')?.value || '';
+    } else {
+      companyName = document.getElementById('employerCompanyName')?.value || '';
+      companyId = document.getElementById('employerCompanyId')?.value || '';
+    }
+
+    // اول ببینیم پروفایل وجود داره یا نه
+    const { data: existingProfile } = await supabase
+      .from('profiles')
+      .select('user_id')
+      .eq('user_id', authData.user.id)
+      .single();
+
+    if (existingProfile) {
+      // اگه وجود داره، آپدیتش کن
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .update({
+          user_type: 'employer',
+          account_type: accountType,
+          phone: mobile,
+          address: address,
+          full_name: fullName,
+          national_code: nationalCode,
+          company_name: companyName,
+          company_id: companyId,
+          terms_accepted_at: terms ? new Date().toISOString() : null,
+          terms_version: '1.0'
+        })
+        .eq('user_id', authData.user.id);
+
+      if (updateError) {
+        console.error('خطا در آپدیت پروفایل:', updateError);
+      }
+    } else {
+      // اگه وجود نداره، جدید بساز
+      const { error: insertError } = await supabase
+        .from('profiles')
+        .insert([{
+          user_id: authData.user.id,
+          email: email,
+          user_type: 'employer',
+          account_type: accountType,
+          phone: mobile,
+          address: address,
+          full_name: fullName,
+          national_code: nationalCode,
+          company_name: companyName,
+          company_id: companyId,
+          created_at: new Date().toISOString(),
+          terms_accepted_at: terms ? new Date().toISOString() : null,
+          terms_version: '1.0'
+        }]);
+
+      if (insertError) {
+        console.error('خطا در ایجاد پروفایل:', insertError);
+      }
+    }
+
     this.showToast('ثبت‌نام کارفرما با موفقیت انجام شد!', 'success');
 
     this.userData = {
       id: authData.user.id,
       email: email,
-      full_name: '',
+      full_name: fullName || companyName,
       phone: mobile,
       user_type: 'employer',
       account_type: accountType,
       terms_accepted: true
     };
     
-    localStorage.setItem('peymanyar_user', JSON.stringify(this.userData));
+    this.saveUserData(this.userData);
 
     setTimeout(() => {
       this.showPage('home');
@@ -4553,7 +4622,7 @@ updateContractorFields() {
   }
 }
 
-// ===== تابع ثبت‌نام پیمانکار (نسخه نهایی با مدیریت خطای ایمیل) =====
+// ===== تابع ثبت‌نام پیمانکار (نسخه اصلاح شده) =====
 async submitContractorForm(e) {
   e.preventDefault();
 
@@ -4606,8 +4675,6 @@ async submitContractorForm(e) {
       if (authError.status === 500 || authError.message.includes('confirmation email')) {
         this.showToast('ثبت‌نام با موفقیت انجام شد!', 'success');
         
-        // اینجا دیگه temp_ نمی‌سازیم، بلکه به کاربر می‌گیم ثبت‌نام شده
-        // ولی برای تست موقت، یه رکورد در profiles می‌سازیم
         const tempUserId = 'temp_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5);
         
         // اطلاعات اولیه
@@ -4624,28 +4691,99 @@ async submitContractorForm(e) {
           companyId = document.getElementById('companyId')?.value || '000000';
         }
         
-        // ذخیره در profiles
+        // ذخیره اطلاعات کامل در profiles
+        const profileData = {
+          user_id: tempUserId,
+          email: email,
+          user_type: 'contractor',
+          account_type: accountType,
+          phone: mobile,
+          landline: phone,
+          contact_person: contactPerson,
+          main_expertise: mainExpertise,
+          full_name: fullName,
+          national_code: nationalCode,
+          company_name: companyName,
+          company_id: companyId,
+          verification_status: 'pending',
+          trust_level: 1,
+          created_at: new Date().toISOString(),
+          terms_accepted_at: terms ? new Date().toISOString() : null,
+          terms_version: '1.0'
+        };
+
+        // دریافت مقادیر پروژه و وزن
+        const projectArea = document.getElementById('projectArea')?.value;
+        const projectWeight = document.getElementById('projectWeight')?.value;
+        const areaUnit = document.getElementById('areaUnit')?.value;
+        
+        if (projectArea) {
+          profileData.project_area = parseInt(projectArea);
+          profileData.area_unit = areaUnit;
+        }
+        if (projectWeight) {
+          profileData.project_weight = parseInt(projectWeight);
+        }
+
+        // دریافت محدوده جغرافیایی
+        const workAreaSelect = document.getElementById('workArea');
+        const selectedAreas = Array.from(workAreaSelect.selectedOptions).map(opt => opt.value);
+        if (selectedAreas.length > 0) {
+          profileData.work_area = selectedAreas;
+        }
+
+        // دریافت شعاع فعالیت
+        const radius = document.getElementById('radius')?.value;
+        if (radius) {
+          profileData.work_radius = parseInt(radius);
+        }
+
+        // دریافت زیرحوزه‌های تخصصی
+        const subExpertiseCheckboxes = document.querySelectorAll('input[id^="subExpertise"]:checked');
+        if (subExpertiseCheckboxes.length > 0) {
+          const subExpertises = Array.from(subExpertiseCheckboxes).map(cb => cb.value);
+          profileData.sub_expertise = subExpertises;
+        }
+
+        // دریافت سال شروع فعالیت
+        const startYear = document.getElementById('startYear')?.value;
+        if (startYear) {
+          profileData.start_year = parseInt(startYear);
+        }
+
+        // دریافت تعداد نیروی انسانی
+        const teamSize = document.getElementById('teamSize')?.value;
+        if (teamSize) {
+          profileData.team_size = parseInt(teamSize);
+        }
+
+        // دریافت تجهیزات
+        const equipment = document.getElementById('equipment')?.value;
+        if (equipment) {
+          profileData.equipment = equipment;
+        }
+
+        // دریافت روش قرارداد
+        const contractMethod = document.getElementById('contractMethod')?.value;
+        if (contractMethod) {
+          profileData.contract_method = contractMethod;
+        }
+
+        // دریافت بیمه
+        const insurance = document.getElementById('insurance')?.value;
+        if (insurance) {
+          profileData.insurance = insurance;
+          if (insurance === 'yes') {
+            const insuranceExpiry = document.getElementById('insuranceExpiry')?.value;
+            if (insuranceExpiry) {
+              profileData.insurance_expiry = insuranceExpiry;
+            }
+          }
+        }
+
         const { error: profileError } = await supabase
           .from('profiles')
-          .insert([{
-            user_id: tempUserId,
-            email: email,
-            user_type: 'contractor',
-            account_type: accountType,
-            phone: mobile,
-            landline: phone,
-            contact_person: contactPerson,
-            main_expertise: mainExpertise,
-            full_name: fullName,
-            national_code: nationalCode,
-            company_name: companyName,
-            company_id: companyId,
-            verification_status: 'pending',
-            trust_level: 1,
-            created_at: new Date().toISOString(),
-            terms_accepted_at: terms ? new Date().toISOString() : null,
-            terms_version: '1.0'
-          }]);
+          .insert([profileData]);
 
         if (profileError) {
           console.error('خطای پروفایل:', profileError);
@@ -4661,7 +4799,7 @@ async submitContractorForm(e) {
           terms_accepted: true
         };
         
-        localStorage.setItem('peymanyar_user', JSON.stringify(this.userData));
+        this.saveUserData(this.userData);
 
         setTimeout(() => {
           this.showPage('home');
@@ -4676,20 +4814,153 @@ async submitContractorForm(e) {
       throw new Error('خطا در ثبت‌نام');
     }
 
-    // اینجا ثبت‌نام در Auth موفق بوده
+    // ثبت‌نام موفق - حالا اطلاعات کامل رو توی profiles ذخیره کن
+    let fullName = '';
+    let nationalCode = '';
+    let companyName = '';
+    let companyId = '';
+    
+    if (accountType === 'individual') {
+      fullName = document.getElementById('fullName')?.value || '';
+      nationalCode = document.getElementById('nationalCode')?.value || '';
+    } else {
+      companyName = document.getElementById('companyName')?.value || '';
+      companyId = document.getElementById('companyId')?.value || '';
+    }
+
+    // آماده‌سازی اطلاعات پروفایل
+    const profileData = {
+      user_type: 'contractor',
+      account_type: accountType,
+      phone: mobile,
+      landline: phone,
+      contact_person: contactPerson,
+      main_expertise: mainExpertise,
+      full_name: fullName,
+      national_code: nationalCode,
+      company_name: companyName,
+      company_id: companyId,
+      verification_status: 'pending',
+      trust_level: 1,
+      terms_accepted_at: terms ? new Date().toISOString() : null,
+      terms_version: '1.0'
+    };
+
+    // دریافت مقادیر پروژه و وزن
+    const projectArea = document.getElementById('projectArea')?.value;
+    const projectWeight = document.getElementById('projectWeight')?.value;
+    const areaUnit = document.getElementById('areaUnit')?.value;
+    
+    if (projectArea) {
+      profileData.project_area = parseInt(projectArea);
+      profileData.area_unit = areaUnit;
+    }
+    if (projectWeight) {
+      profileData.project_weight = parseInt(projectWeight);
+    }
+
+    // دریافت محدوده جغرافیایی
+    const workAreaSelect = document.getElementById('workArea');
+    const selectedAreas = Array.from(workAreaSelect.selectedOptions).map(opt => opt.value);
+    if (selectedAreas.length > 0) {
+      profileData.work_area = selectedAreas;
+    }
+
+    // دریافت شعاع فعالیت
+    const radius = document.getElementById('radius')?.value;
+    if (radius) {
+      profileData.work_radius = parseInt(radius);
+    }
+
+    // دریافت زیرحوزه‌های تخصصی
+    const subExpertiseCheckboxes = document.querySelectorAll('input[id^="subExpertise"]:checked');
+    if (subExpertiseCheckboxes.length > 0) {
+      const subExpertises = Array.from(subExpertiseCheckboxes).map(cb => cb.value);
+      profileData.sub_expertise = subExpertises;
+    }
+
+    // دریافت سال شروع فعالیت
+    const startYear = document.getElementById('startYear')?.value;
+    if (startYear) {
+      profileData.start_year = parseInt(startYear);
+    }
+
+    // دریافت تعداد نیروی انسانی
+    const teamSize = document.getElementById('teamSize')?.value;
+    if (teamSize) {
+      profileData.team_size = parseInt(teamSize);
+    }
+
+    // دریافت تجهیزات
+    const equipment = document.getElementById('equipment')?.value;
+    if (equipment) {
+      profileData.equipment = equipment;
+    }
+
+    // دریافت روش قرارداد
+    const contractMethod = document.getElementById('contractMethod')?.value;
+    if (contractMethod) {
+      profileData.contract_method = contractMethod;
+    }
+
+    // دریافت بیمه
+    const insurance = document.getElementById('insurance')?.value;
+    if (insurance) {
+      profileData.insurance = insurance;
+      if (insurance === 'yes') {
+        const insuranceExpiry = document.getElementById('insuranceExpiry')?.value;
+        if (insuranceExpiry) {
+          profileData.insurance_expiry = insuranceExpiry;
+        }
+      }
+    }
+
+    // اول ببینیم پروفایل وجود داره یا نه
+    const { data: existingProfile } = await supabase
+      .from('profiles')
+      .select('user_id')
+      .eq('user_id', authData.user.id)
+      .single();
+
+    if (existingProfile) {
+      // اگه وجود داره، آپدیتش کن
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .update(profileData)
+        .eq('user_id', authData.user.id);
+
+      if (updateError) {
+        console.error('خطا در آپدیت پروفایل:', updateError);
+      }
+    } else {
+      // اگه وجود نداره، جدید بساز
+      const { error: insertError } = await supabase
+        .from('profiles')
+        .insert([{
+          user_id: authData.user.id,
+          email: email,
+          ...profileData,
+          created_at: new Date().toISOString()
+        }]);
+
+      if (insertError) {
+        console.error('خطا در ایجاد پروفایل:', insertError);
+      }
+    }
+
     this.showToast('ثبت‌نام پیمانکار با موفقیت انجام شد!', 'success');
 
     this.userData = {
       id: authData.user.id,
       email: email,
-      full_name: '',
+      full_name: fullName || companyName,
       phone: mobile,
       user_type: 'contractor',
       account_type: accountType,
       terms_accepted: true
     };
     
-    localStorage.setItem('peymanyar_user', JSON.stringify(this.userData));
+    this.saveUserData(this.userData);
 
     setTimeout(() => {
       this.showPage('home');
