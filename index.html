@@ -5378,34 +5378,54 @@ this.userData = null;
 this.showPage('home');
 this.showToast('با موفقیت خارج شدید', 'success');
 }
-// ===== توابع مدیریت پروژه‌ها =====
 async loadProjects() {
   const statusFilter = document.getElementById('projectFilterStatus')?.value || 'all';
   const searchTerm = document.getElementById('projectSearch')?.value || '';
   
-  let query = supabase
-    .from('projects')
-    .select(`
-      *,
-      employer:profiles!employer_id(full_name, company_name, email)
-    `)
-    .order('created_at', { ascending: false });
-  
-  if (statusFilter !== 'all') {
-    query = query.eq('status', statusFilter);
-  }
-  
-  if (searchTerm) {
-    query = query.or(`title.ilike.%${searchTerm}%,description.ilike.%${searchTerm}%`);
-  }
-  
-  const { data: projects, error } = await query;
-  
-  if (error) {
-    console.error('خطا در دریافت پروژه‌ها:', error);
+  try {
+    // اول پروژه‌ها رو می‌گیریم
+    let query = supabase
+      .from('projects')
+      .select('*')
+      .order('created_at', { ascending: false });
+    
+    if (statusFilter !== 'all') {
+      query = query.eq('status', statusFilter);
+    }
+    
+    if (searchTerm) {
+      query = query.or(`title.ilike.%${searchTerm}%,description.ilike.%${searchTerm}%`);
+    }
+    
+    const { data: projects, error: projectsError } = await query;
+    
+    if (projectsError) {
+      console.error('خطا در دریافت پروژه‌ها:', projectsError);
+      this.showToast('خطا در دریافت پروژه‌ها', 'error');
+      return;
+    }
+    
+    // حالا برای هر پروژه، اطلاعات کارفرما رو جداگانه می‌گیریم
+    const projectsWithEmployer = await Promise.all(projects.map(async (project) => {
+      const { data: employer } = await supabase
+        .from('profiles')
+        .select('full_name, company_name, email')
+        .eq('user_id', project.employer_id)
+        .single();
+      
+      return {
+        ...project,
+        employer: employer || null
+      };
+    }));
+    
+    this.displayProjects(projectsWithEmployer);
+    
+  } catch (error) {
+    console.error('خطا:', error);
     this.showToast('خطا در دریافت پروژه‌ها', 'error');
-    return;
   }
+}
   
   this.displayProjects(projects);
 }
