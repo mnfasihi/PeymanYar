@@ -4241,37 +4241,33 @@ const summaryHtml = `
 document.getElementById('employerSummary').innerHTML = summaryHtml;
 }
 }
-//  تابع  (ثبت نام کارفرما)
+// ===== تابع ثبت‌نام کارفرما (نسخه نهایی) =====
 async submitEmployerForm(e) {
   e.preventDefault();
 
-  // بررسی اعتبارسنجی مرحله
   if (!this.validateEmployerStep(this.employerCurrentStep)) {
     return;
   }
 
-  // بررسی پذیرش قوانین
   const terms = document.getElementById('employerTerms').checked;
   if (!terms) {
     this.showToast('لطفاً با قوانین و مقررات موافقت کنید.', 'error');
     return;
   }
 
-  // دریافت اطلاعات فرم
   const accountType = document.getElementById('employerAccountType').value;
   const email = document.getElementById('employerEmail').value;
   const password = document.getElementById('employerPassword').value;
   const mobile = document.getElementById('employerMobile').value;
   const address = document.getElementById('employerAddress').value;
 
-  // غیرفعال کردن دکمه ثبت‌نام
   const submitBtn = document.getElementById('employerSubmitBtn');
   const originalText = submitBtn.innerHTML;
   submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>در حال ثبت‌نام...';
   submitBtn.disabled = true;
 
   try {
-    // ثبت‌نام در Supabase Auth
+    // ثبت‌نام در Supabase Auth (اینجا کاربر در auth.users ساخته می‌شود)
     const { data: authData, error: authError } = await supabase.auth.signUp({
       email,
       password,
@@ -4284,126 +4280,91 @@ async submitEmployerForm(e) {
       }
     });
 
-    // اگر خطای 500 یا خطای ارسال ایمیل رخ داد، باز هم ادامه بده
     if (authError) {
-      console.warn('خطای ثبت‌نام در Auth:', authError);
+      console.error('خطای ثبت‌نام:', authError);
       
-      // اگر خطای 500 یا خطای ایمیل است، با یک شناسه موقت ادامه بده
-      if (authError.status === 500 || authError.message.includes('confirmation email')) {
-        this.showToast('ثبت‌نام با شناسه موقت ادامه می‌یابد...', 'warning');
-        
-        // ایجاد شناسه موقت
-        const tempUserId = 'temp_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5);
-        
-        // آماده‌سازی اطلاعات پروفایل
-        const profileData = {
-          user_id: tempUserId,
-          email: email,
-          user_type: 'employer',
-          account_type: accountType,
-          phone: mobile,
-          address: address,
-          created_at: new Date().toISOString(),
-          terms_accepted_at: terms ? new Date().toISOString() : null,
-          terms_version: '1.0'
-        };
-
-        if (accountType === 'individual') {
-          profileData.full_name = document.getElementById('employerFullName')?.value || 'کاربر';
-          profileData.national_code = document.getElementById('employerNationalCode')?.value || '0000000000';
-        } else {
-          profileData.company_name = document.getElementById('employerCompanyName')?.value || 'شرکت';
-          profileData.company_id = document.getElementById('employerCompanyId')?.value || '000000';
-          profileData.registration_no = document.getElementById('employerRegistrationNo')?.value || '0000';
-          profileData.company_type = document.getElementById('employerCompanyType')?.value || 'other';
-          profileData.website = document.getElementById('employerCompanyWebsite')?.value || '';
-          profileData.company_description = document.getElementById('employerCompanyDescription')?.value || '';
-        }
-
-        // ذخیره مستقیم در profiles
-        const { error: profileError } = await supabase
-          .from('profiles')
-          .insert([profileData]);
-
-        if (profileError) {
-          throw new Error('خطا در ثبت اطلاعات: ' + profileError.message);
-        }
-
-        this.showToast('ثبت‌نام کارفرما با موفقیت انجام شد!', 'success');
-
-        this.userData = {
-          id: tempUserId,
-          email: email,
-          full_name: profileData.full_name || profileData.company_name,
-          phone: mobile,
-          user_type: 'employer',
-          account_type: accountType,
-          terms_accepted: true
-        };
-        localStorage.setItem('peymanyar_user', JSON.stringify(this.userData));
-
-        setTimeout(() => {
-          this.showPage('home');
-        }, 1500);
-        return;
+      if (authError.message.includes('User already registered')) {
+        throw new Error('این ایمیل قبلاً ثبت‌نام شده است.');
       } else {
         throw authError;
       }
     }
 
-    // اگر ثبت‌نام در Auth موفق بود
-    if (authData && authData.user) {
-      // آماده‌سازی اطلاعات پروفایل
-      const profileData = {
-        user_id: authData.user.id,
-        email: email,
-        user_type: 'employer',
+    if (!authData || !authData.user) {
+      throw new Error('خطا در ثبت‌نام');
+    }
+
+    // حالا تریگر به طور خودکار یک رکورد در profiles ایجاد می‌کند
+    // اما ما باید اطلاعات تکمیلی رو به‌روزرسانی کنیم
+    const { error: updateError } = await supabase
+      .from('profiles')
+      .update({
         account_type: accountType,
         phone: mobile,
         address: address,
-        created_at: new Date().toISOString(),
         terms_accepted_at: terms ? new Date().toISOString() : null,
         terms_version: '1.0'
-      };
+      })
+      .eq('user_id', authData.user.id);
 
-      if (accountType === 'individual') {
-        profileData.full_name = document.getElementById('employerFullName')?.value;
-        profileData.national_code = document.getElementById('employerNationalCode')?.value;
-      } else {
-        profileData.company_name = document.getElementById('employerCompanyName')?.value;
-        profileData.company_id = document.getElementById('employerCompanyId')?.value;
-        profileData.registration_no = document.getElementById('employerRegistrationNo')?.value;
-        profileData.company_type = document.getElementById('employerCompanyType')?.value;
-        profileData.website = document.getElementById('employerCompanyWebsite')?.value;
-        profileData.company_description = document.getElementById('employerCompanyDescription')?.value;
-      }
-
-      // ذخیره پروفایل
-      const { error: profileError } = await supabase
-        .from('profiles')
-        .insert([profileData]);
-
-      if (profileError) {
-        throw profileError;
-      }
-
-      this.showToast('ثبت‌نام کارفرما با موفقیت انجام شد!', 'success');
-
-      this.userData = {
-        id: authData.user.id,
-        email: email,
-        full_name: profileData.full_name || profileData.company_name,
-        phone: mobile,
-        user_type: 'employer',
-        account_type: accountType,
-        terms_accepted: true
-      };
-      localStorage.setItem('peymanyar_user', JSON.stringify(this.userData));
-
-      setTimeout(() => {
-        this.showPage('home');
-      }, 1500);
+    if (updateError) {
+      console.error('خطا در به‌روزرسانی پروفایل:', updateError);
     }
+
+    // اگر شخص حقیقی است
+    if (accountType === 'individual') {
+      const fullName = document.getElementById('employerFullName')?.value;
+      const nationalCode = document.getElementById('employerNationalCode')?.value;
+      
+      if (fullName || nationalCode) {
+        await supabase
+          .from('profiles')
+          .update({
+            full_name: fullName,
+            national_code: nationalCode
+          })
+          .eq('user_id', authData.user.id);
+      }
+    } 
+    // اگر شخص حقوقی است
+    else {
+      const companyName = document.getElementById('employerCompanyName')?.value;
+      const companyId = document.getElementById('employerCompanyId')?.value;
+      const registrationNo = document.getElementById('employerRegistrationNo')?.value;
+      const companyType = document.getElementById('employerCompanyType')?.value;
+      const website = document.getElementById('employerCompanyWebsite')?.value;
+      const companyDesc = document.getElementById('employerCompanyDescription')?.value;
+      
+      await supabase
+        .from('profiles')
+        .update({
+          company_name: companyName,
+          company_id: companyId,
+          registration_no: registrationNo,
+          company_type: companyType,
+          website: website,
+          company_description: companyDesc
+        })
+        .eq('user_id', authData.user.id);
+    }
+
+    this.showToast('ثبت‌نام کارفرما با موفقیت انجام شد!', 'success');
+
+    this.userData = {
+      id: authData.user.id,
+      email: email,
+      full_name: document.getElementById('employerFullName')?.value || companyName,
+      phone: mobile,
+      user_type: 'employer',
+      account_type: accountType,
+      terms_accepted: true
+    };
+    
+    localStorage.setItem('peymanyar_user', JSON.stringify(this.userData));
+
+    setTimeout(() => {
+      this.showPage('home');
+    }, 1500);
 
   } catch (error) {
     console.error('خطای ثبت‌نام:', error);
@@ -4520,11 +4481,10 @@ updateContractorFields() {
   }
 }
 
-// تابع ثبت‌نام پیمانکار
-// تابع ثبت‌نام پیمانکار (کامل و اصلاح شده)
+// ===== تابع ثبت‌نام پیمانکار (نسخه نهایی) =====
 async submitContractorForm(e) {
   e.preventDefault();
-  
+
   // بررسی اعتبارسنجی مرحله
   if (!this.validateContractorStep(this.contractorCurrentStep)) {
     return;
@@ -4553,7 +4513,7 @@ async submitContractorForm(e) {
   submitBtn.disabled = true;
 
   try {
-    // ثبت‌نام در Supabase Auth
+    // ثبت‌نام در Supabase Auth (کاربر در auth.users ساخته می‌شود)
     const { data: authData, error: authError } = await supabase.auth.signUp({
       email,
       password,
@@ -4566,311 +4526,179 @@ async submitContractorForm(e) {
       }
     });
 
-    // اگر خطای 500 یا خطای ارسال ایمیل رخ داد، باز هم ادامه بده
     if (authError) {
-      console.warn('خطای ثبت‌نام در Auth:', authError);
+      console.error('خطای ثبت‌نام:', authError);
       
-      // اگر خطای 500 یا خطای ایمیل است، با یک شناسه موقت ادامه بده
-      if (authError.status === 500 || authError.message.includes('confirmation email')) {
-        this.showToast('ثبت‌نام با شناسه موقت ادامه می‌یابد...', 'warning');
-        
-        // ایجاد شناسه موقت
-        const tempUserId = 'temp_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5);
-        
-        // آماده‌سازی اطلاعات پروفایل
-        const profileData = {
-          user_id: tempUserId,
-          email: email,
-          user_type: 'contractor',
-          account_type: accountType,
-          phone: mobile,
-          landline: phone,
-          contact_person: contactPerson,
-          main_expertise: mainExpertise,
-          verification_status: 'pending',
-          trust_level: 1,
-          created_at: new Date().toISOString(),
-          terms_accepted_at: terms ? new Date().toISOString() : null,
-          terms_version: '1.0'
-        };
-
-        // دریافت مقادیر پروژه و وزن
-        const projectArea = document.getElementById('projectArea')?.value;
-        const projectWeight = document.getElementById('projectWeight')?.value;
-        const areaUnit = document.getElementById('areaUnit')?.value;
-        
-        if (projectArea) {
-          profileData.project_area = parseInt(projectArea);
-          profileData.area_unit = areaUnit;
-        }
-        if (projectWeight) {
-          profileData.project_weight = parseInt(projectWeight);
-        }
-
-        // دریافت محدوده جغرافیایی
-        const workAreaSelect = document.getElementById('workArea');
-        const selectedAreas = Array.from(workAreaSelect.selectedOptions).map(opt => opt.value);
-        if (selectedAreas.length > 0) {
-          profileData.work_area = selectedAreas;
-        }
-
-        // دریافت شعاع فعالیت
-        const radius = document.getElementById('radius')?.value;
-        if (radius) {
-          profileData.work_radius = parseInt(radius);
-        }
-
-        // دریافت زیرحوزه‌های تخصصی
-        const subExpertiseCheckboxes = document.querySelectorAll('input[id^="subExpertise"]:checked');
-        if (subExpertiseCheckboxes.length > 0) {
-          const subExpertises = Array.from(subExpertiseCheckboxes).map(cb => cb.value);
-          profileData.sub_expertise = subExpertises;
-        }
-
-        // دریافت سال شروع فعالیت
-        const startYear = document.getElementById('startYear')?.value;
-        if (startYear) {
-          profileData.start_year = parseInt(startYear);
-        }
-
-        // دریافت تعداد نیروی انسانی
-        const teamSize = document.getElementById('teamSize')?.value;
-        if (teamSize) {
-          profileData.team_size = parseInt(teamSize);
-        }
-
-        // دریافت تجهیزات
-        const equipment = document.getElementById('equipment')?.value;
-        if (equipment) {
-          profileData.equipment = equipment;
-        }
-
-        // دریافت روش قرارداد
-        const contractMethod = document.getElementById('contractMethod')?.value;
-        if (contractMethod) {
-          profileData.contract_method = contractMethod;
-        }
-
-        // دریافت بیمه
-        const insurance = document.getElementById('insurance')?.value;
-        if (insurance) {
-          profileData.insurance = insurance;
-          if (insurance === 'yes') {
-            const insuranceExpiry = document.getElementById('insuranceExpiry')?.value;
-            if (insuranceExpiry) {
-              profileData.insurance_expiry = insuranceExpiry;
-            }
-          }
-        }
-
-        // دریافت پروژه‌های نمونه
-        const projectNames = document.querySelectorAll('input[name="projectName[]"]');
-        const projectYears = document.querySelectorAll('select[name="projectYear[]"]');
-        const projectClients = document.querySelectorAll('input[name="projectClient[]"]');
-        
-        const projects = [];
-        for (let i = 0; i < projectNames.length; i++) {
-          if (projectNames[i].value || projectYears[i].value || projectClients[i].value) {
-            projects.push({
-              name: projectNames[i].value || 'بدون نام',
-              year: projectYears[i]?.value || '',
-              client: projectClients[i]?.value || ''
-            });
-          }
-        }
-        if (projects.length > 0) {
-          profileData.projects = projects;
-        }
-
-        // اطلاعات شخصی یا شرکت
-        if (accountType === 'individual') {
-          profileData.full_name = document.getElementById('fullName')?.value || 'کاربر';
-          profileData.national_code = document.getElementById('nationalCode')?.value || '0000000000';
-        } else {
-          profileData.company_name = document.getElementById('companyName')?.value || 'شرکت';
-          profileData.company_id = document.getElementById('companyId')?.value || '000000';
-        }
-
-        // ذخیره مستقیم در profiles
-        const { error: profileError } = await supabase
-          .from('profiles')
-          .insert([profileData]);
-
-        if (profileError) {
-          console.error('خطای پروفایل:', profileError);
-          throw new Error('خطا در ثبت اطلاعات: ' + profileError.message);
-        }
-
-        this.showToast('ثبت‌نام پیمانکار با موفقیت انجام شد!', 'success');
-
-        this.userData = {
-          id: tempUserId,
-          email: email,
-          full_name: profileData.full_name || profileData.company_name,
-          phone: mobile,
-          user_type: 'contractor',
-          account_type: accountType,
-          terms_accepted: true
-        };
-        localStorage.setItem('peymanyar_user', JSON.stringify(this.userData));
-
-        setTimeout(() => {
-          this.showPage('home');
-        }, 1500);
-        return;
+      if (authError.message.includes('User already registered')) {
+        throw new Error('این ایمیل قبلاً ثبت‌نام شده است.');
       } else {
         throw authError;
       }
     }
 
-    // اگر ثبت‌نام در Auth موفق بود
-    if (authData && authData.user) {
-      // آماده‌سازی اطلاعات پروفایل
-      const profileData = {
-        user_id: authData.user.id,
-        email: email,
-        user_type: 'contractor',
-        account_type: accountType,
-        phone: mobile,
-        landline: phone,
-        contact_person: contactPerson,
-        main_expertise: mainExpertise,
-        verification_status: 'pending',
-        trust_level: 1,
-        created_at: new Date().toISOString(),
-        terms_accepted_at: terms ? new Date().toISOString() : null,
-        terms_version: '1.0'
-      };
-
-      // دریافت مقادیر پروژه و وزن
-      const projectArea = document.getElementById('projectArea')?.value;
-      const projectWeight = document.getElementById('projectWeight')?.value;
-      const areaUnit = document.getElementById('areaUnit')?.value;
-      
-      if (projectArea) {
-        profileData.project_area = parseInt(projectArea);
-        profileData.area_unit = areaUnit;
-      }
-      if (projectWeight) {
-        profileData.project_weight = parseInt(projectWeight);
-      }
-
-      // دریافت محدوده جغرافیایی
-      const workAreaSelect = document.getElementById('workArea');
-      const selectedAreas = Array.from(workAreaSelect.selectedOptions).map(opt => opt.value);
-      if (selectedAreas.length > 0) {
-        profileData.work_area = selectedAreas;
-      }
-
-      // دریافت شعاع فعالیت
-      const radius = document.getElementById('radius')?.value;
-      if (radius) {
-        profileData.work_radius = parseInt(radius);
-      }
-
-      // دریافت زیرحوزه‌های تخصصی
-      const subExpertiseCheckboxes = document.querySelectorAll('input[id^="subExpertise"]:checked');
-      if (subExpertiseCheckboxes.length > 0) {
-        const subExpertises = Array.from(subExpertiseCheckboxes).map(cb => cb.value);
-        profileData.sub_expertise = subExpertises;
-      }
-
-      // دریافت سال شروع فعالیت
-      const startYear = document.getElementById('startYear')?.value;
-      if (startYear) {
-        profileData.start_year = parseInt(startYear);
-      }
-
-      // دریافت تعداد نیروی انسانی
-      const teamSize = document.getElementById('teamSize')?.value;
-      if (teamSize) {
-        profileData.team_size = parseInt(teamSize);
-      }
-
-      // دریافت تجهیزات
-      const equipment = document.getElementById('equipment')?.value;
-      if (equipment) {
-        profileData.equipment = equipment;
-      }
-
-      // دریافت روش قرارداد
-      const contractMethod = document.getElementById('contractMethod')?.value;
-      if (contractMethod) {
-        profileData.contract_method = contractMethod;
-      }
-
-      // دریافت بیمه
-      const insurance = document.getElementById('insurance')?.value;
-      if (insurance) {
-        profileData.insurance = insurance;
-        if (insurance === 'yes') {
-          const insuranceExpiry = document.getElementById('insuranceExpiry')?.value;
-          if (insuranceExpiry) {
-            profileData.insurance_expiry = insuranceExpiry;
-          }
-        }
-      }
-
-      // دریافت پروژه‌های نمونه
-      const projectNames = document.querySelectorAll('input[name="projectName[]"]');
-      const projectYears = document.querySelectorAll('select[name="projectYear[]"]');
-      const projectClients = document.querySelectorAll('input[name="projectClient[]"]');
-      
-      const projects = [];
-      for (let i = 0; i < projectNames.length; i++) {
-        if (projectNames[i].value || projectYears[i].value || projectClients[i].value) {
-          projects.push({
-            name: projectNames[i].value || 'بدون نام',
-            year: projectYears[i]?.value || '',
-            client: projectClients[i]?.value || ''
-          });
-        }
-      }
-      if (projects.length > 0) {
-        profileData.projects = projects;
-      }
-
-      // اطلاعات شخصی یا شرکت
-      if (accountType === 'individual') {
-        profileData.full_name = document.getElementById('fullName')?.value;
-        profileData.national_code = document.getElementById('nationalCode')?.value;
-      } else {
-        profileData.company_name = document.getElementById('companyName')?.value;
-        profileData.company_id = document.getElementById('companyId')?.value;
-      }
-
-      // ذخیره پروفایل
-      const { error: profileError } = await supabase
-        .from('profiles')
-        .insert([profileData]);
-
-      if (profileError) {
-        // اگر خطا در ذخیره پروفایل بود، کاربر ایجاد شده را حذف کن
-        try {
-          await supabase.auth.admin.deleteUser(authData.user.id);
-        } catch (deleteError) {
-          console.error('خطا در حذف کاربر:', deleteError);
-        }
-        throw profileError;
-      }
-
-      this.showToast('ثبت‌نام پیمانکار با موفقیت انجام شد!', 'success');
-
-      this.userData = {
-        id: authData.user.id,
-        email: email,
-        full_name: profileData.full_name || profileData.company_name,
-        phone: mobile,
-        user_type: 'contractor',
-        account_type: accountType,
-        terms_accepted: true
-      };
-      localStorage.setItem('peymanyar_user', JSON.stringify(this.userData));
-
-      setTimeout(() => {
-        this.showPage('home');
-      }, 1500);
+    if (!authData || !authData.user) {
+      throw new Error('خطا در ثبت‌نام');
     }
+
+    // تریگر به طور خودکار یک رکورد در profiles ایجاد کرده
+    // حالا باید اطلاعات تکمیلی رو به‌روزرسانی کنیم
+    const profileData = {
+      phone: mobile,
+      landline: phone,
+      contact_person: contactPerson,
+      main_expertise: mainExpertise,
+      verification_status: 'pending',
+      trust_level: 1,
+      terms_accepted_at: terms ? new Date().toISOString() : null,
+      terms_version: '1.0'
+    };
+
+    // دریافت مقادیر پروژه و وزن
+    const projectArea = document.getElementById('projectArea')?.value;
+    const projectWeight = document.getElementById('projectWeight')?.value;
+    const areaUnit = document.getElementById('areaUnit')?.value;
+    
+    if (projectArea) {
+      profileData.project_area = parseInt(projectArea);
+      profileData.area_unit = areaUnit;
+    }
+    if (projectWeight) {
+      profileData.project_weight = parseInt(projectWeight);
+    }
+
+    // دریافت محدوده جغرافیایی
+    const workAreaSelect = document.getElementById('workArea');
+    const selectedAreas = Array.from(workAreaSelect.selectedOptions).map(opt => opt.value);
+    if (selectedAreas.length > 0) {
+      profileData.work_area = selectedAreas;
+    }
+
+    // دریافت شعاع فعالیت
+    const radius = document.getElementById('radius')?.value;
+    if (radius) {
+      profileData.work_radius = parseInt(radius);
+    }
+
+    // دریافت زیرحوزه‌های تخصصی
+    const subExpertiseCheckboxes = document.querySelectorAll('input[id^="subExpertise"]:checked');
+    if (subExpertiseCheckboxes.length > 0) {
+      const subExpertises = Array.from(subExpertiseCheckboxes).map(cb => cb.value);
+      profileData.sub_expertise = subExpertises;
+    }
+
+    // دریافت سال شروع فعالیت
+    const startYear = document.getElementById('startYear')?.value;
+    if (startYear) {
+      profileData.start_year = parseInt(startYear);
+    }
+
+    // دریافت تعداد نیروی انسانی
+    const teamSize = document.getElementById('teamSize')?.value;
+    if (teamSize) {
+      profileData.team_size = parseInt(teamSize);
+    }
+
+    // دریافت تجهیزات
+    const equipment = document.getElementById('equipment')?.value;
+    if (equipment) {
+      profileData.equipment = equipment;
+    }
+
+    // دریافت روش قرارداد
+    const contractMethod = document.getElementById('contractMethod')?.value;
+    if (contractMethod) {
+      profileData.contract_method = contractMethod;
+    }
+
+    // دریافت بیمه
+    const insurance = document.getElementById('insurance')?.value;
+    if (insurance) {
+      profileData.insurance = insurance;
+      if (insurance === 'yes') {
+        const insuranceExpiry = document.getElementById('insuranceExpiry')?.value;
+        if (insuranceExpiry) {
+          profileData.insurance_expiry = insuranceExpiry;
+        }
+      }
+    }
+
+    // اطلاعات شخصی یا شرکت
+    if (accountType === 'individual') {
+      const fullName = document.getElementById('fullName')?.value;
+      const nationalCode = document.getElementById('nationalCode')?.value;
+      
+      if (fullName) profileData.full_name = fullName;
+      if (nationalCode) profileData.national_code = nationalCode;
+      
+    } else {
+      const companyName = document.getElementById('companyName')?.value;
+      const companyId = document.getElementById('companyId')?.value;
+      
+      if (companyName) profileData.company_name = companyName;
+      if (companyId) profileData.company_id = companyId;
+    }
+
+    // به‌روزرسانی پروفایل
+    const { error: updateError } = await supabase
+      .from('profiles')
+      .update(profileData)
+      .eq('user_id', authData.user.id);
+
+    if (updateError) {
+      console.error('خطا در به‌روزرسانی پروفایل:', updateError);
+      throw updateError;
+    }
+
+    // دریافت پروژه‌های نمونه
+    const projectNames = document.querySelectorAll('input[name="projectName[]"]');
+    const projectYears = document.querySelectorAll('select[name="projectYear[]"]');
+    const projectClients = document.querySelectorAll('input[name="projectClient[]"]');
+    
+    const projects = [];
+    for (let i = 0; i < projectNames.length; i++) {
+      if (projectNames[i].value || projectYears[i]?.value || projectClients[i]?.value) {
+        projects.push({
+          name: projectNames[i].value || 'بدون نام',
+          year: projectYears[i]?.value || '',
+          client: projectClients[i]?.value || ''
+        });
+      }
+    }
+    
+    if (projects.length > 0) {
+      const { error: projectsError } = await supabase
+        .from('contractor_projects')
+        .insert(
+          projects.map(p => ({
+            user_id: authData.user.id,
+            project_name: p.name,
+            project_year: p.year,
+            client_name: p.client
+          }))
+        );
+      
+      if (projectsError) {
+        console.error('خطا در ذخیره پروژه‌ها:', projectsError);
+      }
+    }
+
+    this.showToast('ثبت‌نام پیمانکار با موفقیت انجام شد!', 'success');
+
+    this.userData = {
+      id: authData.user.id,
+      email: email,
+      full_name: profileData.full_name || profileData.company_name,
+      phone: mobile,
+      user_type: 'contractor',
+      account_type: accountType,
+      terms_accepted: true
+    };
+    
+    localStorage.setItem('peymanyar_user', JSON.stringify(this.userData));
+
+    setTimeout(() => {
+      this.showPage('home');
+    }, 1500);
 
   } catch (error) {
     console.error('خطای ثبت‌نام:', error);
