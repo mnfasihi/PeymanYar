@@ -6351,17 +6351,31 @@ async loadAdminStats() {
     console.error('خطا در بارگذاری آمار مدیریت:', error);
   }
 }
+}
+console.log('PeymanyarApp class defined?', typeof PeymanyarApp);
+
 let app;
 document.addEventListener('DOMContentLoaded', () => {
-  app = new PeymanyarApp();
+  console.log('DOM loaded, creating app...');
+  try {
+    app = new PeymanyarApp();
+    console.log('App created successfully');
+  } catch (error) {
+    console.error('Error creating app:', error);
+  }
+  
   const hash = window.location.hash.substring(1) || 'home';
-  app.showPage(hash, false);
+  if (app) {
+    app.showPage(hash, false);
+  }
+  
   setTimeout(() => {
     const notification = document.getElementById('assistantNotification');
     if (notification) notification.style.display = 'flex';
   }, 2000);
 });
 
+// ===== توابع گلوبال =====
 window.showPage = (pageId) => app?.showPage(pageId);
 window.showMainPage = () => app?.showMainPage();
 window.showLogin = () => app?.showLogin();
