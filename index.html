@@ -4985,58 +4985,66 @@ this.handleFileUpload({ target: input });
 }
 
 addProject() {
-const container = document.getElementById('projectContainer');
-const projectCount = container.children.length + 1;
-if (projectCount > 5) {
-this.showToast('حداکثر ۵ پروژه می‌توانید اضافه کنید.', 'error');
-return;
-}
-const projectDiv = document.createElement('div');
-projectDiv.className = 'card mb-3 project-card';
-projectDiv.innerHTML = `
-<div class="card-body">
-<div class="d-flex justify-content-between align-items-center mb-3">
-<h6 class="card-title mb-0">پروژه نمونه ${projectCount}</h6>
-<button type="button" class="btn btn-sm btn-outline-danger" onclick="app.removeProject(this)">
-<i class="bi bi-trash"></i>
-</button>
-</div>
-<div class="row">
-<div class="col-md-4 mb-3">
-<label class="form-label">نام پروژه</label>
-<input type="text" class="form-control" name="projectName[]">
-</div>
-<div class="col-md-4 mb-3">
-<label class="form-label">سال تحویل (شمسی)</label>
-<select class="form-select" name="projectYear[]">
-<option value="">-- انتخاب --</option>
-</select>
-</div>
-<div class="col-md-4 mb-3">
-<label class="form-label">مشتری</label>
-<input type="text" class="form-control" name="projectClient[]" placeholder="نام شرکت یا شخص">
-</div>
-<div class="col-12 mb-3">
-<label class="form-label">تصویر پروژه (حداکثر ۱ تصویر)</label>
-<input type="file" class="form-control" name="projectImage[]" accept="image/*">
-</div>
-</div>
-</div>
-`;
-container.appendChild(projectDiv);
-const yearSelect = projectDiv.querySelector('select[name="projectYear[]"]');
-this.populateYearSelect(yearSelect, 1380, 1403);
-this.showAutoSaveStatus('پروژه جدید اضافه شد.', 'success');
+  const container = document.getElementById('projectContainer');
+  const projectCount = container.children.length + 1;
+  
+  if (projectCount > 5) {
+    this.showToast('حداکثر ۵ پروژه می‌توانید اضافه کنید.', 'error');
+    return;
+  }
+  
+  const projectDiv = document.createElement('div');
+  projectDiv.className = 'card mb-3 project-card';
+  projectDiv.innerHTML = `
+  <div class="card-body">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h6 class="card-title mb-0">پروژه نمونه ${projectCount}</h6>
+      <button type="button" class="btn btn-sm btn-outline-danger" onclick="app.removeProject(this)">
+        <i class="bi bi-trash"></i>
+      </button>
+    </div>
+    <div class="row">
+      <div class="col-md-4 mb-3">
+        <label class="form-label">نام پروژه</label>
+        <input type="text" class="form-control" name="projectName[]">
+      </div>
+      <div class="col-md-4 mb-3">
+        <label class="form-label">سال تحویل (شمسی)</label>
+        <select class="form-select" name="projectYear[]">
+          <option value="">-- انتخاب سال --</option>
+        </select>
+      </div>
+      <div class="col-md-4 mb-3">
+        <label class="form-label">مشتری</label>
+        <input type="text" class="form-control" name="projectClient[]" placeholder="نام شرکت یا شخص">
+      </div>
+      <div class="col-12 mb-3">
+        <label class="form-label">تصویر پروژه (حداکثر ۱ تصویر)</label>
+        <input type="file" class="form-control" name="projectImage[]" accept="image/*">
+      </div>
+    </div>
+  </div>
+  `;
+  
+  container.appendChild(projectDiv);
+  
+  // پر کردن کرکره سال برای پروژه جدید
+  const yearSelect = projectDiv.querySelector('select[name="projectYear[]"]');
+  this.populateProjectYearSelect(yearSelect);
+  
+  this.showAutoSaveStatus('پروژه جدید اضافه شد.', 'success');
 }
 
 removeProject(button) {
-const projectCard = button.closest('.project-card');
-if (projectCard && document.getElementById('projectContainer').children.length > 1) {
-projectCard.remove();
-this.showAutoSaveStatus('پروژه حذف شد.', 'success');
-} else {
-this.showToast('حداقل یک پروژه باید وجود داشته باشد.', 'error');
-}
+  const projectCard = button.closest('.project-card');
+  const container = document.getElementById('projectContainer');
+  
+  if (container.children.length > 1) {
+    projectCard.remove();
+    this.showAutoSaveStatus('پروژه حذف شد.', 'success');
+  } else {
+    this.showToast('حداقل یک پروژه باید وجود داشته باشد.', 'error');
+  }
 }
 
 nextContractorStep() {
@@ -5286,33 +5294,67 @@ this.clearValidationErrors();
 }
 
 showContractorRegistration() {
-this.showPage('contractorRegistration');
-this.contractorCurrentStep = 1;
-document.querySelectorAll('#contractorRegistration .form-section').forEach((section, index) => {
-if (index === 0) {
-section.style.display = 'block';
-} else {
-section.style.display = 'none';
+  this.showPage('contractorRegistration');
+  this.contractorCurrentStep = 1;
+  
+  document.querySelectorAll('#contractorRegistration .form-section').forEach((section, index) => {
+    if (index === 0) {
+      section.style.display = 'block';
+    } else {
+      section.style.display = 'none';
+    }
+  });
+  
+  this.updateProgressBar();
+  this.updateStepIndicator();
+  this.updateContractorNavigation();
+  document.getElementById('contractorForm').reset();
+  this.updateContractorFields();
+  this.clearValidationErrors();
+  document.getElementById('fileList').innerHTML = '';
+  
+  // ریست کردن پروژه‌ها
+  const projectContainer = document.getElementById('projectContainer');
+  projectContainer.innerHTML = `
+    <div class="card mb-3 project-card">
+      <div class="card-body">
+        <h6 class="card-title">پروژه نمونه ۱</h6>
+        <div class="row">
+          <div class="col-md-4 mb-3">
+            <label class="form-label">نام پروژه</label>
+            <input type="text" class="form-control" name="projectName[]">
+          </div>
+          <div class="col-md-4 mb-3">
+            <label class="form-label">سال تحویل (شمسی)</label>
+            <select class="form-select" name="projectYear[]">
+              <option value="">-- انتخاب سال --</option>
+            </select>
+          </div>
+          <div class="col-md-4 mb-3">
+            <label class="form-label">مشتری</label>
+            <input type="text" class="form-control" name="projectClient[]" placeholder="نام شرکت یا شخص">
+          </div>
+          <div class="col-12 mb-3">
+            <label class="form-label">تصویر پروژه (حداکثر ۱ تصویر)</label>
+            <input type="file" class="form-control" name="projectImage[]" accept="image/*">
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+  
+  // پر کردن کرکره سال برای پروژه اول
+  const firstYearSelect = document.querySelector('#projectContainer select[name="projectYear[]"]');
+  this.populateProjectYearSelect(firstYearSelect);
+  
+  const workArea = document.getElementById('workArea');
+  Array.from(workArea.options).forEach(opt => {
+    opt.disabled = false;
+    opt.selected = false;
+  });
+  
+  document.getElementById('formSummary').style.display = 'none';
   localStorage.removeItem('contractor_form_temp');
-}
-});
-this.updateProgressBar();
-this.updateStepIndicator();
-this.updateContractorNavigation();
-document.getElementById('contractorForm').reset();
-this.updateContractorFields();
-this.clearValidationErrors();
-document.getElementById('fileList').innerHTML = '';
-const projectContainer = document.getElementById('projectContainer');
-while (projectContainer.children.length > 1) {
-projectContainer.removeChild(projectContainer.lastChild);
-}
-const workArea = document.getElementById('workArea');
-Array.from(workArea.options).forEach(opt => {
-opt.disabled = false;
-opt.selected = false;
-});
-document.getElementById('formSummary').style.display = 'none';
 }
 
 populateYearSelect(selectId, startYear, endYear) {
@@ -5332,6 +5374,23 @@ option.value = year;
 option.text = year;
 selectElement.appendChild(option);
 }
+}
+
+populateProjectYearSelect(selectElement) {
+  if (!selectElement) return;
+  
+  // پاک کردن گزینه‌های قبلی به جز گزینه اول
+  while (selectElement.options.length > 1) {
+    selectElement.remove(1);
+  }
+  
+  // اضافه کردن سال‌ها از 1380 تا 1403
+  for (let year = 1403; year >= 1380; year--) {
+    const option = document.createElement('option');
+    option.value = year;
+    option.text = year;
+    selectElement.appendChild(option);
+  }
 }
 
 showAutoSaveStatus(message, type = 'success') {
