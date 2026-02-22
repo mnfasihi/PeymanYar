@@ -5808,15 +5808,17 @@ async loadAdminStats() {
   } catch (error) {
     console.error('خطا در بارگذاری آمار مدیریت:', error);
   }
+} // <--- این آکولاد رو اضافه کن
+
 let app;
 document.addEventListener('DOMContentLoaded', () => {
-app = new PeymanyarApp();
-const hash = window.location.hash.substring(1) || 'home';
-app.showPage(hash, false);
-setTimeout(() => {
-const notification = document.getElementById('assistantNotification');
-if (notification) notification.style.display = 'flex';
-}, 2000);
+  app = new PeymanyarApp();
+  const hash = window.location.hash.substring(1) || 'home';
+  app.showPage(hash, false);
+  setTimeout(() => {
+    const notification = document.getElementById('assistantNotification');
+    if (notification) notification.style.display = 'flex';
+  }, 2000);
 });
 
 window.showPage = (pageId) => app?.showPage(pageId);
