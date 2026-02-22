@@ -2910,6 +2910,7 @@ this.setupMessagingSystem();
 this.setupHeroSlider();
 this.setupAdminSystem();
 this.setupLoginForms();
+this.setupPasswordValidation();
 }
 
 setupEventListeners() {
@@ -3899,7 +3900,64 @@ input.type = 'text';
 input.type = 'password';
 }
 }
-
+// ===== تابع بررسی تطابق رمز عبور =====
+setupPasswordValidation() {
+  // برای فرم کارفرما
+  const employerPassword = document.getElementById('employerPassword');
+  const employerConfirm = document.getElementById('employerConfirmPassword');
+  
+  if (employerPassword && employerConfirm) {
+    const checkEmployerMatch = () => {
+      if (employerConfirm.value && employerPassword.value !== employerConfirm.value) {
+        employerConfirm.classList.add('is-invalid');
+        let feedback = document.getElementById('employerConfirmFeedback');
+        if (!feedback) {
+          feedback = document.createElement('div');
+          feedback.id = 'employerConfirmFeedback';
+          feedback.className = 'invalid-feedback';
+          employerConfirm.parentNode.appendChild(feedback);
+        }
+        feedback.textContent = 'رمز عبور و تکرار آن یکسان نیستند';
+        feedback.style.display = 'block';
+      } else {
+        employerConfirm.classList.remove('is-invalid');
+        const feedback = document.getElementById('employerConfirmFeedback');
+        if (feedback) feedback.style.display = 'none';
+      }
+    };
+    
+    employerPassword.addEventListener('keyup', checkEmployerMatch);
+    employerConfirm.addEventListener('keyup', checkEmployerMatch);
+  }
+  
+  // برای فرم پیمانکار
+  const contractorPassword = document.getElementById('contractorPassword');
+  const contractorConfirm = document.getElementById('contractorConfirmPassword');
+  
+  if (contractorPassword && contractorConfirm) {
+    const checkContractorMatch = () => {
+      if (contractorConfirm.value && contractorPassword.value !== contractorConfirm.value) {
+        contractorConfirm.classList.add('is-invalid');
+        let feedback = document.getElementById('contractorConfirmFeedback');
+        if (!feedback) {
+          feedback = document.createElement('div');
+          feedback.id = 'contractorConfirmFeedback';
+          feedback.className = 'invalid-feedback';
+          contractorConfirm.parentNode.appendChild(feedback);
+        }
+        feedback.textContent = 'رمز عبور و تکرار آن یکسان نیستند';
+        feedback.style.display = 'block';
+      } else {
+        contractorConfirm.classList.remove('is-invalid');
+        const feedback = document.getElementById('contractorConfirmFeedback');
+        if (feedback) feedback.style.display = 'none';
+      }
+    };
+    
+    contractorPassword.addEventListener('keyup', checkContractorMatch);
+    contractorConfirm.addEventListener('keyup', checkContractorMatch);
+  }
+}
 setupEmployerForm() {
 const accountTypeSelect = document.getElementById('employerAccountType');
 if (accountTypeSelect) {
@@ -3943,9 +4001,9 @@ dynamicFields.innerHTML = `
 <div class="invalid-feedback">لطفاً رمز عبور را وارد کنید</div>
 </div>
 <div class="col-md-6 mb-3">
-<label for="employerConfirmPassword" class="form-label required">تکرار رمز عبور</label>
-<input type="password" class="form-control" id="employerConfirmPassword" required>
-<div class="invalid-feedback">لطفاً تکرار رمز عبور را وارد کنید</div>
+  <label for="employerConfirmPassword" class="form-label required">تکرار رمز عبور</label>
+  <input type="password" class="form-control" id="employerConfirmPassword" required>
+  <div class="invalid-feedback" id="employerConfirmFeedback"></div>
 </div>
 </div>
 `;
@@ -4008,48 +4066,125 @@ this.updateEmployerNavigation();
 }
 
 validateEmployerStep(step) {
-let isValid = true;
-this.clearValidationErrors();
+  let isValid = true;
+  this.clearValidationErrors();
 
-switch(step) {
-case 1:
-const accountType = document.getElementById('employerAccountType').value;
-const email = document.getElementById('employerEmail').value;
-if (!accountType) {
-this.showValidationError('employerAccountType', 'لطفاً نوع شخصیت را انتخاب کنید');
-isValid = false;
-}
-if (!email || !this.isValidEmail(email)) {
-this.showValidationError('employerEmail', 'لطفاً ایمیل معتبر وارد کنید');
-isValid = false;
-}
-if (!isValid) return false;
-break;
+  switch(step) {
+    case 1:
+      const accountType = document.getElementById('employerAccountType').value;
+      const email = document.getElementById('employerEmail').value;
+      const password = document.getElementById('employerPassword').value;
+      const confirmPassword = document.getElementById('employerConfirmPassword').value;
+      
+      if (!accountType) {
+        this.showValidationError('employerAccountType', 'لطفاً نوع شخصیت را انتخاب کنید');
+        isValid = false;
+      }
+      
+      if (!email || !this.isValidEmail(email)) {
+        this.showValidationError('employerEmail', 'لطفاً ایمیل معتبر وارد کنید');
+        isValid = false;
+      }
+      
+      if (!password) {
+        this.showValidationError('employerPassword', 'لطفاً رمز عبور را وارد کنید');
+        isValid = false;
+      }
+      
+      if (!confirmPassword) {
+        this.showValidationError('employerConfirmPassword', 'لطفاً تکرار رمز عبور را وارد کنید');
+        isValid = false;
+      }
+      
+      if (password && confirmPassword && password !== confirmPassword) {
+        this.showValidationError('employerConfirmPassword', 'رمز عبور و تکرار آن یکسان نیستند');
+        isValid = false;
+      }
+      
+      // بررسی فیلدهای داینامیک بر اساس نوع شخصیت
+      if (accountType === 'individual') {
+        const fullName = document.getElementById('employerFullName')?.value;
+        const nationalCode = document.getElementById('employerNationalCode')?.value;
+        
+        if (!fullName) {
+          this.showValidationError('employerFullName', 'لطفاً نام و نام خانوادگی را وارد کنید');
+          isValid = false;
+        }
+        
+        if (!nationalCode || nationalCode.length !== 10) {
+          this.showValidationError('employerNationalCode', 'لطفاً کد ملی معتبر وارد کنید');
+          isValid = false;
+        }
+      } else if (accountType === 'company') {
+        const companyName = document.getElementById('employerCompanyName')?.value;
+        const managerName = document.getElementById('employerManagerName')?.value;
+        
+        if (!companyName) {
+          this.showValidationError('employerCompanyName', 'لطفاً نام شرکت را وارد کنید');
+          isValid = false;
+        }
+        
+        if (!managerName) {
+          this.showValidationError('employerManagerName', 'لطفاً نام مدیرعامل را وارد کنید');
+          isValid = false;
+        }
+      }
+      
+      if (!isValid) return false;
+      break;
 
-case 2:
-const mobile = document.getElementById('employerMobile').value;
-const address = document.getElementById('employerAddress').value;
-if (!mobile || !this.isValidMobile(mobile)) {
-this.showValidationError('employerMobile', 'لطفاً شماره موبایل معتبر وارد کنید');
-isValid = false;
-}
-if (!address) {
-this.showValidationError('employerAddress', 'لطفاً آدرس را وارد کنید');
-isValid = false;
-}
-if (!isValid) return false;
-break;
+    case 2:
+      const mobile = document.getElementById('employerMobile').value;
+      const address = document.getElementById('employerAddress').value;
+      
+      if (!mobile || !this.isValidMobile(mobile)) {
+        this.showValidationError('employerMobile', 'لطفاً شماره موبایل معتبر وارد کنید');
+        isValid = false;
+      }
+      
+      if (!address) {
+        this.showValidationError('employerAddress', 'لطفاً آدرس را وارد کنید');
+        isValid = false;
+      }
+      
+      // اگر شخص حقوقی است، فیلدهای شرکت را هم چک کن
+      const accType = document.getElementById('employerAccountType').value;
+      if (accType === 'company') {
+        const companyId = document.getElementById('employerCompanyId')?.value;
+        const registrationNo = document.getElementById('employerRegistrationNo')?.value;
+        const companyType = document.getElementById('employerCompanyType')?.value;
+        
+        if (!companyId) {
+          this.showValidationError('employerCompanyId', 'لطفاً شناسه ملی شرکت را وارد کنید');
+          isValid = false;
+        }
+        
+        if (!registrationNo) {
+          this.showValidationError('employerRegistrationNo', 'لطفاً شماره ثبت شرکت را وارد کنید');
+          isValid = false;
+        }
+        
+        if (!companyType) {
+          this.showValidationError('employerCompanyType', 'لطفاً نوع فعالیت را انتخاب کنید');
+          isValid = false;
+        }
+      }
+      
+      if (!isValid) return false;
+      break;
 
-case 3:
-const projectTypes = document.querySelectorAll('input[name="projectType"]:checked');
-if (projectTypes.length === 0) {
-this.showValidationError('projectResidential', 'لطفاً حداقل یک نوع پروژه انتخاب کنید');
-isValid = false;
-}
-if (!isValid) return false;
-break;
-}
-return isValid;
+    case 3:
+      const projectTypes = document.querySelectorAll('input[name="projectType"]:checked');
+      if (projectTypes.length === 0) {
+        this.showToast('لطفاً حداقل یک نوع پروژه را انتخاب کنید', 'error');
+        isValid = false;
+      }
+      
+      if (!isValid) return false;
+      break;
+  }
+  
+  return isValid;
 }
 
 updateEmployerNavigation() {
@@ -4106,7 +4241,7 @@ const summaryHtml = `
 document.getElementById('employerSummary').innerHTML = summaryHtml;
 }
 }
-// خط 5318 - تابع  (ثبت نام کارفرما)
+//  تابع  (ثبت نام کارفرما)
 async submitEmployerForm(e) {
   e.preventDefault();
 
@@ -4344,10 +4479,10 @@ updateContractorFields() {
         <div class="invalid-feedback">لطفاً رمز عبور را وارد کنید</div>
       </div>
       <div class="col-md-6 mb-3">
-        <label for="contractorConfirmPassword" class="form-label required">تکرار رمز عبور</label>
-        <input type="password" class="form-control" id="contractorConfirmPassword" required>
-        <div class="invalid-feedback">لطفاً تکرار رمز عبور را وارد کنید</div>
-      </div>
+  <label for="contractorConfirmPassword" class="form-label required">تکرار رمز عبور</label>
+  <input type="password" class="form-control" id="contractorConfirmPassword" required>
+  <div class="invalid-feedback" id="contractorConfirmFeedback"></div>
+</div>
     </div>
     `;
   } else if (accountType === 'company') {
@@ -4932,45 +5067,134 @@ this.updateContractorNavigation();
 }
 
 validateContractorStep(step) {
-let isValid = true;
-this.clearValidationErrors();
+  let isValid = true;
+  this.clearValidationErrors();
 
-switch(step) {
-case 1:
-const accountType = document.getElementById('accountType').value;
-const contactPerson = document.getElementById('contactPerson').value;
-const mobile = document.getElementById('mobile').value;
-if (!accountType) {
-this.showValidationError('accountType', 'لطفاً نوع شخصیت را انتخاب کنید');
-isValid = false;
-}
-if (!contactPerson) {
-this.showValidationError('contactPerson', 'لطفاً نام مسئول ارتباط را وارد کنید');
-isValid = false;
-}
-if (!mobile || !this.isValidMobile(mobile)) {
-this.showValidationError('mobile', 'لطفاً شماره موبایل معتبر وارد کنید');
-isValid = false;
-}
-if (!isValid) return false;
-break;
+  switch(step) {
+    case 1:
+      const accountType = document.getElementById('accountType').value;
+      const contactPerson = document.getElementById('contactPerson').value;
+      const mobile = document.getElementById('mobile').value;
+      const email = document.getElementById('contractorEmail').value;
+      const password = document.getElementById('contractorPassword').value;
+      const confirmPassword = document.getElementById('contractorConfirmPassword').value;
+      
+      if (!accountType) {
+        this.showValidationError('accountType', 'لطفاً نوع شخصیت را انتخاب کنید');
+        isValid = false;
+      }
+      
+      if (!contactPerson) {
+        this.showValidationError('contactPerson', 'لطفاً نام مسئول ارتباط را وارد کنید');
+        isValid = false;
+      }
+      
+      if (!mobile || !this.isValidMobile(mobile)) {
+        this.showValidationError('mobile', 'لطفاً شماره موبایل معتبر وارد کنید');
+        isValid = false;
+      }
+      
+      if (!email || !this.isValidEmail(email)) {
+        this.showValidationError('contractorEmail', 'لطفاً ایمیل معتبر وارد کنید');
+        isValid = false;
+      }
+      
+      if (!password) {
+        this.showValidationError('contractorPassword', 'لطفاً رمز عبور را وارد کنید');
+        isValid = false;
+      }
+      
+      if (!confirmPassword) {
+        this.showValidationError('contractorConfirmPassword', 'لطفاً تکرار رمز عبور را وارد کنید');
+        isValid = false;
+      }
+      
+      if (password && confirmPassword && password !== confirmPassword) {
+        this.showValidationError('contractorConfirmPassword', 'رمز عبور و تکرار آن یکسان نیستند');
+        isValid = false;
+      }
+      
+      // بررسی فیلدهای داینامیک بر اساس نوع شخصیت
+      if (accountType === 'individual') {
+        const fullName = document.getElementById('fullName')?.value;
+        const nationalCode = document.getElementById('nationalCode')?.value;
+        
+        if (!fullName) {
+          this.showValidationError('fullName', 'لطفاً نام و نام خانوادگی را وارد کنید');
+          isValid = false;
+        }
+        
+        if (!nationalCode || nationalCode.length !== 10) {
+          this.showValidationError('nationalCode', 'لطفاً کد ملی معتبر وارد کنید');
+          isValid = false;
+        }
+      } else if (accountType === 'company') {
+        const companyName = document.getElementById('companyName')?.value;
+        const companyId = document.getElementById('companyId')?.value;
+        
+        if (!companyName) {
+          this.showValidationError('companyName', 'لطفاً نام شرکت را وارد کنید');
+          isValid = false;
+        }
+        
+        if (!companyId) {
+          this.showValidationError('companyId', 'لطفاً شناسه ملی شرکت را وارد کنید');
+          isValid = false;
+        }
+      }
+      
+      if (!isValid) return false;
+      break;
 
-case 2:
-const mainExpertise = document.getElementById('mainExpertise').value;
-const workArea = document.getElementById('workArea');
-const selectedAreas = Array.from(workArea.selectedOptions).map(opt => opt.value);
-if (!mainExpertise) {
-this.showValidationError('mainExpertise', 'لطفاً تخصص اصلی را انتخاب کنید');
-isValid = false;
-}
-if (selectedAreas.length === 0) {
-this.showValidationError('workArea', 'لطفاً حداقل یک محدوده جغرافیایی انتخاب کنید');
-isValid = false;
-}
-if (!isValid) return false;
-break;
-}
-return isValid;
+    case 2:
+      const mainExpertise = document.getElementById('mainExpertise').value;
+      const workArea = document.getElementById('workArea');
+      const selectedAreas = Array.from(workArea.selectedOptions).map(opt => opt.value);
+      
+      if (!mainExpertise) {
+        this.showValidationError('mainExpertise', 'لطفاً تخصص اصلی را انتخاب کنید');
+        isValid = false;
+      }
+      
+      if (selectedAreas.length === 0) {
+        this.showToast('لطفاً حداقل یک محدوده جغرافیایی انتخاب کنید', 'error');
+        isValid = false;
+      }
+      
+      // حداقل یکی از فیلدهای متراژ یا وزن باید پر شود
+      const projectArea = document.getElementById('projectArea')?.value;
+      const projectWeight = document.getElementById('projectWeight')?.value;
+      
+      if (!projectArea && !projectWeight) {
+        this.showToast('لطفاً حداقل یکی از فیلدهای متراژ یا وزن را پر کنید', 'error');
+        isValid = false;
+      }
+      
+      if (!isValid) return false;
+      break;
+      
+    case 3:
+      const startYear = document.getElementById('startYear').value;
+      if (!startYear) {
+        this.showValidationError('startYear', 'لطفاً سال آغاز فعالیت را انتخاب کنید');
+        isValid = false;
+      }
+      
+      if (!isValid) return false;
+      break;
+      
+    case 4:
+      const projectCount = document.querySelectorAll('.project-card').length;
+      if (projectCount < 2) {
+        this.showToast('لطفاً حداقل ۲ پروژه نمونه وارد کنید', 'error');
+        isValid = false;
+      }
+      
+      if (!isValid) return false;
+      break;
+  }
+  
+  return isValid;
 }
 
 updateProgressBar() {
@@ -5123,19 +5347,31 @@ statusElement.className = 'auto-save-status';
 }
 
 showValidationError(fieldId, message) {
-const field = document.getElementById(fieldId);
-if (field) {
-field.classList.add('is-invalid');
-let feedback = field.nextElementSibling;
-if (!feedback || !feedback.classList.contains('invalid-feedback')) {
-feedback = document.createElement('div');
-feedback.className = 'invalid-feedback';
-field.parentNode.appendChild(feedback);
-}
-feedback.textContent = message;
-feedback.style.display = 'block';
-field.scrollIntoView({ behavior: 'smooth', block: 'center' });
-}
+  const field = document.getElementById(fieldId);
+  if (field) {
+    field.classList.add('is-invalid');
+    
+    // پیدا کردن یا ساختن المان feedback
+    let feedback = field.nextElementSibling;
+    while (feedback && !feedback.classList.contains('invalid-feedback')) {
+      feedback = feedback.nextElementSibling;
+    }
+    
+    if (!feedback || !feedback.classList.contains('invalid-feedback')) {
+      feedback = document.createElement('div');
+      feedback.className = 'invalid-feedback';
+      field.parentNode.appendChild(feedback);
+    }
+    
+    feedback.textContent = message;
+    feedback.style.display = 'block';
+    
+    // اسکرول به سمت فیلد
+    field.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  } else {
+    // اگر فیلد پیدا نشد، از toast استفاده کن
+    this.showToast(message, 'error');
+  }
 }
 
 clearValidationErrors() {
