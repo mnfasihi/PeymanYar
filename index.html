@@ -1388,47 +1388,109 @@ body { background-color: #121212; color: #e0e0e0; }
 
 <!-- صفحه پروژه‌ها -->
 <div id="projects" class="page-section" role="main" aria-label="صفحه پروژه‌ها">
-<div class="container page-header">
-<h2 class="section-title mb-4">پروژه‌های فعال</h2>
-<p class="text-muted mb-5">مدیریت و پیگیری پروژه‌های در حال انجام</p>
-<div class="row">
-<div class="col-md-8">
-<div class="card-peymanyar mb-4">
-<div class="d-flex justify-content-between align-items-start mb-3">
-<div>
-<h4 class="mb-1">ساختمان مسکونی در تهرانپارس</h4>
-<p class="text-muted mb-2">کارفرما: حسین رضایی | پیمانکار: شرکت سازه‌گستر</p>
+  <div class="container page-header">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h2 class="section-title">📋 پروژه‌ها</h2>
+      <button class="btn btn-primary" onclick="app.showNewProjectModal()">
+        <i class="bi bi-plus-circle me-2"></i>پروژه جدید
+      </button>
+    </div>
+
+    <!-- فیلترها -->
+    <div class="card-peymanyar mb-4">
+      <div class="row g-3">
+        <div class="col-md-4">
+          <select class="form-select" id="projectFilterStatus">
+            <option value="all">همه پروژه‌ها</option>
+            <option value="open">در انتظار پیمانکار</option>
+            <option value="in_progress">در حال انجام</option>
+            <option value="completed">تکمیل شده</option>
+          </select>
+        </div>
+        <div class="col-md-4">
+          <input type="text" class="form-control" id="projectSearch" placeholder="جستجو در پروژه‌ها...">
+        </div>
+        <div class="col-md-4">
+          <button class="btn btn-peymanyar w-100" onclick="app.loadProjects()">
+            <i class="bi bi-search me-2"></i>اعمال فیلتر
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- لیست پروژه‌ها -->
+    <div id="projectsList" class="row">
+      <!-- پروژه‌ها توسط جاوااسکریپت اینجا نمایش داده می‌شوند -->
+    </div>
+  </div>
 </div>
-<span class="badge bg-primary">در حال انجام</span>
-</div>
-<div class="mb-3">
-<label class="form-label">پیشرفت پروژه: ۶۵٪</label>
-<div class="progress" style="height: 10px;">
-<div class="progress-bar" role="progressbar" style="width: 65%;" aria-valuenow="65" aria-valuemin="0" aria-valuemax="100"></div>
-</div>
-</div>
-<div class="row">
-<div class="col-md-4"><p><strong>بودجه:</strong> ۵ میلیارد تومان</p></div>
-<div class="col-md-4"><p><strong>شروع:</strong> ۱۵ فروردین ۱۴۰۳</p></div>
-<div class="col-md-4"><p><strong>پیش‌بینی اتمام:</strong> ۱۵ مرداد ۱۴۰۳</p></div>
-</div>
-<div class="d-flex gap-2 mt-3">
-<button class="btn btn-primary"><i class="bi bi-chat-dots me-2"></i>ارتباط با پیمانکار</button>
-<button class="btn btn-outline-primary"><i class="bi bi-eye me-2"></i>مشاهده جزئیات</button>
-</div>
-</div>
-</div>
-<div class="col-md-4">
-<div class="card-peymanyar">
-<h5 class="mb-3"><i class="bi bi-plus-circle me-2"></i>ایجاد پروژه جدید</h5>
-<p class="text-muted small mb-3">برای ایجاد پروژه جدید و جذب پیمانکار، دکمه زیر را کلیک کنید.</p>
-<button class="btn btn-peymanyar w-100" onclick="createNewProject()">
-<i class="bi bi-plus-lg me-2"></i>پروژه جدید
-</button>
-</div>
-</div>
-</div>
-</div>
+
+<!-- مودال پروژه جدید -->
+<div class="modal fade" id="newProjectModal" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">ایجاد پروژه جدید</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="بستن"></button>
+      </div>
+      <div class="modal-body">
+        <form id="newProjectForm">
+          <div class="mb-3">
+            <label class="form-label required">عنوان پروژه</label>
+            <input type="text" class="form-control" id="projectTitle" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label required">توضیحات پروژه</label>
+            <textarea class="form-control" id="projectDescription" rows="4" required></textarea>
+          </div>
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label class="form-label">دسته‌بندی</label>
+              <select class="form-select" id="projectCategory">
+                <option value="">انتخاب کنید</option>
+                <option value="residential">مسکونی</option>
+                <option value="commercial">تجاری</option>
+                <option value="industrial">صنعتی</option>
+                <option value="renovation">نوسازی</option>
+              </select>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label">بودجه تقریبی</label>
+              <select class="form-select" id="projectBudget">
+                <option value="">انتخاب کنید</option>
+                <option value="under100">زیر ۱۰۰ میلیون</option>
+                <option value="100-500">۱۰۰ تا ۵۰۰ میلیون</option>
+                <option value="500-1000">۵۰۰ میلیون تا ۱ میلیارد</option>
+                <option value="1-5">۱ تا ۵ میلیارد</option>
+                <option value="5+">بالای ۵ میلیارد</option>
+              </select>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label class="form-label">موقعیت مکانی</label>
+              <input type="text" class="form-control" id="projectLocation" placeholder="مثال: تهران، سعادت‌آباد">
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label">زمانبندی</label>
+              <select class="form-select" id="projectTimeline">
+                <option value="">انتخاب کنید</option>
+                <option value="urgent">فوری (کمتر از ۱ ماه)</option>
+                <option value="1-3">۱ تا ۳ ماه</option>
+                <option value="3-6">۳ تا ۶ ماه</option>
+                <option value="6-12">۶ تا ۱۲ ماه</option>
+                <option value="flexible">انعطاف‌پذیر</option>
+              </select>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">انصراف</button>
+        <button type="button" class="btn btn-primary" onclick="app.createProject()">ایجاد پروژه</button>
+      </div>
+    </div>
+  </div>
 </div>
 
 <!-- صفحه پیام‌یار -->
@@ -5436,8 +5498,13 @@ async loadProjects() {
 }
 
 displayProjects(projects) {
-  const container = document.getElementById('projectsList');
-  if (!container) return;
+  // این المان باید با id درست باشه
+  const container = document.getElementById('projectsList'); // یا 'projectsContainer' یا 'projectsGrid'
+  
+  if (!container) {
+    console.error('المان پروژه‌ها پیدا نشد!');
+    return;
+  }
   
   if (!projects || projects.length === 0) {
     container.innerHTML = `
@@ -5454,8 +5521,6 @@ displayProjects(projects) {
   
   let html = '';
   projects.forEach(project => {
-    const employerName = project.employer?.full_name || project.employer?.company_name || 'کارفرما';
-    
     const statusClass = {
       'open': 'bg-success',
       'in_progress': 'bg-primary',
@@ -5472,24 +5537,13 @@ displayProjects(projects) {
     
     html += `
       <div class="col-md-6 mb-4">
-        <div class="card-peymanyar h-100">
+        <div class="card-peymanyar">
           <div class="d-flex justify-content-between align-items-start mb-3">
-            <h5 class="mb-0">${project.title || 'بدون عنوان'}</h5>
+            <h5>${project.title}</h5>
             <span class="badge ${statusClass}">${statusText}</span>
           </div>
-          <p class="text-muted mb-3">${project.description || 'توضیحاتی ثبت نشده'}</p>
-          <div class="small mb-3">
-            <div class="mb-2"><i class="bi bi-person me-2"></i>${employerName}</div>
-            ${project.location ? `<div class="mb-2"><i class="bi bi-geo-alt me-2"></i>${project.location}</div>` : ''}
-            ${project.budget_range ? `<div class="mb-2"><i class="bi bi-cash me-2"></i>${this.getBudgetText(project.budget_range)}</div>` : ''}
-            ${project.timeline ? `<div class="mb-2"><i class="bi bi-clock me-2"></i>${this.getTimelineText(project.timeline)}</div>` : ''}
-          </div>
-          <div class="d-flex justify-content-between align-items-center mt-auto">
-            <small class="text-muted">${project.created_at ? new Date(project.created_at).toLocaleDateString('fa-IR') : ''}</small>
-            <button class="btn btn-sm btn-outline-primary" onclick="app.viewProject(${project.id})">
-              <i class="bi bi-eye me-1"></i>جزئیات
-            </button>
-          </div>
+          <p>${project.description || 'بدون توضیحات'}</p>
+          <small>شناسه پروژه: ${project.id}</small>
         </div>
       </div>
     `;
