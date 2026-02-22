@@ -3875,6 +3875,7 @@ account_type: profile?.account_type || 'individual'
 
 this.showToast('ورود موفقیت‌آمیز بود', 'success');
 this.showPage('home');
+this.checkAdminStatus();
 } catch (error) {
 this.showToast('ایمیل یا رمز عبور اشتباه است', 'error');
 }
@@ -5489,43 +5490,40 @@ this.adminLogin();
 }
 }
 
-checkAdminStatus() {
-const adminToken = localStorage.getItem('peymanyar_admin_token');
-const adminEmail = localStorage.getItem('peymanyar_admin_email');
-if (adminToken && adminEmail) {
-this.isAdmin = true;
-this.adminToken = adminToken;
-this.adminEmail = adminEmail;
-this.showAdminControls();
-}
-}
-
-showAdminControls() {
-document.querySelectorAll('.admin-only').forEach(link => { link.style.display = 'block'; });
-}
-
-hideAdminControls() {
-document.querySelectorAll('.admin-only').forEach(link => { link.style.display = 'none'; });
-}
-
-adminLogin() {
-const email = document.getElementById('adminEmail')?.value || '';
-const password = document.getElementById('adminPassword')?.value || '';
-const remember = document.getElementById('rememberAdmin')?.checked || false;
-if (email === 'admin@peymanyar.com' && password === 'admin123') {
-const token = 'admin_token_' + Date.now();
-localStorage.setItem('peymanyar_admin_token', token);
-localStorage.setItem('peymanyar_admin_email', email);
-if (remember) localStorage.setItem('peymanyar_admin_remember', 'true');
-this.isAdmin = true;
-this.adminToken = token;
-this.adminEmail = email;
-this.showToast('ورود موفقیت‌آمیز به پنل مدیریت', 'success');
-this.showAdminMessages();
-this.showAdminControls();
-} else {
-this.showToast('ایمیل یا رمز عبور نامعتبر است', 'error');
-}
+async checkAdminStatus() {
+  const adminToken = localStorage.getItem('peymanyar_admin_token');
+  const adminEmail = localStorage.getItem('peymanyar_admin_email');
+  
+  if (adminToken && adminEmail) {
+    this.isAdmin = true;
+    this.adminToken = adminToken;
+    this.adminEmail = adminEmail;
+    this.showAdminControls();
+  } else if (this.userData && this.userData.id) {
+    // اگر کاربر لاگین کرده، بررسی کن که آیا ادمین است
+    try {
+      const { data: profile, error } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('user_id', this.userData.id)
+        .single();
+        
+      if (!error && profile?.role === 'admin') {
+        this.isAdmin = true;
+        this.showAdminControls();
+      } else {
+        this.isAdmin = false;
+        this.hideAdminControls();
+      }
+    } catch (error) {
+      console.error('خطا در بررسی نقش کاربر:', error);
+      this.isAdmin = false;
+      this.hideAdminControls();
+    }
+  } else {
+    this.isAdmin = false;
+    this.hideAdminControls();
+  }
 }
 
 adminLogout() {
