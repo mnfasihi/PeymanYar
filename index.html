@@ -6441,7 +6441,7 @@ window.showProjectManagementPanel = function() {
           <div class="col-md-4"><div class="card-peymanyar text-center"><h3 id="statApproved">0</h3><p>تایید شده</p></div></div>
           <div class="col-md-4"><div class="card-peymanyar text-center"><h3 id="statTotal">0</h3><p>کل</p></div></div>
         </div>
-        <div id="projectsList" class="row"></div>
+        <div id="adminprojectsList" class="row"></div>
         <button class="btn btn-secondary mt-3" onclick="goBack()">بازگشت</button>
       </div>
     `;
@@ -6496,7 +6496,7 @@ window.loadProjects = async function() {
       `;
     });
     
-    document.getElementById('projectsList').innerHTML = html || '<p class="text-center">پروژه‌ای در انتظار تایید نیست</p>';
+   document.getElementById('adminProjectsList').innerHTML = html || '<p class="text-center">پروژه‌ای در انتظار تایید نیست</p>';
     
   } catch (error) {
     console.error('خطا:', error);
@@ -6507,7 +6507,7 @@ window.approve = async function(id) {
   if (confirm('تایید میشود؟')) {
     await supabase.from('projects').update({ admin_approved: true }).eq('id', id);
     loadProjects();
-    if (document.getElementById('projectsList') && !document.getElementById('projectsList').closest('#adminProjectsPanel')) {
+    if (document.getElementById('adminprojectsList') && !document.getElementById('projectsList').closest('#adminProjectsPanel')) {
       loadApprovedProjects();
     }
   }
