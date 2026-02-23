@@ -1537,6 +1537,21 @@ body { background-color: #121212; color: #e0e0e0; }
 <p>پاکسازی پیام‌های قدیمی و بهینه‌سازی فضای ذخیره‌سازی</p>
 <button class="btn-messages btn-messages-danger" onclick="cleanupStorage()">پاکسازی</button>
 </div>
+<!-- کارت مدیریت پروژه‌ها (اضافه کن به بخش messages-cards-container در پنل مدیریت) -->
+<div class="messages-card">
+  <h3>
+    <i class="bi bi-building" style="color: var(--primary-color);"></i>
+    مدیریت پروژه‌ها
+  </h3>
+  <p>تایید و مدیریت پروژه‌های ثبت شده توسط کارفرمایان</p>
+  <div class="d-flex gap-2 mt-3">
+    <span class="badge bg-warning" id="pendingProjectsCount">0</span>
+    <span class="text-muted">پروژه در انتظار تایید</span>
+  </div>
+  <button class="btn-messages mt-3" onclick="showProjectManagementPanel()">
+    <i class="bi bi-check2-circle me-2"></i>مدیریت پروژه‌ها
+  </button>
+</div>
 <div class="messages-card">
 <h3>📚 راهنما و پشتیبانی</h3>
 <p>مشاهده راهنمای استفاده و ارتباط با پشتیبانی</p>
@@ -6591,5 +6606,317 @@ document.addEventListener('DOMContentLoaded', function() {
   }, 500);
 });
 </script>
+... (همه کدهای قبلی)
+  
+<!-- کدهای قبلی اسکریپت -->
+<script>
+// ... کدهای قبلی ...
+</script>
+
+<!-- ===== پنل مدیریت پروژه‌ها برای پیام‌یار ===== -->
+<script>
+// ===== پنل مدیریت پروژه‌ها برای پیام‌یار =====
+
+// نمایش پنل مدیریت پروژه‌ها
+window.showProjectManagementPanel = function() {
+  // مخفی کردن صفحه فعلی
+  document.querySelectorAll('.page-section').forEach(p => p.style.display = 'none');
+  
+  // ایجاد یا نمایش صفحه مدیریت پروژه‌ها
+  let projectPanel = document.getElementById('adminProjectsPanel');
+  if (!projectPanel) {
+    projectPanel = document.createElement('div');
+    projectPanel.id = 'adminProjectsPanel';
+    projectPanel.className = 'page-section';
+    projectPanel.innerHTML = `
+      <div class="container page-header">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <div>
+            <h2 class="section-title mb-1">
+              <i class="bi bi-building me-2"></i>مدیریت پروژه‌ها
+            </h2>
+            <p class="text-muted">تایید و مدیریت پروژه‌های ثبت شده</p>
+          </div>
+          <div>
+            <button class="btn btn-outline-primary me-2" onclick="loadPendingProjects()">
+              <i class="bi bi-arrow-repeat me-1"></i>بروزرسانی
+            </button>
+            <button class="btn btn-outline-secondary" onclick="goBackToAdminPanel()">
+              <i class="bi bi-arrow-right me-1"></i>بازگشت
+            </button>
+          </div>
+        </div>
+
+        <!-- آمار پروژه‌ها -->
+        <div class="row mb-4">
+          <div class="col-md-4">
+            <div class="card-peymanyar text-center">
+              <div class="h3 mb-2" id="statPending">0</div>
+              <div class="text-muted">در انتظار تایید</div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="card-peymanyar text-center">
+              <div class="h3 mb-2" id="statApproved">0</div>
+              <div class="text-muted">تایید شده</div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="card-peymanyar text-center">
+              <div class="h3 mb-2" id="statTotal">0</div>
+              <div class="text-muted">کل پروژه‌ها</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- فیلترها -->
+        <div class="card-peymanyar mb-4">
+          <div class="row g-3">
+            <div class="col-md-4">
+              <select class="form-select" id="projectFilter" onchange="filterProjects()">
+                <option value="pending">در انتظار تایید</option>
+                <option value="approved">تایید شده</option>
+                <option value="all">همه پروژه‌ها</option>
+              </select>
+            </div>
+            <div class="col-md-4">
+              <input type="text" class="form-control" id="projectSearch" placeholder="جستجوی پروژه...">
+            </div>
+            <div class="col-md-4">
+              <button class="btn btn-peymanyar w-100" onclick="filterProjects()">
+                <i class="bi bi-search me-2"></i>اعمال فیلتر
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- لیست پروژه‌ها -->
+        <div id="projectsAdminList" class="row"></div>
+      </div>
+    `;
+    document.body.appendChild(projectPanel);
+  }
+  
+  projectPanel.style.display = 'block';
+  loadAllProjects();
+}
+
+// بازگشت به پنل مدیریت
+window.goBackToAdminPanel = function() {
+  document.querySelectorAll('.page-section').forEach(p => p.style.display = 'none');
+  document.getElementById('adminMessages').style.display = 'block';
+}
+
+// بارگذاری همه پروژه‌ها
+window.loadAllProjects = async function() {
+  try {
+    const { data: projects, error } = await supabase
+      .from('projects')
+      .select('*')
+      .order('created_at', { ascending: false });
+    
+    if (error) throw error;
+    
+    // نمایش آمار
+    const pending = projects.filter(p => !p.admin_approved).length;
+    const approved = projects.filter(p => p.admin_approved).length;
+    
+    document.getElementById('statPending').textContent = pending;
+    document.getElementById('statApproved').textContent = approved;
+    document.getElementById('statTotal').textContent = projects.length;
+    
+    // بروزرسانی شمارنده روی کارت
+    const badge = document.getElementById('pendingProjectsCount');
+    if (badge) badge.textContent = pending;
+    
+    // نمایش پروژه‌ها
+    window.projectsData = projects;
+    filterProjects();
+    
+  } catch (error) {
+    console.error('خطا:', error);
+  }
+}
+
+// فیلتر پروژه‌ها
+window.filterProjects = function() {
+  const filter = document.getElementById('projectFilter')?.value || 'pending';
+  const search = document.getElementById('projectSearch')?.value || '';
+  
+  let filtered = window.projectsData || [];
+  
+  // اعمال فیلتر وضعیت
+  if (filter === 'pending') {
+    filtered = filtered.filter(p => !p.admin_approved);
+  } else if (filter === 'approved') {
+    filtered = filtered.filter(p => p.admin_approved);
+  }
+  
+  // اعمال جستجو
+  if (search) {
+    filtered = filtered.filter(p => 
+      p.title.toLowerCase().includes(search.toLowerCase()) ||
+      p.description?.toLowerCase().includes(search.toLowerCase())
+    );
+  }
+  
+  displayProjectsList(filtered);
+}
+
+// نمایش لیست پروژه‌ها
+function displayProjectsList(projects) {
+  const container = document.getElementById('projectsAdminList');
+  if (!container) return;
+  
+  if (!projects || projects.length === 0) {
+    container.innerHTML = `
+      <div class="col-12">
+        <div class="card-peymanyar text-center py-5">
+          <i class="bi bi-folder-x display-4 text-muted mb-3"></i>
+          <h4>پروژه‌ای یافت نشد</h4>
+        </div>
+      </div>
+    `;
+    return;
+  }
+  
+  let html = '';
+  projects.forEach(project => {
+    const statusClass = project.admin_approved ? 'bg-success' : 'bg-warning';
+    const statusText = project.admin_approved ? 'تایید شده' : 'در انتظار تایید';
+    
+    html += `
+      <div class="col-md-6 mb-4">
+        <div class="card-peymanyar">
+          <div class="d-flex justify-content-between align-items-start mb-3">
+            <h5>${project.title}</h5>
+            <span class="badge ${statusClass}">${statusText}</span>
+          </div>
+          <p>${project.description || 'بدون توضیحات'}</p>
+          <div class="row mt-3">
+            <div class="col-6">
+              <small class="text-muted d-block">دسته‌بندی: ${project.category || 'نامشخص'}</small>
+              <small class="text-muted d-block">بودجه: ${getBudgetText(project.budget_range)}</small>
+            </div>
+            <div class="col-6">
+              <small class="text-muted d-block">مکان: ${project.location || 'نامشخص'}</small>
+              <small class="text-muted d-block">زمانبندی: ${getTimelineText(project.timeline)}</small>
+            </div>
+          </div>
+          <div class="d-flex justify-content-between align-items-center mt-3 pt-3 border-top">
+            <small class="text-muted">
+              <i class="bi bi-calendar me-1"></i>
+              ${new Date(project.created_at).toLocaleDateString('fa-IR')}
+            </small>
+            <div>
+              ${!project.admin_approved ? `
+                <button class="btn btn-sm btn-success me-2" onclick="approveProject(${project.id})">
+                  <i class="bi bi-check-circle me-1"></i>تایید
+                </button>
+              ` : ''}
+              <button class="btn btn-sm btn-outline-danger" onclick="deleteProject(${project.id})">
+                <i class="bi bi-trash"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  });
+  
+  container.innerHTML = html;
+}
+
+// تایید پروژه
+window.approveProject = async function(projectId) {
+  if (!confirm('آیا از تایید این پروژه اطمینان دارید؟')) return;
+  
+  try {
+    const { error } = await supabase
+      .from('projects')
+      .update({ admin_approved: true, status: 'open' })
+      .eq('id', projectId);
+    
+    if (error) throw error;
+    
+    alert('✅ پروژه با موفقیت تایید شد');
+    loadAllProjects();
+    
+    // بروزرسانی صفحه پروژه‌ها
+    if (window.app?.loadProjects) window.app.loadProjects();
+    
+  } catch (error) {
+    alert('خطا: ' + error.message);
+  }
+}
+
+// حذف پروژه
+window.deleteProject = async function(projectId) {
+  if (!confirm('⚠️ آیا از حذف این پروژه اطمینان دارید؟ این عمل قابل بازگشت نیست.')) return;
+  
+  try {
+    const { error } = await supabase
+      .from('projects')
+      .delete()
+      .eq('id', projectId);
+    
+    if (error) throw error;
+    
+    alert('✅ پروژه حذف شد');
+    loadAllProjects();
+    
+    // بروزرسانی صفحه پروژه‌ها
+    if (window.app?.loadProjects) window.app.loadProjects();
+    
+  } catch (error) {
+    alert('خطا: ' + error.message);
+  }
+}
+
+// توابع کمکی برای نمایش متن بودجه و زمانبندی
+function getBudgetText(budget) {
+  const budgets = {
+    'under100': 'زیر ۱۰۰ میلیون',
+    '100-500': '۱۰۰ تا ۵۰۰ میلیون',
+    '500-1000': '۵۰۰ میلیون تا ۱ میلیارد',
+    '1-5': '۱ تا ۵ میلیارد',
+    '5+': 'بالای ۵ میلیارد'
+  };
+  return budgets[budget] || budget || 'نامشخص';
+}
+
+function getTimelineText(timeline) {
+  const timelines = {
+    'urgent': 'فوری (کمتر از ۱ ماه)',
+    '1-3': '۱ تا ۳ ماه',
+    '3-6': '۳ تا ۶ ماه',
+    '6-12': '۶ تا ۱۲ ماه',
+    'flexible': 'انعطاف‌پذیر'
+  };
+  return timelines[timeline] || timeline || 'نامشخص';
+}
+
+// بارگذاری اولیه وقتی صفحه مدیریت باز میشه
+document.addEventListener('DOMContentLoaded', function() {
+  // چک کردن دسترسی ادمین
+  setTimeout(() => {
+    const user = JSON.parse(localStorage.getItem('peymanyar_user') || 'null');
+    if (user?.email === 'admin@peymanyar.com' || user?.email === 'karfarma3@test.com') {
+      // اضافه کردن دکمه مدیریت به نوار
+      const adminBtn = document.querySelector('[onclick="showAdminMessages()"]')?.parentElement;
+      if (adminBtn) {
+        const projectBtn = document.createElement('li');
+        projectBtn.innerHTML = `
+          <a class="dropdown-item" href="#" onclick="showProjectManagementPanel()">
+            <i class="bi bi-building me-2"></i>مدیریت پروژه‌ها
+          </a>
+        `;
+        adminBtn.parentNode.insertBefore(projectBtn, adminBtn.nextSibling);
+      }
+    }
+  }, 1000);
+});
+</script>
+
 </body>
 </html>
