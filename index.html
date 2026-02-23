@@ -6422,8 +6422,34 @@ window.saveProfileChanges = () => app?.saveProfileChanges();
 window.app = app;
 </script>
 <script>
-// تابع باز کردن مودال پروژه جدید
+// ===== توابع پروژه با احراز هویت =====
+
+// ۱. بررسی وضعیت ورود کاربر
+function isUserLoggedIn() {
+  return window.app && window.app.userData && window.app.userData.id;
+}
+
+// ۲. بررسی کارفرما بودن کاربر
+function isUserEmployer() {
+  return window.app && window.app.userData && window.app.userData.user_type === 'employer';
+}
+
+// ۳. باز کردن مودال پروژه جدید (فقط برای کارفرمایان)
 window.openProjectModal = function() {
+  // بررسی ورود
+  if (!isUserLoggedIn()) {
+    alert('لطفاً ابتدا وارد حساب کاربری خود شوید');
+    window.showLogin();
+    return;
+  }
+  
+  // بررسی کارفرما بودن
+  if (!isUserEmployer()) {
+    alert('ثبت پروژه فقط برای کارفرمایان امکان‌پذیر است');
+    return;
+  }
+  
+  // باز کردن مودال
   const modalElement = document.getElementById('newProjectModal');
   if (modalElement) {
     const modal = new bootstrap.Modal(modalElement);
@@ -6431,31 +6457,187 @@ window.openProjectModal = function() {
   }
 }
 
-// درست کردن دکمه ذخیره
-document.addEventListener('DOMContentLoaded', function() {
+// ۴. ذخیره پروژه در دیتابیس
+window.saveNewProject = async function() {
+  // بررسی مجدد احراز هویت
+  if (!isUserLoggedIn() || !isUserEmployer()) {
+    alert('شما اجازه ثبت پروژه ندارید');
+    return;
+  }
+  
+  // گرفتن مقادیر فرم
+  const title = document.getElementById('projectTitle')?.value;
+  const description = document.getElementById('projectDescription')?.value;
+  const category = document.getElementById('projectCategory')?.value;
+  const budget = document.getElementById('projectBudget')?.value;
+  const location = document.getElementById('projectLocation')?.value;
+  const timeline = document.getElementById('projectTimeline')?.value;
+  
+  // اعتبارسنجی
+  if (!title || !description) {
+    alert('لطفاً عنوان و توضیحات پروژه را وارد کنید');
+    return;
+  }
+  
+  // دکمه رو غیرفعال کن
   const saveBtn = document.querySelector('#newProjectModal .btn-primary');
-  if (saveBtn && saveBtn.textContent.includes('ایجاد')) {
-    saveBtn.onclick = function(e) {
-      e.preventDefault();
-      const title = document.getElementById('projectTitle')?.value;
-      const desc = document.getElementById('projectDescription')?.value;
+  const originalText = saveBtn.innerHTML;
+  saveBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>در حال ثبت...';
+  saveBtn.disabled = true;
+  
+  try {
+    // آماده‌سازی داده برای ارسال به Supabase
+    const projectData = {
+      title: title,
+      description: description,
+      employer_id: window.app.userData.id,
+      category: category || null,
+      budget_range: budget || null,
+      location: location || null,
+      timeline: timeline || null,
+      status: 'pending', // در انتظار تایید
+      admin_approved: false, // تایید نشده
+      created_at: new Date().toISOString()
+    };
+    
+    // ارسال به Supabase
+    const { data, error } = await supabase
+      .from('projects')
+      .insert([projectData])
+      .select();
+    
+    if (error) {
+      console.error('خطا:', error);
+      alert('خطا در ثبت پروژه: ' + error.message);
+      return;
+    }
+    
+    // پیام موفقیت
+    alert('✅ پروژه شما با موفقیت ثبت و برای تایید ارسال شد');
+    
+    // بستن مودال
+    const modal = bootstrap.Modal.getInstance(document.getElementById('newProjectModal'));
+    if (modal) modal.hide();
+    
+    // پاک کردن فرم
+    document.getElementById('newProjectForm')?.reset();
+    
+    // بارگذاری مجدد پروژه‌ها
+    if (window.app && typeof window.app.loadProjects === 'function') {
+      window.app.loadProjects();
+    } else {
+      // اگر تابع loadProjects وجود نداشت، خودمون پروژه‌ها رو نمایش میدیم
+      window.loadApprovedProjects();
+    }
+    
+  } catch (error) {
+    console.error('خطا:', error);
+    alert('خطا در ثبت پروژه');
+  } finally {
+    // برگردوندن دکمه به حالت اول
+    saveBtn.innerHTML = originalText;
+    saveBtn.disabled = false;
+  }
+}
+
+// ۵. نمایش پروژه‌های تایید شده
+window.loadApprovedProjects = async function() {
+  const container = document.getElementById('projectsList');
+  if (!container) return;
+  
+  try {
+    // گرفتن پروژه‌های تایید شده
+    const { data: projects, error } = await supabase
+      .from('projects')
+      .select('*')
+      .eq('admin_approved', true)
+      .order('created_at', { ascending: false });
+    
+    if (error) {
+      console.error('خطا:', error);
+      return;
+    }
+    
+    if (!projects || projects.length === 0) {
+      container.innerHTML = `
+        <div class="col-12">
+          <div class="card-peymanyar text-center py-5">
+            <i class="bi bi-folder-x display-4 text-muted mb-3"></i>
+            <h4>پروژه‌ای یافت نشد</h4>
+            <p class="text-muted">هنوز پروژه‌ای ثبت نشده است.</p>
+          </div>
+        </div>
+      `;
+      return;
+    }
+    
+    // نمایش پروژه‌ها
+    let html = '';
+    projects.forEach(project => {
+      const statusClass = {
+        'open': 'bg-success',
+        'in_progress': 'bg-primary',
+        'completed': 'bg-secondary',
+        'pending': 'bg-warning'
+      }[project.status] || 'bg-secondary';
       
-      if (!title || !desc) {
-        alert('عنوان و توضیحات رو وارد کن');
-        return;
-      }
+      const statusText = {
+        'open': 'در انتظار پیمانکار',
+        'in_progress': 'در حال انجام',
+        'completed': 'تکمیل شده',
+        'pending': 'در انتظار تایید'
+      }[project.status] || project.status;
       
-      alert('پروژه ثبت شد: ' + title);
-      
-      // بستن مودال
-      const modal = bootstrap.Modal.getInstance(document.getElementById('newProjectModal'));
-      if (modal) modal.hide();
-      
-      // پاک کردن فرم
-      document.getElementById('newProjectForm')?.reset();
+      html += `
+        <div class="col-md-6 mb-4">
+          <div class="card-peymanyar">
+            <div class="d-flex justify-content-between align-items-start mb-3">
+              <h5>${project.title}</h5>
+              <span class="badge ${statusClass}">${statusText}</span>
+            </div>
+            <p>${project.description || 'بدون توضیحات'}</p>
+            <small class="text-muted">
+              <i class="bi bi-calendar me-1"></i>
+              ${new Date(project.created_at).toLocaleDateString('fa-IR')}
+            </small>
+          </div>
+        </div>
+      `;
+    });
+    
+    container.innerHTML = html;
+    
+  } catch (error) {
+    console.error('خطا:', error);
+  }
+}
+
+// ۶. اتصال دکمه ذخیره به تابع جدید
+document.addEventListener('DOMContentLoaded', function() {
+  // دکمه ذخیره پروژه
+  setTimeout(function() {
+    const saveBtn = document.querySelector('#newProjectModal .btn-primary');
+    if (saveBtn && saveBtn.textContent.includes('ایجاد')) {
+      saveBtn.onclick = function(e) {
+        e.preventDefault();
+        window.saveNewProject();
+      };
+    }
+    
+    // بارگذاری پروژه‌ها
+    window.loadApprovedProjects();
+  }, 500);
+});
+
+// ۷. رفع دکمه اعمال فیلتر
+setTimeout(function() {
+  const filterBtn = document.querySelector('.btn-peymanyar.w-100');
+  if (filterBtn && filterBtn.textContent.includes('اعمال فیلتر')) {
+    filterBtn.onclick = function() {
+      window.loadApprovedProjects();
     };
   }
-});
+}, 500);
 </script>
 </body>
 </html>
