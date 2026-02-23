@@ -6708,6 +6708,7 @@ window.loadAllProjects = async function() {
     
     if (error) throw error;
     
+    // نمایش آمار
     const pending = projects.filter(p => !p.admin_approved).length;
     const approved = projects.filter(p => p.admin_approved).length;
     
@@ -6715,14 +6716,30 @@ window.loadAllProjects = async function() {
     document.getElementById('statApproved').textContent = approved;
     document.getElementById('statTotal').textContent = projects.length;
     
+    // بروزرسانی شمارنده روی کارت
     const badge = document.getElementById('pendingProjectsCount');
     if (badge) badge.textContent = pending;
     
+    // ذخیره پروژه‌ها
     window.projectsData = projects;
-    filterProjects();
+    
+    // نمایش پروژه‌های در انتظار تایید (نه همه)
+    const pendingProjects = projects.filter(p => !p.admin_approved);
+    displayProjectsList(pendingProjects);
+    
+    // تنظیم فیلتر روی "pending"
+    const filterSelect = document.getElementById('projectFilter');
+    if (filterSelect) filterSelect.value = 'pending';
     
   } catch (error) {
     console.error('خطا:', error);
+    document.getElementById('projectsAdminList').innerHTML = `
+      <div class="col-12">
+        <div class="alert alert-danger">
+          خطا در دریافت پروژه‌ها: ${error.message}
+        </div>
+      </div>
+    `;
   }
 }
 
