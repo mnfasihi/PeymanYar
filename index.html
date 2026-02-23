@@ -6920,11 +6920,30 @@ document.addEventListener('DOMContentLoaded', function() {
 <script>
 </script>
 <script>
-// تعریف تابع مدیریت پروژه‌ها
+// تعریف ساده تابع برای تست
 window.showProjectManagementPanel = function() {
-  console.log('مدیریت پروژه‌ها باز شد');
-  alert('تابع مدیریت پروژه‌ها فراخوانی شد');
-  // اینجا کد اصلی رو بعداً اضافه می‌کنیم
+  console.log('✅ تابع اجرا شد');
+  alert('مدیریت پروژه‌ها باز شد');
+  
+  // مخفی کردن صفحه فعلی
+  document.querySelectorAll('.page-section').forEach(p => p.style.display = 'none');
+  
+  // ایجاد صفحه ساده
+  let testPanel = document.getElementById('testPanel');
+  if (!testPanel) {
+    testPanel = document.createElement('div');
+    testPanel.id = 'testPanel';
+    testPanel.className = 'page-section';
+    testPanel.innerHTML = '<div class="container"><h1>صفحه مدیریت پروژه‌ها</h1><button onclick="goBack()">بازگشت</button></div>';
+    document.body.appendChild(testPanel);
+  }
+  
+  testPanel.style.display = 'block';
+}
+
+window.goBack = function() {
+  document.querySelectorAll('.page-section').forEach(p => p.style.display = 'none');
+  document.getElementById('adminMessages').style.display = 'block';
 }
 </script>
 </body>
