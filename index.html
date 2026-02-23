@@ -6606,16 +6606,13 @@ document.addEventListener('DOMContentLoaded', function() {
   }, 500);
 });
 </script>
+<script>
 // ===== پنل مدیریت پروژه‌ها برای پیام‌یار =====
-
-// نمایش پنل مدیریت پروژه‌ها
 window.showProjectManagementPanel = function() {
   console.log('مدیریت پروژه‌ها باز شد');
   
-  // مخفی کردن صفحه فعلی
   document.querySelectorAll('.page-section').forEach(p => p.style.display = 'none');
   
-  // ایجاد یا نمایش صفحه مدیریت پروژه‌ها
   let projectPanel = document.getElementById('adminProjectsPanel');
   if (!projectPanel) {
     projectPanel = document.createElement('div');
@@ -6640,7 +6637,6 @@ window.showProjectManagementPanel = function() {
           </div>
         </div>
 
-        <!-- آمار پروژه‌ها -->
         <div class="row mb-4">
           <div class="col-md-4">
             <div class="card-peymanyar text-center">
@@ -6662,7 +6658,6 @@ window.showProjectManagementPanel = function() {
           </div>
         </div>
 
-        <!-- فیلترها -->
         <div class="card-peymanyar mb-4">
           <div class="row g-3">
             <div class="col-md-4">
@@ -6683,19 +6678,10 @@ window.showProjectManagementPanel = function() {
           </div>
         </div>
 
-        <!-- لیست پروژه‌ها -->
-        <div id="projectsAdminList" class="row">
-          <div class="col-12 text-center py-5">
-            <div class="spinner-border text-primary" role="status">
-              <span class="visually-hidden">در حال بارگذاری...</span>
-            </div>
-            <p class="mt-2">در حال دریافت پروژه‌ها...</p>
-          </div>
-        </div>
+        <div id="projectsAdminList" class="row"></div>
       </div>
     `;
     
-    // پیدا کردن فوتر و درج صفحه قبل از آن
     const footer = document.querySelector('footer');
     if (footer) {
       document.body.insertBefore(projectPanel, footer);
@@ -6705,33 +6691,23 @@ window.showProjectManagementPanel = function() {
   }
   
   projectPanel.style.display = 'block';
-  loadPendingProjects(); // بلافاصله پروژه‌ها رو بارگذاری کن
+  loadAllProjects();
 }
 
-// بازگشت به پنل مدیریت
 window.goBackToAdminPanel = function() {
   document.querySelectorAll('.page-section').forEach(p => p.style.display = 'none');
   document.getElementById('adminMessages').style.display = 'block';
 }
 
-// بارگذاری پروژه‌های در انتظار تایید
-window.loadPendingProjects = async function() {
-  console.log('بارگذاری پروژه‌های در انتظار...');
-  
+window.loadAllProjects = async function() {
   try {
     const { data: projects, error } = await supabase
       .from('projects')
       .select('*')
       .order('created_at', { ascending: false });
     
-    if (error) {
-      console.error('خطا:', error);
-      throw error;
-    }
+    if (error) throw error;
     
-    console.log('پروژه‌ها:', projects);
-    
-    // نمایش آمار
     const pending = projects.filter(p => !p.admin_approved).length;
     const approved = projects.filter(p => p.admin_approved).length;
     
@@ -6739,41 +6715,29 @@ window.loadPendingProjects = async function() {
     document.getElementById('statApproved').textContent = approved;
     document.getElementById('statTotal').textContent = projects.length;
     
-    // بروزرسانی شمارنده روی کارت
     const badge = document.getElementById('pendingProjectsCount');
     if (badge) badge.textContent = pending;
     
-    // نمایش پروژه‌ها
     window.projectsData = projects;
-    displayProjectsList(projects.filter(p => !p.admin_approved)); // اول پروژه‌های در انتظار رو نشون بده
+    filterProjects();
     
   } catch (error) {
     console.error('خطا:', error);
-    document.getElementById('projectsAdminList').innerHTML = `
-      <div class="col-12">
-        <div class="alert alert-danger">
-          خطا در دریافت پروژه‌ها: ${error.message}
-        </div>
-      </div>
-    `;
   }
 }
 
-// فیلتر پروژه‌ها
 window.filterProjects = function() {
   const filter = document.getElementById('projectFilter')?.value || 'pending';
   const search = document.getElementById('projectSearch')?.value || '';
   
   let filtered = window.projectsData || [];
   
-  // اعمال فیلتر وضعیت
   if (filter === 'pending') {
     filtered = filtered.filter(p => !p.admin_approved);
   } else if (filter === 'approved') {
     filtered = filtered.filter(p => p.admin_approved);
   }
   
-  // اعمال جستجو
   if (search) {
     filtered = filtered.filter(p => 
       p.title.toLowerCase().includes(search.toLowerCase()) ||
@@ -6784,7 +6748,6 @@ window.filterProjects = function() {
   displayProjectsList(filtered);
 }
 
-// نمایش لیست پروژه‌ها
 function displayProjectsList(projects) {
   const container = document.getElementById('projectsAdminList');
   if (!container) return;
@@ -6795,7 +6758,6 @@ function displayProjectsList(projects) {
         <div class="card-peymanyar text-center py-5">
           <i class="bi bi-folder-x display-4 text-muted mb-3"></i>
           <h4>پروژه‌ای یافت نشد</h4>
-          <p class="text-muted">همه پروژه‌ها تایید شده‌اند.</p>
         </div>
       </div>
     `;
@@ -6815,16 +6777,6 @@ function displayProjectsList(projects) {
             <span class="badge ${statusClass}">${statusText}</span>
           </div>
           <p>${project.description || 'بدون توضیحات'}</p>
-          <div class="row mt-3">
-            <div class="col-6">
-              <small class="text-muted d-block">دسته‌بندی: ${project.category || 'نامشخص'}</small>
-              <small class="text-muted d-block">بودجه: ${getBudgetText(project.budget_range)}</small>
-            </div>
-            <div class="col-6">
-              <small class="text-muted d-block">مکان: ${project.location || 'نامشخص'}</small>
-              <small class="text-muted d-block">زمانبندی: ${getTimelineText(project.timeline)}</small>
-            </div>
-          </div>
           <div class="d-flex justify-content-between align-items-center mt-3 pt-3 border-top">
             <small class="text-muted">
               <i class="bi bi-calendar me-1"></i>
@@ -6849,7 +6801,6 @@ function displayProjectsList(projects) {
   container.innerHTML = html;
 }
 
-// تایید پروژه
 window.approveProject = async function(projectId) {
   if (!confirm('آیا از تایید این پروژه اطمینان دارید؟')) return;
   
@@ -6862,9 +6813,8 @@ window.approveProject = async function(projectId) {
     if (error) throw error;
     
     alert('✅ پروژه با موفقیت تایید شد');
-    loadPendingProjects();
+    loadAllProjects();
     
-    // بروزرسانی صفحه پروژه‌ها
     if (window.app?.loadProjects) window.app.loadProjects();
     
   } catch (error) {
@@ -6872,9 +6822,8 @@ window.approveProject = async function(projectId) {
   }
 }
 
-// حذف پروژه
 window.deleteProject = async function(projectId) {
-  if (!confirm('⚠️ آیا از حذف این پروژه اطمینان دارید؟ این عمل قابل بازگشت نیست.')) return;
+  if (!confirm('⚠️ آیا از حذف این پروژه اطمینان دارید؟')) return;
   
   try {
     const { error } = await supabase
@@ -6885,37 +6834,14 @@ window.deleteProject = async function(projectId) {
     if (error) throw error;
     
     alert('✅ پروژه حذف شد');
-    loadPendingProjects();
+    loadAllProjects();
     
-    // بروزرسانی صفحه پروژه‌ها
     if (window.app?.loadProjects) window.app.loadProjects();
     
   } catch (error) {
     alert('خطا: ' + error.message);
   }
 }
-
-// توابع کمکی برای نمایش متن بودجه و زمانبندی
-function getBudgetText(budget) {
-  const budgets = {
-    'under100': 'زیر ۱۰۰ میلیون',
-    '100-500': '۱۰۰ تا ۵۰۰ میلیون',
-    '500-1000': '۵۰۰ میلیون تا ۱ میلیارد',
-    '1-5': '۱ تا ۵ میلیارد',
-    '5+': 'بالای ۵ میلیارد'
-  };
-  return budgets[budget] || budget || 'نامشخص';
-}
-
-function getTimelineText(timeline) {
-  const timelines = {
-    'urgent': 'فوری (کمتر از ۱ ماه)',
-    '1-3': '۱ تا ۳ ماه',
-    '3-6': '۳ تا ۶ ماه',
-    '6-12': '۶ تا ۱۲ ماه',
-    'flexible': 'انعطاف‌پذیر'
-  };
-  return timelines[timeline] || timeline || 'نامشخص';
-}
+</script>
 </body>
 </html>
