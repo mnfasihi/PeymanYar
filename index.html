@@ -3943,7 +3943,7 @@ address: profile?.address || '',
 user_type: profile?.user_type || 'employer',
 account_type: profile?.account_type || 'individual'
 };
-
+localStorage.setItem('peymanyar_user', JSON.stringify(this.userData));
 this.showToast('ورود موفقیت‌آمیز بود', 'success');
 this.showPage('home');
 this.checkAdminStatus();
@@ -5706,10 +5706,11 @@ this.showToast('این قابلیت در نسخه کامل پیاده‌سازی
 }
 
 async logout() {
-await supabase.auth.signOut();
-this.userData = null;
-this.showPage('home');
-this.showToast('با موفقیت خارج شدید', 'success');
+  await supabase.auth.signOut();
+  this.userData = null;
+  localStorage.removeItem('peymanyar_user'); // این خط مهمه
+  this.showPage('home');
+  this.showToast('با موفقیت خارج شدید', 'success');
 }
 // ===== توابع مدیریت پروژه‌ها =====
 async loadProjects() {
@@ -5924,7 +5925,13 @@ loadUserData() {
     this.userData = null;
   }
 }
-
+syncUserData() {
+  if (this.userData) {
+    localStorage.setItem('peymanyar_user', JSON.stringify(this.userData));
+  } else {
+    localStorage.removeItem('peymanyar_user');
+  }
+}
 setupIntersectionObserver() {
 const observer = new IntersectionObserver((entries) => {
 entries.forEach(entry => {
