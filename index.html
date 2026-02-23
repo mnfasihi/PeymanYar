@@ -1392,9 +1392,9 @@ body { background-color: #121212; color: #e0e0e0; }
   <div class="container page-header">
     <div class="d-flex justify-content-between align-items-center mb-4">
       <h2 class="section-title">📋 پروژه‌ها</h2>
-      <button class="btn btn-primary" onclick="window.safeShowNewProjectModal()">
-  <i class="bi bi-plus-circle me-2"></i>پروژه جدید
-</button>
+      <button class="btn btn-primary" onclick="app.showNewProjectModal()">
+        <i class="bi bi-plus-circle me-2"></i>پروژه جدید
+      </button>
     </div>
 
     <!-- فیلترها -->
@@ -6274,35 +6274,6 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 window.app = app;
-// تضمین اینکه app همیشه در دسترس باشه
-window.ensureApp = function(callback) {
-  if (app) {
-    callback();
-  } else {
-    // اگه app آماده نبود، ۱۰۰ میلی‌ثانیه صبر کن
-    setTimeout(() => {
-      if (app) {
-        callback();
-      } else {
-        console.error('app still not ready');
-      }
-    }, 100);
-  }
-};
-
-// wrapper برای توابع
-window.safeShowNewProjectModal = function() {
-  window.ensureApp(() => {
-    if (app.userData && app.userData.user_type === 'employer') {
-      app.showNewProjectModal();
-    } else if (!app.userData) {
-      app.showToast('برای ثبت پروژه ابتدا وارد شوید', 'error');
-      app.showPage('login');
-    } else {
-      app.showToast('فقط کارفرمایان می‌توانند پروژه ثبت کنند', 'error');
-    }
-  });
-};
 </script>
 </body>
 </html>
