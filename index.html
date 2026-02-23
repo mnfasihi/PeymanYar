@@ -6422,10 +6422,11 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 <script>
 // ===== پنل مدیریت پروژه‌ها - نسخه نهایی =====
-let isLoadingProjects = false; // متغیر کنترلی برای جلوگیری از لود مجدد
-
 window.showProjectManagementPanel = function() {
   console.log('مدیریت پروژه‌ها باز شد');
+  
+  // ذخیره وضعیت فعلی
+  window.lastPage = document.querySelector('.page-section.active')?.id || 'home';
   
   document.querySelectorAll('.page-section').forEach(p => p.style.display = 'none');
   
@@ -6450,21 +6451,16 @@ window.showProjectManagementPanel = function() {
   }
   
   panel.style.display = 'block';
-  isLoadingProjects = true; // ست کردن پرچم
   loadPendingProjects();
 }
 
 window.goBack = function() {
   document.querySelectorAll('.page-section').forEach(p => p.style.display = 'none');
   document.getElementById('adminMessages').style.display = 'block';
-  isLoadingProjects = false; // ریست پرچم
 }
 
 // بارگذاری پروژه‌های در انتظار تایید
 window.loadPendingProjects = async function() {
-  // اگه در حال لود نیست، ادامه نده
-  if (!isLoadingProjects) return;
-  
   try {
     const { data: pendingProjects, error } = await supabase
       .from('projects')
@@ -6492,6 +6488,11 @@ window.loadPendingProjects = async function() {
     if (badge) badge.textContent = pendingProjects.length;
     
     // نمایش پروژه‌ها
+    if (pendingProjects.length === 0) {
+      document.getElementById('adminProjectsList').innerHTML = '<p class="text-center">پروژه‌ای در انتظار تایید نیست</p>';
+      return;
+    }
+    
     let html = '';
     pendingProjects.forEach(p => {
       html += `
@@ -6506,10 +6507,11 @@ window.loadPendingProjects = async function() {
       `;
     });
     
-    document.getElementById('adminProjectsList').innerHTML = html || '<p class="text-center">پروژه‌ای در انتظار تایید نیست</p>';
+    document.getElementById('adminProjectsList').innerHTML = html;
     
   } catch (error) {
     console.error('خطا:', error);
+    document.getElementById('adminProjectsList').innerHTML = '<p class="text-center">خطا در دریافت پروژه‌ها</p>';
   }
 }
 
@@ -6521,7 +6523,8 @@ window.approveProject = async function(id) {
     await supabase.from('projects').update({ admin_approved: true }).eq('id', id);
     
     // حذف پروژه از لیست
-    document.getElementById(`project-${id}`).remove();
+    const projectElement = document.getElementById(`project-${id}`);
+    if (projectElement) projectElement.remove();
     
     // آپدیت آمار
     const pendingSpan = document.getElementById('statPending');
@@ -6539,9 +6542,6 @@ window.approveProject = async function(id) {
       document.getElementById('adminProjectsList').innerHTML = '<p class="text-center">پروژه‌ای در انتظار تایید نیست</p>';
     }
     
-    // بروزرسانی صفحه اصلی پروژه‌ها
-    loadApprovedProjects();
-    
   } catch (error) {
     console.error('خطا:', error);
     alert('خطا در تایید پروژه');
@@ -6556,7 +6556,8 @@ window.deleteProject = async function(id) {
     await supabase.from('projects').delete().eq('id', id);
     
     // حذف پروژه از لیست
-    document.getElementById(`project-${id}`).remove();
+    const projectElement = document.getElementById(`project-${id}`);
+    if (projectElement) projectElement.remove();
     
     // آپدیت آمار
     const pendingSpan = document.getElementById('statPending');
@@ -6582,11 +6583,11 @@ window.deleteProject = async function(id) {
 
 // نمایش پروژه‌های تایید شده در صفحه اصلی
 window.loadApprovedProjects = async function() {
-  const container = document.getElementById('projectsList');
-  if (!container) return;
-  
   // اگه پنل مدیریت بازه، کاری نکن
   if (document.getElementById('adminProjectsPanel')?.style.display === 'block') return;
+  
+  const container = document.getElementById('projectsList');
+  if (!container) return;
   
   try {
     const { data: projects } = await supabase
@@ -6616,22 +6617,11 @@ window.loadApprovedProjects = async function() {
     
   } catch (error) {
     console.error('خطا:', error);
-    container.innerHTML = '<p class="text-center">خطا در دریافت پروژه‌ها</p>';
   }
 }
 
-// بارگذاری پروژه‌ها هنگام باز شدن صفحه اصلی
-document.addEventListener('pageChanged', function(e) {
-  if (e.detail.pageId === 'projects') {
-    // اگه پنل مدیریت باز نیست، پروژه‌ها رو لود کن
-    if (document.getElementById('adminProjectsPanel')?.style.display !== 'block') {
-      setTimeout(loadApprovedProjects, 100);
-    }
-  }
-});
-
 // بارگذاری اولیه
-setTimeout(loadApprovedProjects, 500);
+setTimeout(loadApprovedProjects, 1000);
 </script>
 </body>
 </html>
