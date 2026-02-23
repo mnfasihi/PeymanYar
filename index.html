@@ -1537,21 +1537,6 @@ body { background-color: #121212; color: #e0e0e0; }
 <p>پاکسازی پیام‌های قدیمی و بهینه‌سازی فضای ذخیره‌سازی</p>
 <button class="btn-messages btn-messages-danger" onclick="cleanupStorage()">پاکسازی</button>
 </div>
-<!-- کارت مدیریت پروژه‌ها (اضافه کن به بخش messages-cards-container در پنل مدیریت) -->
-<div class="messages-card">
-  <h3>
-    <i class="bi bi-building" style="color: var(--primary-color);"></i>
-    مدیریت پروژه‌ها
-  </h3>
-  <p>تایید و مدیریت پروژه‌های ثبت شده توسط کارفرمایان</p>
-  <div class="d-flex gap-2 mt-3">
-    <span class="badge bg-warning" id="pendingProjectsCount">0</span>
-    <span class="text-muted">پروژه در انتظار تایید</span>
-  </div>
-  <button class="btn-messages mt-3" onclick="showProjectManagementPanel()">
-    <i class="bi bi-check2-circle me-2"></i>مدیریت پروژه‌ها
-  </button>
-</div>
 <div class="messages-card">
 <h3>📚 راهنما و پشتیبانی</h3>
 <p>مشاهده راهنمای استفاده و ارتباط با پشتیبانی</p>
@@ -1838,6 +1823,21 @@ body { background-color: #121212; color: #e0e0e0; }
 <p>آنالیز کامل پیام‌ها با گزارش‌های تحلیلی پیشرفته</p>
 <button class="btn-messages" onclick="adminAnalyzeMessages()">شروع تحلیل پیشرفته</button>
 </div>
+ <!-- ✅ کارت جدید مدیریت پروژه‌ها رو اینجا اضافه کن -->
+    <div class="messages-card">
+      <h3>
+        <i class="bi bi-building" style="color: var(--primary-color);"></i>
+        مدیریت پروژه‌ها
+      </h3>
+      <p>تایید و مدیریت پروژه‌های ثبت شده توسط کارفرمایان</p>
+      <div class="d-flex gap-2 mt-3">
+        <span class="badge bg-warning" id="pendingProjectsCount">0</span>
+        <span class="text-muted">پروژه در انتظار تایید</span>
+      </div>
+      <button class="btn-messages mt-3" onclick="showProjectManagementPanel()">
+        <i class="bi bi-check2-circle me-2"></i>مدیریت پروژه‌ها
+      </button>
+    </div>
 <div class="messages-card">
 <h3>📨 ارسال پیام مدیریتی</h3>
 <p>ارسال پیام به تمام کاربران یا گروه‌های خاص</p>
