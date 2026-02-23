@@ -1391,7 +1391,7 @@ body { background-color: #121212; color: #e0e0e0; }
   <div class="container page-header">
     <div class="d-flex justify-content-between align-items-center mb-4">
       <h2 class="section-title">📋 پروژه‌ها</h2>
-      <button class="btn btn-primary" onclick="showNewProjectModal()">
+   <button class="btn btn-primary" onclick="window.openProjectModal()">
   <i class="bi bi-plus-circle me-2"></i>پروژه جدید
 </button>
     </div>
@@ -6420,6 +6420,42 @@ window.enableProfileEdit = () => app?.enableProfileEdit();
 window.cancelProfileEdit = () => app?.cancelProfileEdit();
 window.saveProfileChanges = () => app?.saveProfileChanges();
 window.app = app;
+</script>
+<script>
+// تابع باز کردن مودال پروژه جدید
+window.openProjectModal = function() {
+  const modalElement = document.getElementById('newProjectModal');
+  if (modalElement) {
+    const modal = new bootstrap.Modal(modalElement);
+    modal.show();
+  }
+}
+
+// درست کردن دکمه ذخیره
+document.addEventListener('DOMContentLoaded', function() {
+  const saveBtn = document.querySelector('#newProjectModal .btn-primary');
+  if (saveBtn && saveBtn.textContent.includes('ایجاد')) {
+    saveBtn.onclick = function(e) {
+      e.preventDefault();
+      const title = document.getElementById('projectTitle')?.value;
+      const desc = document.getElementById('projectDescription')?.value;
+      
+      if (!title || !desc) {
+        alert('عنوان و توضیحات رو وارد کن');
+        return;
+      }
+      
+      alert('پروژه ثبت شد: ' + title);
+      
+      // بستن مودال
+      const modal = bootstrap.Modal.getInstance(document.getElementById('newProjectModal'));
+      if (modal) modal.hide();
+      
+      // پاک کردن فرم
+      document.getElementById('newProjectForm')?.reset();
+    };
+  }
+});
 </script>
 </body>
 </html>
