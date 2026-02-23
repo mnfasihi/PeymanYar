@@ -6420,7 +6420,6 @@ document.addEventListener('DOMContentLoaded', function() {
 // ===== حل نهایی مشکل پروژه‌ها =====
 // (همون کدی که الان داری)
 </script>
-
 <script>
 // ===== پنل مدیریت پروژه‌ها - نسخه نهایی =====
 window.showProjectManagementPanel = function() {
@@ -6441,7 +6440,7 @@ window.showProjectManagementPanel = function() {
           <div class="col-md-4"><div class="card-peymanyar text-center"><h3 id="statApproved">0</h3><p>تایید شده</p></div></div>
           <div class="col-md-4"><div class="card-peymanyar text-center"><h3 id="statTotal">0</h3><p>کل</p></div></div>
         </div>
-        <div id="adminprojectsList" class="row"></div>
+        <div id="adminProjectsList" class="row"></div>
         <button class="btn btn-secondary mt-3" onclick="goBack()">بازگشت</button>
       </div>
     `;
@@ -6449,7 +6448,7 @@ window.showProjectManagementPanel = function() {
   }
   
   panel.style.display = 'block';
-  loadProjects();
+  loadPendingProjects();
 }
 
 window.goBack = function() {
@@ -6457,7 +6456,8 @@ window.goBack = function() {
   document.getElementById('adminMessages').style.display = 'block';
 }
 
-window.loadProjects = async function() {
+// بارگذاری پروژه‌های در انتظار تایید
+window.loadPendingProjects = async function() {
   try {
     const { data: pendingProjects, error } = await supabase
       .from('projects')
@@ -6466,6 +6466,7 @@ window.loadProjects = async function() {
     
     if (error) throw error;
     
+    // آمار
     document.getElementById('statPending').textContent = pendingProjects.length;
     
     const { count: total } = await supabase
@@ -6479,80 +6480,145 @@ window.loadProjects = async function() {
       .eq('admin_approved', true);
     document.getElementById('statApproved').textContent = approved || 0;
     
+    // بروزرسانی شمارنده روی کارت
     const badge = document.getElementById('pendingProjectsCount');
     if (badge) badge.textContent = pendingProjects.length;
     
+    // نمایش پروژه‌ها
     let html = '';
     pendingProjects.forEach(p => {
       html += `
-        <div class="col-md-6 mb-3">
+        <div class="col-md-6 mb-3" id="project-${p.id}">
           <div class="card-peymanyar">
             <h5>${p.title}</h5>
             <p>${p.description || ''}</p>
-            <button class="btn btn-sm btn-success" onclick="approve(${p.id})">تایید</button>
-            <button class="btn btn-sm btn-danger" onclick="del(${p.id})">حذف</button>
+            <button class="btn btn-sm btn-success" onclick="approveProject(${p.id})">تایید</button>
+            <button class="btn btn-sm btn-danger" onclick="deleteProject(${p.id})">حذف</button>
           </div>
         </div>
       `;
     });
     
-   document.getElementById('adminProjectsList').innerHTML = html || '<p class="text-center">پروژه‌ای در انتظار تایید نیست</p>';
+    document.getElementById('adminProjectsList').innerHTML = html || '<p class="text-center">پروژه‌ای در انتظار تایید نیست</p>';
     
   } catch (error) {
     console.error('خطا:', error);
   }
 }
 
-window.approve = async function(id) {
-  if (confirm('تایید میشود؟')) {
+// تایید پروژه
+window.approveProject = async function(id) {
+  if (!confirm('تایید میشود؟')) return;
+  
+  try {
     await supabase.from('projects').update({ admin_approved: true }).eq('id', id);
-    loadProjects();
-    if (document.getElementById('adminprojectsList') && !document.getElementById('projectsList').closest('#adminProjectsPanel')) {
-      loadApprovedProjects();
+    
+    // حذف پروژه از لیست
+    document.getElementById(`project-${id}`).remove();
+    
+    // آپدیت آمار
+    const pendingSpan = document.getElementById('statPending');
+    pendingSpan.textContent = parseInt(pendingSpan.textContent) - 1;
+    
+    const approvedSpan = document.getElementById('statApproved');
+    approvedSpan.textContent = parseInt(approvedSpan.textContent) + 1;
+    
+    // بروزرسانی شمارنده روی کارت
+    const badge = document.getElementById('pendingProjectsCount');
+    if (badge) badge.textContent = pendingSpan.textContent;
+    
+    // اگه پروژه‌ای نموند، پیام مناسب نشون بده
+    if (document.getElementById('adminProjectsList').children.length === 0) {
+      document.getElementById('adminProjectsList').innerHTML = '<p class="text-center">پروژه‌ای در انتظار تایید نیست</p>';
     }
+    
+    // بروزرسانی صفحه اصلی پروژه‌ها
+    loadApprovedProjects();
+    
+  } catch (error) {
+    console.error('خطا:', error);
+    alert('خطا در تایید پروژه');
   }
 }
 
-window.del = async function(id) {
-  if (confirm('حذف میشود؟')) {
+// حذف پروژه
+window.deleteProject = async function(id) {
+  if (!confirm('حذف میشود؟')) return;
+  
+  try {
     await supabase.from('projects').delete().eq('id', id);
-    loadProjects();
+    
+    // حذف پروژه از لیست
+    document.getElementById(`project-${id}`).remove();
+    
+    // آپدیت آمار
+    const pendingSpan = document.getElementById('statPending');
+    pendingSpan.textContent = parseInt(pendingSpan.textContent) - 1;
+    
+    const totalSpan = document.getElementById('statTotal');
+    totalSpan.textContent = parseInt(totalSpan.textContent) - 1;
+    
+    // بروزرسانی شمارنده روی کارت
+    const badge = document.getElementById('pendingProjectsCount');
+    if (badge) badge.textContent = pendingSpan.textContent;
+    
+    // اگه پروژه‌ای نموند، پیام مناسب نشون بده
+    if (document.getElementById('adminProjectsList').children.length === 0) {
+      document.getElementById('adminProjectsList').innerHTML = '<p class="text-center">پروژه‌ای در انتظار تایید نیست</p>';
+    }
+    
+  } catch (error) {
+    console.error('خطا:', error);
+    alert('خطا در حذف پروژه');
   }
 }
 
 // نمایش پروژه‌های تایید شده در صفحه اصلی
 window.loadApprovedProjects = async function() {
   const container = document.getElementById('projectsList');
-  if (!container || container.closest('#adminProjectsPanel')) return;
+  if (!container) return;
   
-  const { data: projects } = await supabase
-    .from('projects')
-    .select('*')
-    .eq('admin_approved', true);
-  
-  let html = '';
-  projects.forEach(p => {
-    html += `
-      <div class="col-md-6 mb-3">
-        <div class="card-peymanyar">
-          <h5>${p.title}</h5>
-          <p>${p.description || ''}</p>
-          <small>وضعیت: ${p.status || 'open'}</small>
+  try {
+    const { data: projects } = await supabase
+      .from('projects')
+      .select('*')
+      .eq('admin_approved', true);
+    
+    if (!projects || projects.length === 0) {
+      container.innerHTML = '<p class="text-center">پروژه‌ای یافت نشد</p>';
+      return;
+    }
+    
+    let html = '';
+    projects.forEach(p => {
+      html += `
+        <div class="col-md-6 mb-3">
+          <div class="card-peymanyar">
+            <h5>${p.title}</h5>
+            <p>${p.description || ''}</p>
+            <small>وضعیت: ${p.status || 'open'}</small>
+          </div>
         </div>
-      </div>
-    `;
-  });
-  
-  container.innerHTML = html || '<p class="text-center">پروژه‌ای نیست</p>';
+      `;
+    });
+    
+    container.innerHTML = html;
+    
+  } catch (error) {
+    console.error('خطا:', error);
+    container.innerHTML = '<p class="text-center">خطا در دریافت پروژه‌ها</p>';
+  }
 }
 
-// اجرا وقتی صفحه پروژه‌ها باز میشه
+// بارگذاری پروژه‌ها هنگام باز شدن صفحه اصلی
 document.addEventListener('pageChanged', function(e) {
   if (e.detail.pageId === 'projects') {
     setTimeout(loadApprovedProjects, 100);
   }
 });
-</script>
 
+// بارگذاری اولیه
+setTimeout(loadApprovedProjects, 500);
+</script>
 </body>
 </html>
