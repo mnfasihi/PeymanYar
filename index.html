@@ -6821,6 +6821,12 @@ function displayProjectsList(projects) {
 window.approveProject = async function(projectId) {
   if (!confirm('آیا از تایید این پروژه اطمینان دارید؟')) return;
   
+  // غیرفعال کردن موقت دکمه
+  const btn = event.target;
+  const originalText = btn.innerHTML;
+  btn.innerHTML = 'در حال تایید...';
+  btn.disabled = true;
+  
   try {
     const { error } = await supabase
       .from('projects')
@@ -6829,18 +6835,54 @@ window.approveProject = async function(projectId) {
     
     if (error) throw error;
     
-    alert('✅ پروژه با موفقیت تایید شد');
-    loadAllProjects();
+    // حذف پروژه از صفحه بدون رفرش
+    const projectCard = btn.closest('.col-md-6');
+    if (projectCard) {
+      projectCard.remove();
+    }
     
-    if (window.app?.loadProjects) window.app.loadProjects();
+    // آپدیت آمار
+    const pendingSpan = document.getElementById('statPending');
+    const currentPending = parseInt(pendingSpan.textContent);
+    pendingSpan.textContent = currentPending - 1;
+    
+    const approvedSpan = document.getElementById('statApproved');
+    approvedSpan.textContent = parseInt(approvedSpan.textContent) + 1;
+    
+    // بروزرسانی شمارنده روی کارت
+    const badge = document.getElementById('pendingProjectsCount');
+    if (badge) badge.textContent = currentPending - 1;
+    
+    // اگه هیچ پروژه‌ای نموند، پیام مناسب نشون بده
+    const container = document.getElementById('projectsAdminList');
+    if (container.children.length === 0) {
+      container.innerHTML = `
+        <div class="col-12">
+          <div class="card-peymanyar text-center py-5">
+            <i class="bi bi-folder-x display-4 text-muted mb-3"></i>
+            <h4>پروژه‌ای یافت نشد</h4>
+            <p class="text-muted">همه پروژه‌ها تایید شده‌اند.</p>
+          </div>
+        </div>
+      `;
+    }
+    
+    alert('✅ پروژه با موفقیت تایید شد');
     
   } catch (error) {
     alert('خطا: ' + error.message);
+    btn.innerHTML = originalText;
+    btn.disabled = false;
   }
 }
 
 window.deleteProject = async function(projectId) {
   if (!confirm('⚠️ آیا از حذف این پروژه اطمینان دارید؟')) return;
+  
+  const btn = event.target;
+  const originalText = btn.innerHTML;
+  btn.innerHTML = 'در حال حذف...';
+  btn.disabled = true;
   
   try {
     const { error } = await supabase
@@ -6850,13 +6892,44 @@ window.deleteProject = async function(projectId) {
     
     if (error) throw error;
     
-    alert('✅ پروژه حذف شد');
-    loadAllProjects();
+    // حذف پروژه از صفحه
+    const projectCard = btn.closest('.col-md-6');
+    if (projectCard) {
+      projectCard.remove();
+    }
     
-    if (window.app?.loadProjects) window.app.loadProjects();
+    // آپدیت آمار
+    const pendingSpan = document.getElementById('statPending');
+    const currentPending = parseInt(pendingSpan.textContent);
+    pendingSpan.textContent = currentPending - 1;
+    
+    const totalSpan = document.getElementById('statTotal');
+    totalSpan.textContent = parseInt(totalSpan.textContent) - 1;
+    
+    // بروزرسانی شمارنده روی کارت
+    const badge = document.getElementById('pendingProjectsCount');
+    if (badge) badge.textContent = currentPending - 1;
+    
+    // اگه هیچ پروژه‌ای نموند، پیام مناسب نشون بده
+    const container = document.getElementById('projectsAdminList');
+    if (container.children.length === 0) {
+      container.innerHTML = `
+        <div class="col-12">
+          <div class="card-peymanyar text-center py-5">
+            <i class="bi bi-folder-x display-4 text-muted mb-3"></i>
+            <h4>پروژه‌ای یافت نشد</h4>
+            <p class="text-muted">همه پروژه‌ها حذف شده‌اند.</p>
+          </div>
+        </div>
+      `;
+    }
+    
+    alert('✅ پروژه حذف شد');
     
   } catch (error) {
     alert('خطا: ' + error.message);
+    btn.innerHTML = originalText;
+    btn.disabled = false;
   }
 }
 </script>
