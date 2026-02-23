@@ -1391,7 +1391,7 @@ body { background-color: #121212; color: #e0e0e0; }
   <div class="container page-header">
     <div class="d-flex justify-content-between align-items-center mb-4">
       <h2 class="section-title">📋 پروژه‌ها</h2>
-   <button class="btn btn-primary" onclick="window.openNewProjectModal()">
+  <button class="btn btn-primary" onclick="window.openNewProjectModal()">
   <i class="bi bi-plus-circle me-2"></i>پروژه جدید
 </button>
     </div>
@@ -6428,8 +6428,15 @@ window.app = app;
 function getCurrentUser() {
   try {
     const userData = localStorage.getItem('peymanyar_user');
-    return userData ? JSON.parse(userData) : null;
+    if (!userData) {
+      console.log('کاربری وارد نشده');
+      return null;
+    }
+    const user = JSON.parse(userData);
+    console.log('کاربر فعلی:', user);
+    return user;
   } catch (e) {
+    console.error('خطا:', e);
     return null;
   }
 }
@@ -6438,19 +6445,24 @@ function getCurrentUser() {
 window.openNewProjectModal = function() {
   const user = getCurrentUser();
   
+  // اگر کاربر وجود نداشت
   if (!user) {
-    alert('لطفا وارد حساب کاربری خود شوید');
+    alert('❌ لطفا ابتدا وارد حساب کاربری خود شوید');
     showLogin();
     return;
   }
   
+  // اگر کاربر بود ولی کارفرما نبود
   if (user.user_type !== 'employer') {
-    alert('ثبت پروژه فقط برای کارفرمایان امکان‌پذیر است');
+    alert('❌ ثبت پروژه فقط برای کارفرمایان امکان‌پذیر است');
     return;
   }
   
+  console.log('✅ کاربر کارفرما تایید شد:', user.email);
+  
   // ذخیره id کاربر برای استفاده در ثبت
   window.currentUserId = user.id;
+  window.currentUserEmail = user.email;
   
   // باز کردن مودال
   const modal = new bootstrap.Modal(document.getElementById('newProjectModal'));
@@ -6459,8 +6471,17 @@ window.openNewProjectModal = function() {
 
 // ۳. ذخیره پروژه در دیتابیس
 window.saveProjectToDatabase = async function() {
-  if (!window.currentUserId) {
-    alert('خطا: لطفا دوباره تلاش کنید');
+  // چک مجدد کاربر
+  const user = getCurrentUser();
+  
+  if (!user) {
+    alert('❌ لطفا وارد حساب کاربری شوید');
+    showLogin();
+    return;
+  }
+  
+  if (user.user_type !== 'employer') {
+    alert('❌ شما اجازه ثبت پروژه ندارید');
     return;
   }
   
@@ -6468,7 +6489,7 @@ window.saveProjectToDatabase = async function() {
   const desc = document.getElementById('projectDescription')?.value;
   
   if (!title || !desc) {
-    alert('عنوان و توضیحات پروژه را وارد کنید');
+    alert('❌ عنوان و توضیحات پروژه را وارد کنید');
     return;
   }
   
@@ -6481,7 +6502,7 @@ window.saveProjectToDatabase = async function() {
     const projectData = {
       title: title,
       description: desc,
-      employer_id: window.currentUserId,
+      employer_id: user.id,  //直接从user بگیر
       category: document.getElementById('projectCategory')?.value || null,
       budget_range: document.getElementById('projectBudget')?.value || null,
       location: document.getElementById('projectLocation')?.value || null,
@@ -6491,13 +6512,17 @@ window.saveProjectToDatabase = async function() {
       created_at: new Date().toISOString()
     };
     
-    const { error } = await supabase
+    console.log('در حال ثبت پروژه برای کاربر:', user.email);
+    console.log('داده پروژه:', projectData);
+    
+    const { error, data } = await supabase
       .from('projects')
-      .insert([projectData]);
+      .insert([projectData])
+      .select();
     
     if (error) throw error;
     
-    alert('✅ پروژه با موفقیت ثبت و منتظر تایید مدیر است');
+    alert(`✅ پروژه "${title}" با موفقیت ثبت و منتظر تایید مدیر است`);
     
     // بستن مودال
     const modal = bootstrap.Modal.getInstance(document.getElementById('newProjectModal'));
@@ -6510,32 +6535,53 @@ window.saveProjectToDatabase = async function() {
     setTimeout(() => location.reload(), 2000);
     
   } catch (error) {
-    alert('خطا: ' + error.message);
+    console.error('خطا:', error);
+    alert('❌ خطا: ' + error.message);
   } finally {
     btn.innerHTML = originalText;
     btn.disabled = false;
   }
 }
 
-// ۴. تنظیم دکمه‌ها بعد از لود صفحه
+// ۴. تابع تست برای چک کردن وضعیت کاربر (اجرا در کنسول)
+window.checkUserStatus = function() {
+  const user = getCurrentUser();
+  if (user) {
+    console.log('✅ کاربر وارد شده:', user);
+    console.log('نوع کاربر:', user.user_type);
+    if (user.user_type === 'employer') {
+      console.log('✅ این کاربر کارفرما است - می‌تواند پروژه ثبت کند');
+    } else {
+      console.log('❌ این کاربر کارفرما نیست');
+    }
+  } else {
+    console.log('❌ هیچ کاربری وارد نشده');
+  }
+}
+
+// ۵. تنظیم دکمه‌ها بعد از لود صفحه
 document.addEventListener('DOMContentLoaded', function() {
   // دکمه پروژه جدید
-  const newBtn = document.querySelector('button[onclick*="openProjectModal"]');
-  if (newBtn) {
-    newBtn.onclick = function(e) {
-      e.preventDefault();
-      window.openNewProjectModal();
-    };
-  }
-  
-  // دکمه ایجاد پروژه
-  const saveBtn = document.querySelector('#newProjectModal .btn-primary');
-  if (saveBtn) {
-    saveBtn.onclick = function(e) {
-      e.preventDefault();
-      window.saveProjectToDatabase();
-    };
-  }
+  setTimeout(() => {
+    const newBtn = document.querySelector('button[onclick*="openProjectModal"]');
+    if (newBtn) {
+      newBtn.onclick = function(e) {
+        e.preventDefault();
+        window.openNewProjectModal();
+      };
+      console.log('✅ دکمه پروژه جدید تنظیم شد');
+    }
+    
+    // دکمه ایجاد پروژه
+    const saveBtn = document.querySelector('#newProjectModal .btn-primary');
+    if (saveBtn) {
+      saveBtn.onclick = function(e) {
+        e.preventDefault();
+        window.saveProjectToDatabase();
+      };
+      console.log('✅ دکمه ایجاد پروژه تنظیم شد');
+    }
+  }, 500);
 });
 </script>
 </body>
