@@ -6418,196 +6418,74 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 <script>
 <script>
-// ===== پنل مدیریت پروژه‌ها (نسخه نهایی) =====
+<script>
+// ===== پنل مدیریت پروژه‌ها - نسخه نهایی =====
 window.showProjectManagementPanel = function() {
   console.log('مدیریت پروژه‌ها باز شد');
   
   document.querySelectorAll('.page-section').forEach(p => p.style.display = 'none');
   
-  let projectPanel = document.getElementById('adminProjectsPanel');
-  if (!projectPanel) {
-    projectPanel = document.createElement('div');
-    projectPanel.id = 'adminProjectsPanel';
-    projectPanel.className = 'page-section';
-    projectPanel.innerHTML = `
+  let panel = document.getElementById('adminProjectsPanel');
+  if (!panel) {
+    panel = document.createElement('div');
+    panel.id = 'adminProjectsPanel';
+    panel.className = 'page-section';
+    panel.innerHTML = `
       <div class="container page-header">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-          <div>
-            <h2 class="section-title mb-1">
-              <i class="bi bi-building me-2"></i>مدیریت پروژه‌ها
-            </h2>
-            <p class="text-muted">تایید و مدیریت پروژه‌های ثبت شده</p>
-          </div>
-          <div>
-            <button class="btn btn-outline-primary me-2" onclick="loadPendingProjects()">
-              <i class="bi bi-arrow-repeat me-1"></i>بروزرسانی
-            </button>
-            <button class="btn btn-outline-secondary" onclick="goBackToAdminPanel()">
-              <i class="bi bi-arrow-right me-1"></i>بازگشت
-            </button>
-          </div>
-        </div>
-
+        <h2 class="section-title mb-4">مدیریت پروژه‌ها</h2>
         <div class="row mb-4">
-          <div class="col-md-4">
-            <div class="card-peymanyar text-center">
-              <div class="h3 mb-2" id="statPending">0</div>
-              <div class="text-muted">در انتظار تایید</div>
-            </div>
-          </div>
-          <div class="col-md-4">
-            <div class="card-peymanyar text-center">
-              <div class="h3 mb-2" id="statApproved">0</div>
-              <div class="text-muted">تایید شده</div>
-            </div>
-          </div>
-          <div class="col-md-4">
-            <div class="card-peymanyar text-center">
-              <div class="h3 mb-2" id="statTotal">0</div>
-              <div class="text-muted">کل پروژه‌ها</div>
-            </div>
-          </div>
+          <div class="col-md-4"><div class="card-peymanyar text-center"><h3 id="statPending">0</h3><p>در انتظار</p></div></div>
+          <div class="col-md-4"><div class="card-peymanyar text-center"><h3 id="statApproved">0</h3><p>تایید شده</p></div></div>
+          <div class="col-md-4"><div class="card-peymanyar text-center"><h3 id="statTotal">0</h3><p>کل</p></div></div>
         </div>
-
-        <div id="projectsAdminList" class="row">
-          <div class="col-12 text-center py-5">
-            <div class="spinner-border text-primary" role="status"></div>
-            <p class="mt-2">در حال دریافت پروژه‌ها...</p>
-          </div>
-        </div>
+        <div id="projectsList" class="row"></div>
+        <button class="btn btn-secondary mt-3" onclick="goBack()">بازگشت</button>
       </div>
     `;
-    
-    const footer = document.querySelector('footer');
-    if (footer) {
-      document.body.insertBefore(projectPanel, footer);
-    } else {
-      document.body.appendChild(projectPanel);
-    }
+    document.body.insertBefore(panel, document.querySelector('footer'));
   }
   
-  projectPanel.style.display = 'block';
-  loadPendingProjects();
+  panel.style.display = 'block';
+  loadProjects();
 }
 
-window.goBackToAdminPanel = function() {
+window.goBack = function() {
   document.querySelectorAll('.page-section').forEach(p => p.style.display = 'none');
   document.getElementById('adminMessages').style.display = 'block';
 }
 
-window.loadPendingProjects = async function() {
-  try {
-    const { data: projects, error } = await supabase
-      .from('projects')
-      .select('*')
-      .eq('admin_approved', false)
-      .order('created_at', { ascending: false });
-    
-    if (error) throw error;
-    
-    document.getElementById('statPending').textContent = projects.length;
-    
-    const { count: total } = await supabase
-      .from('projects')
-      .select('*', { count: 'exact', head: true });
-    
-    const { count: approved } = await supabase
-      .from('projects')
-      .select('*', { count: 'exact', head: true })
-      .eq('admin_approved', true);
-    
-    document.getElementById('statApproved').textContent = approved || 0;
-    document.getElementById('statTotal').textContent = total || 0;
-    
-    const badge = document.getElementById('pendingProjectsCount');
-    if (badge) badge.textContent = projects.length;
-    
-    displayProjects(projects);
-    
-  } catch (error) {
-    console.error('خطا:', error);
-  }
-}
-
-function displayProjects(projects) {
-  const container = document.getElementById('projectsAdminList');
-  if (!container) return;
+window.loadProjects = async function() {
+  const { data: projects } = await supabase.from('projects').select('*').eq('admin_approved', false);
   
-  if (!projects || projects.length === 0) {
-    container.innerHTML = `
-      <div class="col-12">
-        <div class="card-peymanyar text-center py-5">
-          <i class="bi bi-check-circle display-4 text-success mb-3"></i>
-          <h4>هیچ پروژه‌ای در انتظار تایید نیست</h4>
-        </div>
-      </div>
-    `;
-    return;
-  }
+  document.getElementById('statPending').textContent = projects.length;
+  document.getElementById('statTotal').textContent = (await supabase.from('projects').select('*', { count: 'exact', head: true })).count;
+  document.getElementById('statApproved').textContent = (await supabase.from('projects').select('*', { count: 'exact', head: true }).eq('admin_approved', true)).count;
   
   let html = '';
-  projects.forEach(project => {
-    html += `
-      <div class="col-md-6 mb-4" id="project-${project.id}">
+  projects.forEach(p => {
+    html += \`
+      <div class="col-md-6 mb-3">
         <div class="card-peymanyar">
-          <div class="d-flex justify-content-between align-items-start mb-3">
-            <h5>${project.title}</h5>
-            <span class="badge bg-warning">در انتظار تایید</span>
-          </div>
-          <p>${project.description || ''}</p>
-          <div class="d-flex justify-content-between align-items-center mt-3 pt-3 border-top">
-            <small class="text-muted">
-              <i class="bi bi-calendar me-1"></i>
-              ${new Date(project.created_at).toLocaleDateString('fa-IR')}
-            </small>
-            <div>
-              <button class="btn btn-sm btn-success me-2" onclick="approveProject(${project.id})">
-                <i class="bi bi-check-circle me-1"></i>تایید
-              </button>
-              <button class="btn btn-sm btn-outline-danger" onclick="deleteProject(${project.id})">
-                <i class="bi bi-trash"></i>
-              </button>
-            </div>
-          </div>
+          <h5>\${p.title}</h5>
+          <p>\${p.description || ''}</p>
+          <button class="btn btn-sm btn-success" onclick="approve(\${p.id})">تایید</button>
+          <button class="btn btn-sm btn-danger" onclick="del(\${p.id})">حذف</button>
         </div>
       </div>
-    `;
+    \`;
   });
-  
-  container.innerHTML = html;
+  document.getElementById('projectsList').innerHTML = html || '<p>پروژه‌ای نیست</p>';
 }
 
-window.approveProject = async function(projectId) {
-  if (!confirm('تایید میشود؟')) return;
-  
-  try {
-    await supabase
-      .from('projects')
-      .update({ admin_approved: true })
-      .eq('id', projectId);
-    
-    document.getElementById(`project-${projectId}`).remove();
-    loadPendingProjects();
-    
-  } catch (error) {
-    alert('خطا');
-  }
+window.approve = async function(id) {
+  await supabase.from('projects').update({ admin_approved: true }).eq('id', id);
+  loadProjects();
 }
 
-window.deleteProject = async function(projectId) {
-  if (!confirm('حذف میشود؟')) return;
-  
-  try {
-    await supabase
-      .from('projects')
-      .delete()
-      .eq('id', projectId);
-    
-    document.getElementById(`project-${projectId}`).remove();
-    loadPendingProjects();
-    
-  } catch (error) {
-    alert('خطا');
+window.del = async function(id) {
+  if(confirm('حذف؟')) {
+    await supabase.from('projects').delete().eq('id', id);
+    loadProjects();
   }
 }
 </script>
