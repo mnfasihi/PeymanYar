@@ -6416,6 +6416,12 @@ document.addEventListener('DOMContentLoaded', function() {
   }, 500);
 });
 </script>
+<script>
+// ===== حل نهایی مشکل پروژه‌ها =====
+// (همون کدی که الان داری)
+</script>
+
+<script>
 // ===== پنل مدیریت پروژه‌ها - نسخه نهایی =====
 window.showProjectManagementPanel = function() {
   console.log('مدیریت پروژه‌ها باز شد');
@@ -6453,7 +6459,6 @@ window.goBack = function() {
 
 window.loadProjects = async function() {
   try {
-    // گرفتن پروژه‌های در انتظار تایید
     const { data: pendingProjects, error } = await supabase
       .from('projects')
       .select('*')
@@ -6461,23 +6466,22 @@ window.loadProjects = async function() {
     
     if (error) throw error;
     
-    // آمار
     document.getElementById('statPending').textContent = pendingProjects.length;
     
-    // کل پروژه‌ها
     const { count: total } = await supabase
       .from('projects')
       .select('*', { count: 'exact', head: true });
     document.getElementById('statTotal').textContent = total || 0;
     
-    // پروژه‌های تایید شده
     const { count: approved } = await supabase
       .from('projects')
       .select('*', { count: 'exact', head: true })
       .eq('admin_approved', true);
     document.getElementById('statApproved').textContent = approved || 0;
     
-    // نمایش پروژه‌ها
+    const badge = document.getElementById('pendingProjectsCount');
+    if (badge) badge.textContent = pendingProjects.length;
+    
     let html = '';
     pendingProjects.forEach(p => {
       html += `
@@ -6498,38 +6502,57 @@ window.loadProjects = async function() {
     console.error('خطا:', error);
   }
 }
-<script>
+
+window.approve = async function(id) {
+  if (confirm('تایید میشود؟')) {
+    await supabase.from('projects').update({ admin_approved: true }).eq('id', id);
+    loadProjects();
+    if (document.getElementById('projectsList') && !document.getElementById('projectsList').closest('#adminProjectsPanel')) {
+      loadApprovedProjects();
+    }
+  }
+}
+
+window.del = async function(id) {
+  if (confirm('حذف میشود؟')) {
+    await supabase.from('projects').delete().eq('id', id);
+    loadProjects();
+  }
+}
+
 // نمایش پروژه‌های تایید شده در صفحه اصلی
 window.loadApprovedProjects = async function() {
-  if (document.getElementById('projectsList')) {
-    const { data: projects } = await supabase
-      .from('projects')
-      .select('*')
-      .eq('admin_approved', true);
-    
-    let html = '';
-    projects.forEach(p => {
-      html += `
-        <div class="col-md-6 mb-3">
-          <div class="card-peymanyar">
-            <h5>${p.title}</h5>
-            <p>${p.description || ''}</p>
-            <small>وضعیت: ${p.status || 'open'}</small>
-          </div>
+  const container = document.getElementById('projectsList');
+  if (!container || container.closest('#adminProjectsPanel')) return;
+  
+  const { data: projects } = await supabase
+    .from('projects')
+    .select('*')
+    .eq('admin_approved', true);
+  
+  let html = '';
+  projects.forEach(p => {
+    html += `
+      <div class="col-md-6 mb-3">
+        <div class="card-peymanyar">
+          <h5>${p.title}</h5>
+          <p>${p.description || ''}</p>
+          <small>وضعیت: ${p.status || 'open'}</small>
         </div>
-      `;
-    });
-    
-    document.getElementById('projectsList').innerHTML = html || '<p>پروژه‌ای نیست</p>';
-  }
+      </div>
+    `;
+  });
+  
+  container.innerHTML = html || '<p class="text-center">پروژه‌ای نیست</p>';
 }
 
 // اجرا وقتی صفحه پروژه‌ها باز میشه
 document.addEventListener('pageChanged', function(e) {
   if (e.detail.pageId === 'projects') {
-    loadApprovedProjects();
+    setTimeout(loadApprovedProjects, 100);
   }
 });
 </script>
+
 </body>
 </html>
