@@ -5727,196 +5727,6 @@ async logout() {
   this.showPage('home');
   this.showToast('با موفقیت خارج شدید', 'success');
 }
-// ===== توابع مدیریت پروژه‌ها =====
-async loadProjects() {
-  const statusFilter = document.getElementById('projectFilterStatus')?.value || 'all';
-  const searchTerm = document.getElementById('projectSearch')?.value || '';
-  
-  try {
-    // فقط پروژه‌های تایید شده
-    let query = supabase
-      .from('projects')
-      .select('*')
-      .eq('admin_approved', true)
-      .order('created_at', { ascending: false });
-    
-    if (statusFilter !== 'all') {
-      query = query.eq('status', statusFilter);
-    }
-    
-    if (searchTerm) {
-      query = query.or(`title.ilike.%${searchTerm}%,description.ilike.%${searchTerm}%`);
-    }
-    
-    const { data: projects, error } = await query;
-    
-    if (error) {
-      console.error('خطا:', error);
-      this.showToast('خطا در دریافت پروژه‌ها', 'error');
-      return;
-    }
-    
-    // اطلاعات کارفرما
-    const projectsWithEmployer = await Promise.all((projects || []).map(async (project) => {
-      const { data: employer } = await supabase
-        .from('profiles')
-        .select('full_name, company_name')
-        .eq('user_id', project.employer_id)
-        .single();
-      
-      return {
-        ...project,
-        employer: employer || null
-      };
-    }));
-    
-    this.displayProjects(projectsWithEmployer);
-    
-  } catch (error) {
-    console.error('خطا:', error);
-    this.showToast('خطا در دریافت پروژه‌ها', 'error');
-  }
-}
-
-displayProjects(projects) {
-  // این المان باید با id درست باشه
-  const container = document.getElementById('projectsList'); // یا 'projectsContainer' یا 'projectsGrid'
-  
-  if (!container) {
-    console.error('المان پروژه‌ها پیدا نشد!');
-    return;
-  }
-  
-  if (!projects || projects.length === 0) {
-    container.innerHTML = `
-      <div class="col-12">
-        <div class="card-peymanyar text-center py-5">
-          <i class="bi bi-folder-x display-4 text-muted mb-3"></i>
-          <h4>پروژه‌ای یافت نشد</h4>
-          <p class="text-muted">هنوز پروژه‌ای ثبت نشده است.</p>
-        </div>
-      </div>
-    `;
-    return;
-  }
-  
-  let html = '';
-  projects.forEach(project => {
-    const statusClass = {
-      'open': 'bg-success',
-      'in_progress': 'bg-primary',
-      'completed': 'bg-secondary',
-      'cancelled': 'bg-danger'
-    }[project.status] || 'bg-secondary';
-    
-    const statusText = {
-      'open': 'در انتظار پیمانکار',
-      'in_progress': 'در حال انجام',
-      'completed': 'تکمیل شده',
-      'cancelled': 'لغو شده'
-    }[project.status] || project.status;
-    
-    html += `
-      <div class="col-md-6 mb-4">
-        <div class="card-peymanyar">
-          <div class="d-flex justify-content-between align-items-start mb-3">
-            <h5>${project.title}</h5>
-            <span class="badge ${statusClass}">${statusText}</span>
-          </div>
-          <p>${project.description || 'بدون توضیحات'}</p>
-          <small>شناسه پروژه: ${project.id}</small>
-        </div>
-      </div>
-    `;
-  });
-  
-  container.innerHTML = html;
-}
-
-getBudgetText(budget) {
-  const budgets = {
-    'under100': 'زیر ۱۰۰ میلیون',
-    '100-500': '۱۰۰ تا ۵۰۰ میلیون',
-    '500-1000': '۵۰۰ میلیون تا ۱ میلیارد',
-    '1-5': '۱ تا ۵ میلیارد',
-    '5+': 'بالای ۵ میلیارد'
-  };
-  return budgets[budget] || budget;
-}
-
-getTimelineText(timeline) {
-  const timelines = {
-    'urgent': 'فوری (کمتر از ۱ ماه)',
-    '1-3': '۱ تا ۳ ماه',
-    '3-6': '۳ تا ۶ ماه',
-    '6-12': '۶ تا ۱۲ ماه',
-    'flexible': 'انعطاف‌پذیر'
-  };
-  return timelines[timeline] || timeline;
-}
-
-showNewProjectModal() {
-  if (!this.userData) {
-    this.showToast('برای ثبت پروژه ابتدا وارد شوید', 'error');
-    this.showPage('login');
-    return;
-  }
-  
-  if (this.userData.user_type !== 'employer') {
-    this.showToast('فقط کارفرمایان می‌توانند پروژه ثبت کنند', 'error');
-    return;
-  }
-  
-  const modal = new bootstrap.Modal(document.getElementById('newProjectModal'));
-  modal.show();
-}
-
-async createProject() {
-  const title = document.getElementById('projectTitle')?.value;
-  const description = document.getElementById('projectDescription')?.value;
-  const category = document.getElementById('projectCategory')?.value;
-  const budget = document.getElementById('projectBudget')?.value;
-  const location = document.getElementById('projectLocation')?.value;
-  const timeline = document.getElementById('projectTimeline')?.value;
-  
-  if (!title || !description) {
-    this.showToast('لطفاً عنوان و توضیحات پروژه را وارد کنید', 'error');
-    return;
-  }
-  
-  const projectData = {
-    title,
-    description,
-    employer_id: this.userData.id,
-    category: category || null,
-    budget_range: budget || null,
-    location: location || null,
-    timeline: timeline || null,
-    status: 'pending',
-    admin_approved: false
-  };
-  
-  const { data, error } = await supabase
-    .from('projects')
-    .insert([projectData])
-    .select();
-  
-  if (error) {
-    console.error('خطا در ایجاد پروژه:', error);
-    this.showToast('خطا در ایجاد پروژه: ' + error.message, 'error');
-    return;
-  }
-  
-  this.showToast('پروژه شما با موفقیت ثبت و برای تایید ارسال شد', 'success');
-  
-  // بستن مودال
-  const modal = bootstrap.Modal.getInstance(document.getElementById('newProjectModal'));
-  if (modal) modal.hide();
-  
-  // ریست فرم
-  document.getElementById('newProjectForm')?.reset();
-}
-
 // ===== توابع مدیریت userData =====
 saveUserData(data) {
   this.userData = data;
@@ -6607,7 +6417,8 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 <script>
-// ===== پنل مدیریت پروژه‌ها برای پیام‌یار =====
+<script>
+// ===== پنل مدیریت پروژه‌ها (نسخه نهایی) =====
 window.showProjectManagementPanel = function() {
   console.log('مدیریت پروژه‌ها باز شد');
   
@@ -6658,27 +6469,12 @@ window.showProjectManagementPanel = function() {
           </div>
         </div>
 
-        <div class="card-peymanyar mb-4">
-          <div class="row g-3">
-            <div class="col-md-4">
-              <select class="form-select" id="projectFilter" onchange="filterProjects()">
-                <option value="pending">در انتظار تایید</option>
-                <option value="approved">تایید شده</option>
-                <option value="all">همه پروژه‌ها</option>
-              </select>
-            </div>
-            <div class="col-md-4">
-              <input type="text" class="form-control" id="projectSearch" placeholder="جستجوی پروژه...">
-            </div>
-            <div class="col-md-4">
-              <button class="btn btn-peymanyar w-100" onclick="filterProjects()">
-                <i class="bi bi-search me-2"></i>اعمال فیلتر
-              </button>
-            </div>
+        <div id="projectsAdminList" class="row">
+          <div class="col-12 text-center py-5">
+            <div class="spinner-border text-primary" role="status"></div>
+            <p class="mt-2">در حال دریافت پروژه‌ها...</p>
           </div>
         </div>
-
-        <div id="projectsAdminList" class="row"></div>
       </div>
     `;
     
@@ -6691,7 +6487,7 @@ window.showProjectManagementPanel = function() {
   }
   
   projectPanel.style.display = 'block';
-  loadAllProjects();
+  loadPendingProjects();
 }
 
 window.goBackToAdminPanel = function() {
@@ -6699,73 +6495,41 @@ window.goBackToAdminPanel = function() {
   document.getElementById('adminMessages').style.display = 'block';
 }
 
-window.loadAllProjects = async function() {
+window.loadPendingProjects = async function() {
   try {
     const { data: projects, error } = await supabase
       .from('projects')
       .select('*')
+      .eq('admin_approved', false)
       .order('created_at', { ascending: false });
     
     if (error) throw error;
     
-    // نمایش آمار
-    const pending = projects.filter(p => !p.admin_approved).length;
-    const approved = projects.filter(p => p.admin_approved).length;
+    document.getElementById('statPending').textContent = projects.length;
     
-    document.getElementById('statPending').textContent = pending;
-    document.getElementById('statApproved').textContent = approved;
-    document.getElementById('statTotal').textContent = projects.length;
+    const { count: total } = await supabase
+      .from('projects')
+      .select('*', { count: 'exact', head: true });
     
-    // بروزرسانی شمارنده روی کارت
+    const { count: approved } = await supabase
+      .from('projects')
+      .select('*', { count: 'exact', head: true })
+      .eq('admin_approved', true);
+    
+    document.getElementById('statApproved').textContent = approved || 0;
+    document.getElementById('statTotal').textContent = total || 0;
+    
     const badge = document.getElementById('pendingProjectsCount');
-    if (badge) badge.textContent = pending;
+    if (badge) badge.textContent = projects.length;
     
-    // ذخیره پروژه‌ها
-    window.projectsData = projects;
-    
-    // نمایش پروژه‌های در انتظار تایید (نه همه)
-    const pendingProjects = projects.filter(p => !p.admin_approved);
-    displayProjectsList(pendingProjects);
-    
-    // تنظیم فیلتر روی "pending"
-    const filterSelect = document.getElementById('projectFilter');
-    if (filterSelect) filterSelect.value = 'pending';
+    displayProjects(projects);
     
   } catch (error) {
     console.error('خطا:', error);
-    document.getElementById('projectsAdminList').innerHTML = `
-      <div class="col-12">
-        <div class="alert alert-danger">
-          خطا در دریافت پروژه‌ها: ${error.message}
-        </div>
-      </div>
-    `;
   }
 }
 
-window.filterProjects = function() {
-  const filter = document.getElementById('projectFilter')?.value || 'pending';
-  const search = document.getElementById('projectSearch')?.value || '';
-  
-  let filtered = window.projectsData || [];
-  
-  if (filter === 'pending') {
-    filtered = filtered.filter(p => !p.admin_approved);
-  } else if (filter === 'approved') {
-    filtered = filtered.filter(p => p.admin_approved);
-  }
-  
-  if (search) {
-    filtered = filtered.filter(p => 
-      p.title.toLowerCase().includes(search.toLowerCase()) ||
-      (p.description && p.description.toLowerCase().includes(search.toLowerCase()))
-    );
-  }
-  
-  displayProjectsList(filtered);
-}
-
-function displayProjectsList(projects) {
+function displayProjects(projects) {
   const container = document.getElementById('projectsAdminList');
   if (!container) return;
   
@@ -6773,8 +6537,8 @@ function displayProjectsList(projects) {
     container.innerHTML = `
       <div class="col-12">
         <div class="card-peymanyar text-center py-5">
-          <i class="bi bi-folder-x display-4 text-muted mb-3"></i>
-          <h4>پروژه‌ای یافت نشد</h4>
+          <i class="bi bi-check-circle display-4 text-success mb-3"></i>
+          <h4>هیچ پروژه‌ای در انتظار تایید نیست</h4>
         </div>
       </div>
     `;
@@ -6783,28 +6547,23 @@ function displayProjectsList(projects) {
   
   let html = '';
   projects.forEach(project => {
-    const statusClass = project.admin_approved ? 'bg-success' : 'bg-warning';
-    const statusText = project.admin_approved ? 'تایید شده' : 'در انتظار تایید';
-    
     html += `
-      <div class="col-md-6 mb-4">
+      <div class="col-md-6 mb-4" id="project-${project.id}">
         <div class="card-peymanyar">
           <div class="d-flex justify-content-between align-items-start mb-3">
             <h5>${project.title}</h5>
-            <span class="badge ${statusClass}">${statusText}</span>
+            <span class="badge bg-warning">در انتظار تایید</span>
           </div>
-          <p>${project.description || 'بدون توضیحات'}</p>
+          <p>${project.description || ''}</p>
           <div class="d-flex justify-content-between align-items-center mt-3 pt-3 border-top">
             <small class="text-muted">
               <i class="bi bi-calendar me-1"></i>
               ${new Date(project.created_at).toLocaleDateString('fa-IR')}
             </small>
             <div>
-              ${!project.admin_approved ? `
-                <button class="btn btn-sm btn-success me-2" onclick="approveProject(${project.id})">
-                  <i class="bi bi-check-circle me-1"></i>تایید
-                </button>
-              ` : ''}
+              <button class="btn btn-sm btn-success me-2" onclick="approveProject(${project.id})">
+                <i class="bi bi-check-circle me-1"></i>تایید
+              </button>
               <button class="btn btn-sm btn-outline-danger" onclick="deleteProject(${project.id})">
                 <i class="bi bi-trash"></i>
               </button>
@@ -6819,117 +6578,36 @@ function displayProjectsList(projects) {
 }
 
 window.approveProject = async function(projectId) {
-  if (!confirm('آیا از تایید این پروژه اطمینان دارید؟')) return;
-  
-  // غیرفعال کردن موقت دکمه
-  const btn = event.target;
-  const originalText = btn.innerHTML;
-  btn.innerHTML = 'در حال تایید...';
-  btn.disabled = true;
+  if (!confirm('تایید میشود؟')) return;
   
   try {
-    const { error } = await supabase
+    await supabase
       .from('projects')
-      .update({ admin_approved: true, status: 'open' })
+      .update({ admin_approved: true })
       .eq('id', projectId);
     
-    if (error) throw error;
-    
-    // حذف پروژه از صفحه بدون رفرش
-    const projectCard = btn.closest('.col-md-6');
-    if (projectCard) {
-      projectCard.remove();
-    }
-    
-    // آپدیت آمار
-    const pendingSpan = document.getElementById('statPending');
-    const currentPending = parseInt(pendingSpan.textContent);
-    pendingSpan.textContent = currentPending - 1;
-    
-    const approvedSpan = document.getElementById('statApproved');
-    approvedSpan.textContent = parseInt(approvedSpan.textContent) + 1;
-    
-    // بروزرسانی شمارنده روی کارت
-    const badge = document.getElementById('pendingProjectsCount');
-    if (badge) badge.textContent = currentPending - 1;
-    
-    // اگه هیچ پروژه‌ای نموند، پیام مناسب نشون بده
-    const container = document.getElementById('projectsAdminList');
-    if (container.children.length === 0) {
-      container.innerHTML = `
-        <div class="col-12">
-          <div class="card-peymanyar text-center py-5">
-            <i class="bi bi-folder-x display-4 text-muted mb-3"></i>
-            <h4>پروژه‌ای یافت نشد</h4>
-            <p class="text-muted">همه پروژه‌ها تایید شده‌اند.</p>
-          </div>
-        </div>
-      `;
-    }
-    
-    alert('✅ پروژه با موفقیت تایید شد');
+    document.getElementById(`project-${projectId}`).remove();
+    loadPendingProjects();
     
   } catch (error) {
-    alert('خطا: ' + error.message);
-    btn.innerHTML = originalText;
-    btn.disabled = false;
+    alert('خطا');
   }
 }
 
 window.deleteProject = async function(projectId) {
-  if (!confirm('⚠️ آیا از حذف این پروژه اطمینان دارید؟')) return;
-  
-  const btn = event.target;
-  const originalText = btn.innerHTML;
-  btn.innerHTML = 'در حال حذف...';
-  btn.disabled = true;
+  if (!confirm('حذف میشود؟')) return;
   
   try {
-    const { error } = await supabase
+    await supabase
       .from('projects')
       .delete()
       .eq('id', projectId);
     
-    if (error) throw error;
-    
-    // حذف پروژه از صفحه
-    const projectCard = btn.closest('.col-md-6');
-    if (projectCard) {
-      projectCard.remove();
-    }
-    
-    // آپدیت آمار
-    const pendingSpan = document.getElementById('statPending');
-    const currentPending = parseInt(pendingSpan.textContent);
-    pendingSpan.textContent = currentPending - 1;
-    
-    const totalSpan = document.getElementById('statTotal');
-    totalSpan.textContent = parseInt(totalSpan.textContent) - 1;
-    
-    // بروزرسانی شمارنده روی کارت
-    const badge = document.getElementById('pendingProjectsCount');
-    if (badge) badge.textContent = currentPending - 1;
-    
-    // اگه هیچ پروژه‌ای نموند، پیام مناسب نشون بده
-    const container = document.getElementById('projectsAdminList');
-    if (container.children.length === 0) {
-      container.innerHTML = `
-        <div class="col-12">
-          <div class="card-peymanyar text-center py-5">
-            <i class="bi bi-folder-x display-4 text-muted mb-3"></i>
-            <h4>پروژه‌ای یافت نشد</h4>
-            <p class="text-muted">همه پروژه‌ها حذف شده‌اند.</p>
-          </div>
-        </div>
-      `;
-    }
-    
-    alert('✅ پروژه حذف شد');
+    document.getElementById(`project-${projectId}`).remove();
+    loadPendingProjects();
     
   } catch (error) {
-    alert('خطا: ' + error.message);
-    btn.innerHTML = originalText;
-    btn.disabled = false;
+    alert('خطا');
   }
 }
 </script>
