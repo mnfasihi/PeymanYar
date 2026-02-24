@@ -3620,10 +3620,7 @@ window.checkUserStatus = function() {
 // =====================================================================
 window.showProjectManagementPanel = function() {
     console.log('مدیریت پروژه‌ها باز شد');
-     if (window.event) {
-        window.event.preventDefault();
-        window.event.stopPropagation();
-    }
+    
     document.querySelectorAll('.page-section').forEach(p => p.style.display = 'none');
     
     let projectPanel = document.getElementById('adminProjectsPanel');
@@ -3712,7 +3709,7 @@ window.goBackToAdminPanel = function() {
     document.getElementById('adminMessages').style.display = 'block';
 }
 
-window.loadAllProjectsAdmin = async function() {
+window.loadAllProjects = async function() {
     try {
         const { data: projects, error } = await supabase
             .from('projects')
