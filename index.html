@@ -6609,6 +6609,8 @@ document.addEventListener('DOMContentLoaded', function() {
 <script>
 // ===== پنل مدیریت پروژه‌ها برای پیام‌یار =====
 window.showProjectManagementPanel = function() {
+    event.preventDefault();
+    event.stopPropagation();
   console.log('مدیریت پروژه‌ها باز شد');
   
   document.querySelectorAll('.page-section').forEach(p => p.style.display = 'none');
