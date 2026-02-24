@@ -6910,6 +6910,29 @@ window.deleteProject = async function(projectId) {
     btn.disabled = false;
   }
 }
+<script>
+// تنها راه حل نهایی - بدون عارضه
+document.addEventListener('click', function(e) {
+    if (e.target.closest('[onclick*="showProjectManagementPanel"]')) {
+        e.stopImmediatePropagation();
+        e.preventDefault();
+        
+        // اجرای مستقیم
+        setTimeout(function() {
+            // مخفی کردن همه
+            document.querySelectorAll('.page-section').forEach(p => p.style.display = 'none');
+            
+            // نمایش پنل پروژه‌ها
+            let p = document.getElementById('adminProjectsPanel');
+            if (p) p.style.display = 'block';
+            
+            // بارگذاری
+            if (typeof loadAllProjects === 'function') loadAllProjects();
+        }, 50);
+        
+        return false;
+    }
+}, true);
 </script>
 </body>
 </html>
