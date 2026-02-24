@@ -1411,7 +1411,7 @@ body { background-color: #121212; color: #e0e0e0; }
           <input type="text" class="form-control" id="projectSearch" placeholder="جستجو در پروژه‌ها...">
         </div>
         <div class="col-md-4">
-          <button class="btn btn-peymanyar w-100" onclick="app.loadProjects()">
+          <button class="btn btn-peymanyar w-100" onclick="app.applyProjectFilters()">
             <i class="bi bi-search me-2"></i>اعمال فیلتر
           </button>
         </div>
@@ -3042,7 +3042,118 @@ acceptTerms() {
   this.closeTermsModal();
   this.showToast('قوانین و مقررات با موفقیت پذیرفته شد', 'success');
 }
+// اضافه کردن به کلاس PeymanyarApp
+async loadProjects() {
+  const container = document.getElementById('projectsList');
+  if (!container) return;
+  
+  try {
+    // نمایش لودینگ
+    container.innerHTML = '<div class="text-center"><div class="spinner-border text-primary"></div><p>در حال بارگذاری...</p></div>';
+    
+    const { data: projects, error } = await supabase
+      .from('projects')
+      .select(`
+        *,
+        profiles:employer_id (
+          full_name,
+          company_name
+        )
+      `)
+      .eq('admin_approved', true)  // فقط پروژه‌های تایید شده
+      .order('created_at', { ascending: false });
+    
+    if (error) throw error;
+    
+    if (!projects || projects.length === 0) {
+      container.innerHTML = `
+        <div class="col-12">
+          <div class="card-peymanyar text-center py-5">
+            <i class="bi bi-folder2-open display-4 text-muted mb-3"></i>
+            <h4>پروژه‌ای یافت نشد</h4>
+            <p class="text-muted">اولین پروژه را شما ثبت کنید!</p>
+          </div>
+        </div>
+      `;
+      return;
+    }
+    
+    let html = '';
+    projects.forEach(project => {
+      const employerName = project.profiles?.full_name || project.profiles?.company_name || 'کارفرما';
+      const date = new Date(project.created_at).toLocaleDateString('fa-IR');
+      
+      html += `
+        <div class="col-md-6 col-lg-4 mb-4">
+          <div class="card-peymanyar h-100">
+            <div class="d-flex justify-content-between align-items-start mb-3">
+              <h5 class="mb-0">${project.title}</h5>
+              <span class="badge bg-${project.status === 'open' ? 'success' : 'secondary'}">
+                ${project.status === 'open' ? 'دریافت پیشنهاد' : 'بسته شده'}
+              </span>
+            </div>
+            <p class="text-muted small mb-3">${project.description || 'بدون توضیحات'}</p>
+            <div class="mt-auto">
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <small class="text-muted">
+                  <i class="bi bi-person me-1"></i>${employerName}
+                </small>
+                <small class="text-muted">
+                  <i class="bi bi-calendar me-1"></i>${date}
+                </small>
+              </div>
+              <div class="d-flex gap-2">
+                <button class="btn btn-sm btn-outline-primary flex-grow-1" onclick="viewProject(${project.id})">
+                  <i class="bi bi-eye me-1"></i>مشاهده
+                </button>
+                ${project.budget_range ? `
+                  <span class="badge bg-light text-dark p-2">
+                    <i class="bi bi-cash me-1"></i>${getBudgetLabel(project.budget_range)}
+                  </span>
+                ` : ''}
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    });
+    
+    container.innerHTML = html;
+    
+  } catch (error) {
+    console.error('خطا در بارگذاری پروژه‌ها:', error);
+    container.innerHTML = `
+      <div class="col-12">
+        <div class="alert alert-danger">
+          خطا در بارگذاری پروژه‌ها. لطفاً دوباره تلاش کنید.
+        </div>
+      </div>
+    `;
+  }
+}
+applyProjectFilters() {
+  const status = document.getElementById('projectFilterStatus')?.value || 'all';
+  const search = document.getElementById('projectSearch')?.value || '';
+  
+  console.log('اعمال فیلتر:', status, search);
+  this.loadProjects(status, search);
+}
+// تابع کمکی برای نمایش بودجه
+function getBudgetLabel(budget) {
+  const labels = {
+    'under100': 'زیر ۱۰۰ میلیون',
+    '100-500': '۱۰۰ تا ۵۰۰ میلیون',
+    '500-1000': '۵۰۰ میلیون تا ۱ میلیارد',
+    '1-5': '۱ تا ۵ میلیارد',
+    '5+': 'بالای ۵ میلیارد'
+  };
+  return labels[budget] || budget;
+}
 
+// تابع مشاهده پروژه
+window.viewProject = function(id) {
+  alert(`نمایش جزئیات پروژه ${id} - در حال توسعه`);
+}
 // تابع جدید برای ریست کردن چک‌باکس در صورت بستن مودال
 closeTermsModal() {
   const termsModal = bootstrap.Modal.getInstance(document.getElementById('termsModal'));
@@ -3588,9 +3699,8 @@ showPage(pageId, pushState = true) {
     // اگر صفحه پروژه‌ها است، پروژه‌ها را بارگذاری کن
     if (pageId === 'projects' || pageId === 'projectsPage') {
   console.log('رفتن به صفحه پروژه‌ها');
-  // این خط رو کامنت کن یا پاک کن
-  // this.loadProjects();
-    }
+  this.loadProjects();  // این خط رو از کامنت خارج کنید
+}
   }
 }
 
@@ -6548,57 +6658,64 @@ document.addEventListener('DOMContentLoaded', function() {
   window.adminPanelActive = false;
   
   window.showProjectManagementPanel = function() {
-    window.adminPanelActive = true;
+  window.adminPanelActive = true;
+  
+  // اول همه صفحه‌ها رو مخفی کن و aria-hidden رو اضافه کن
+  document.querySelectorAll('.page-section').forEach(p => {
+    p.style.display = 'none';
+    p.classList.remove('active');
+    p.setAttribute('aria-hidden', 'true');  // اضافه کردن aria-hidden به همه صفحه‌ها
+  });
+  
+  let panel = document.getElementById('adminProjectsPanel');
+  if (!panel) {
+    panel = document.createElement('div');
+    panel.id = 'adminProjectsPanel';
+    panel.className = 'page-section';
+    panel.style.display = 'block';
+    panel.classList.add('active');
+    panel.removeAttribute('aria-hidden');  // حذف aria-hidden از پنل فعال
     
-    document.querySelectorAll('.page-section').forEach(p => {
-      p.style.display = 'none';
-      p.classList.remove('active');
-    });
-    
-    let panel = document.getElementById('adminProjectsPanel');
-    if (!panel) {
-      panel = document.createElement('div');
-      panel.id = 'adminProjectsPanel';
-      panel.className = 'page-section';
-      panel.style.display = 'block';
-      panel.innerHTML = `
-        <div class="container page-header">
-          <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2 class="section-title">مدیریت پروژه‌ها</h2>
-            <button class="btn btn-secondary" onclick="window.closeAdminPanel()">
-              <i class="bi bi-arrow-right me-2"></i>بازگشت
-            </button>
-          </div>
-          <div class="row mb-4">
-            <div class="col-md-4">
-              <div class="card-peymanyar text-center">
-                <div class="h3 mb-2" id="pendingCount">0</div>
-                <p class="text-muted">در انتظار تایید</p>
-              </div>
-            </div>
-            <div class="col-md-4">
-              <div class="card-peymanyar text-center">
-                <div class="h3 mb-2" id="approvedCount">0</div>
-                <p class="text-muted">تایید شده</p>
-              </div>
-            </div>
-            <div class="col-md-4">
-              <div class="card-peymanyar text-center">
-                <div class="h3 mb-2" id="totalCount">0</div>
-                <p class="text-muted">کل پروژه‌ها</p>
-              </div>
-            </div>
-          </div>
-          <div id="adminProjectsContainer" class="row"></div>
+    panel.innerHTML = `
+      <div class="container page-header">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <h2 class="section-title">مدیریت پروژه‌ها</h2>
+          <button class="btn btn-secondary" onclick="window.closeAdminPanel()">
+            <i class="bi bi-arrow-right me-2"></i>بازگشت
+          </button>
         </div>
-      `;
-      document.body.insertBefore(panel, document.querySelector('footer'));
-    } else {
-      panel.style.display = 'block';
-    }
-    
-    loadAdminProjects();
-  };
+        <div class="row mb-4">
+          <div class="col-md-4">
+            <div class="card-peymanyar text-center">
+              <div class="h3 mb-2" id="pendingCount">0</div>
+              <p class="text-muted">در انتظار تایید</p>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="card-peymanyar text-center">
+              <div class="h3 mb-2" id="approvedCount">0</div>
+              <p class="text-muted">تایید شده</p>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="card-peymanyar text-center">
+              <div class="h3 mb-2" id="totalCount">0</div>
+              <p class="text-muted">کل پروژه‌ها</p>
+            </div>
+          </div>
+        </div>
+        <div id="adminProjectsContainer" class="row"></div>
+      </div>
+    `;
+    document.body.insertBefore(panel, document.querySelector('footer'));
+  } else {
+    panel.style.display = 'block';
+    panel.classList.add('active');
+    panel.removeAttribute('aria-hidden');  // حذف aria-hidden
+  }
+  
+  loadAdminProjects();
+};
   
   window.closeAdminPanel = function() {
     window.adminPanelActive = false;
