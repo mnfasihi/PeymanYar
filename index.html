@@ -6074,16 +6074,27 @@ window.filterProjectsFrontend = function() {
   app.displayProjects(filtered);
 }
 
+// ===== پنل مدیریت پروژه‌ها برای پیام‌یار =====
+let projectsData = null;
+let isLoadingProjects = false;
+
 window.showProjectManagementPanel = function() {
   console.log('مدیریت پروژه‌ها باز شد');
   
-  document.querySelectorAll('.page-section').forEach(p => p.style.display = 'none');
+  // اول همه صفحه‌ها رو مخفی کن
+  document.querySelectorAll('.page-section').forEach(p => { 
+    p.style.display = 'none'; 
+    p.classList.remove('active');
+  });
   
   let projectPanel = document.getElementById('adminProjectsPanel');
+  
+  // اگه پنل وجود نداره، بسازش
   if (!projectPanel) {
     projectPanel = document.createElement('div');
     projectPanel.id = 'adminProjectsPanel';
     projectPanel.className = 'page-section';
+    projectPanel.setAttribute('data-loaded', 'false');
     projectPanel.innerHTML = `
       <div class="container page-header">
         <div class="d-flex justify-content-between align-items-center mb-4">
@@ -6094,7 +6105,7 @@ window.showProjectManagementPanel = function() {
             <p class="text-muted">تایید و مدیریت پروژه‌های ثبت شده</p>
           </div>
           <div>
-            <button class="btn btn-outline-primary me-2" onclick="loadPendingProjects()">
+            <button class="btn btn-outline-primary me-2" onclick="refreshProjectsList()">
               <i class="bi bi-arrow-repeat me-1"></i>بروزرسانی
             </button>
             <button class="btn btn-outline-secondary" onclick="goBackToAdminPanel()">
@@ -6144,7 +6155,14 @@ window.showProjectManagementPanel = function() {
           </div>
         </div>
 
-        <div id="projectsAdminList" class="row"></div>
+        <div id="projectsAdminList" class="row">
+          <div class="col-12 text-center py-5">
+            <div class="spinner-border text-primary" role="status">
+              <span class="visually-hidden">در حال بارگذاری...</span>
+            </div>
+            <p class="mt-2">در حال دریافت پروژه‌ها...</p>
+          </div>
+        </div>
       </div>
     `;
     
@@ -6156,16 +6174,38 @@ window.showProjectManagementPanel = function() {
     }
   }
   
+  // نمایش پنل
   projectPanel.style.display = 'block';
-  loadAllProjects();
+  projectPanel.classList.add('active');
+  
+  // فقط اگه قبلاً لود نشده بود یا دیتا نداریم، دوباره لود کن
+  if (!projectsData || projectPanel.getAttribute('data-loaded') !== 'true') {
+    loadAllProjects();
+  } else {
+    // اگه دیتا داریم، همین الان نمایش بده
+    displayProjectsList(getFilteredProjects('pending', ''));
+    updateStats();
+  }
 }
 
 window.goBackToAdminPanel = function() {
-  document.querySelectorAll('.page-section').forEach(p => p.style.display = 'none');
-  document.getElementById('adminMessages').style.display = 'block';
+  document.querySelectorAll('.page-section').forEach(p => { 
+    p.style.display = 'none'; 
+    p.classList.remove('active');
+  });
+  const adminPanel = document.getElementById('adminMessages');
+  if (adminPanel) {
+    adminPanel.style.display = 'block';
+    adminPanel.classList.add('active');
+  }
 }
 
 window.loadAllProjects = async function() {
+  // اگه در حال لود کردن هستیم، دوباره لود نکن
+  if (isLoadingProjects) return;
+  
+  isLoadingProjects = true;
+  
   try {
     const { data: projects, error } = await supabase
       .from('projects')
@@ -6174,23 +6214,23 @@ window.loadAllProjects = async function() {
     
     if (error) throw error;
     
-    const pending = projects.filter(p => !p.admin_approved).length;
-    const approved = projects.filter(p => p.admin_approved).length;
+    // ذخیره در متغیر گلوبال
+    projectsData = projects || [];
     
-    document.getElementById('statPending').textContent = pending;
-    document.getElementById('statApproved').textContent = approved;
-    document.getElementById('statTotal').textContent = projects.length;
+    // به‌روزرسانی آمار
+    updateStats();
     
-    const badge = document.getElementById('pendingProjectsCount');
-    if (badge) badge.textContent = pending;
-    
-    window.projectsData = projects;
-    
-    const pendingProjects = projects.filter(p => !p.admin_approved);
+    // نمایش پروژه‌های در انتظار تایید
+    const pendingProjects = projectsData.filter(p => !p.admin_approved);
     displayProjectsList(pendingProjects);
     
+    // تنظیم فیلتر روی "pending"
     const filterSelect = document.getElementById('projectFilter');
     if (filterSelect) filterSelect.value = 'pending';
+    
+    // علامت بزن که لود شده
+    const panel = document.getElementById('adminProjectsPanel');
+    if (panel) panel.setAttribute('data-loaded', 'true');
     
   } catch (error) {
     console.error('خطا:', error);
@@ -6201,14 +6241,37 @@ window.loadAllProjects = async function() {
         </div>
       </div>
     `;
+  } finally {
+    isLoadingProjects = false;
   }
 }
 
-window.filterProjectsAdmin = function() {
-  const filter = document.getElementById('projectFilter')?.value || 'pending';
-  const search = document.getElementById('projectSearch')?.value || '';
+window.refreshProjectsList = function() {
+  // برای رفرش دستی، دیتا رو پاک کن و دوباره لود کن
+  projectsData = null;
+  const panel = document.getElementById('adminProjectsPanel');
+  if (panel) panel.setAttribute('data-loaded', 'false');
+  loadAllProjects();
+}
+
+function updateStats() {
+  if (!projectsData) return;
   
-  let filtered = window.projectsData || [];
+  const pending = projectsData.filter(p => !p.admin_approved).length;
+  const approved = projectsData.filter(p => p.admin_approved).length;
+  
+  document.getElementById('statPending').textContent = pending;
+  document.getElementById('statApproved').textContent = approved;
+  document.getElementById('statTotal').textContent = projectsData.length;
+  
+  const badge = document.getElementById('pendingProjectsCount');
+  if (badge) badge.textContent = pending;
+}
+
+function getFilteredProjects(filter, search) {
+  if (!projectsData) return [];
+  
+  let filtered = [...projectsData];
   
   if (filter === 'pending') {
     filtered = filtered.filter(p => !p.admin_approved);
@@ -6217,12 +6280,21 @@ window.filterProjectsAdmin = function() {
   }
   
   if (search) {
+    const term = search.toLowerCase();
     filtered = filtered.filter(p => 
-      p.title.toLowerCase().includes(search.toLowerCase()) ||
-      (p.description && p.description.toLowerCase().includes(search.toLowerCase()))
+      (p.title && p.title.toLowerCase().includes(term)) ||
+      (p.description && p.description.toLowerCase().includes(term))
     );
   }
   
+  return filtered;
+}
+
+window.filterProjectsAdmin = function() {
+  const filter = document.getElementById('projectFilter')?.value || 'pending';
+  const search = document.getElementById('projectSearch')?.value || '';
+  
+  const filtered = getFilteredProjects(filter, search);
   displayProjectsList(filtered);
 }
 
@@ -6236,6 +6308,7 @@ function displayProjectsList(projects) {
         <div class="card-peymanyar text-center py-5">
           <i class="bi bi-folder-x display-4 text-muted mb-3"></i>
           <h4>پروژه‌ای یافت نشد</h4>
+          <p class="text-muted">هیچ پروژه‌ای با این شرایط وجود ندارد.</p>
         </div>
       </div>
     `;
@@ -6248,7 +6321,7 @@ function displayProjectsList(projects) {
     const statusText = project.admin_approved ? 'تایید شده' : 'در انتظار تایید';
     
     html += `
-      <div class="col-md-6 mb-4">
+      <div class="col-md-6 mb-4" id="project-${project.id}">
         <div class="card-peymanyar">
           <div class="d-flex justify-content-between align-items-start mb-3">
             <h5>${project.title}</h5>
@@ -6262,11 +6335,11 @@ function displayProjectsList(projects) {
             </small>
             <div>
               ${!project.admin_approved ? `
-                <button class="btn btn-sm btn-success me-2" onclick="approveProject(${project.id})">
+                <button class="btn btn-sm btn-success me-2" onclick="approveProject('${project.id}')">
                   <i class="bi bi-check-circle me-1"></i>تایید
                 </button>
               ` : ''}
-              <button class="btn btn-sm btn-outline-danger" onclick="deleteProject(${project.id})">
+              <button class="btn btn-sm btn-outline-danger" onclick="deleteProject('${project.id}')">
                 <i class="bi bi-trash"></i>
               </button>
             </div>
@@ -6295,21 +6368,25 @@ window.approveProject = async function(projectId) {
     
     if (error) throw error;
     
-    const projectCard = btn.closest('.col-md-6');
+    // آپدیت دیتای محلی
+    if (projectsData) {
+      const projectIndex = projectsData.findIndex(p => p.id === projectId);
+      if (projectIndex !== -1) {
+        projectsData[projectIndex].admin_approved = true;
+        projectsData[projectIndex].status = 'open';
+      }
+    }
+    
+    // حذف پروژه از صفحه
+    const projectCard = document.getElementById(`project-${projectId}`);
     if (projectCard) {
       projectCard.remove();
     }
     
-    const pendingSpan = document.getElementById('statPending');
-    const currentPending = parseInt(pendingSpan.textContent);
-    pendingSpan.textContent = currentPending - 1;
+    // آپدیت آمار
+    updateStats();
     
-    const approvedSpan = document.getElementById('statApproved');
-    approvedSpan.textContent = parseInt(approvedSpan.textContent) + 1;
-    
-    const badge = document.getElementById('pendingProjectsCount');
-    if (badge) badge.textContent = currentPending - 1;
-    
+    // اگه هیچ پروژه‌ای نموند، پیام مناسب نشون بده
     const container = document.getElementById('projectsAdminList');
     if (container.children.length === 0) {
       container.innerHTML = `
@@ -6332,6 +6409,58 @@ window.approveProject = async function(projectId) {
   }
 }
 
+window.deleteProject = async function(projectId) {
+  if (!confirm('⚠️ آیا از حذف این پروژه اطمینان دارید؟')) return;
+  
+  const btn = event.target;
+  const originalText = btn.innerHTML;
+  btn.innerHTML = 'در حال حذف...';
+  btn.disabled = true;
+  
+  try {
+    const { error } = await supabase
+      .from('projects')
+      .delete()
+      .eq('id', projectId);
+    
+    if (error) throw error;
+    
+    // آپدیت دیتای محلی
+    if (projectsData) {
+      projectsData = projectsData.filter(p => p.id !== projectId);
+    }
+    
+    // حذف پروژه از صفحه
+    const projectCard = document.getElementById(`project-${projectId}`);
+    if (projectCard) {
+      projectCard.remove();
+    }
+    
+    // آپدیت آمار
+    updateStats();
+    
+    // اگه هیچ پروژه‌ای نموند، پیام مناسب نشون بده
+    const container = document.getElementById('projectsAdminList');
+    if (container.children.length === 0) {
+      container.innerHTML = `
+        <div class="col-12">
+          <div class="card-peymanyar text-center py-5">
+            <i class="bi bi-folder-x display-4 text-muted mb-3"></i>
+            <h4>پروژه‌ای یافت نشد</h4>
+            <p class="text-muted">همه پروژه‌ها حذف شده‌اند.</p>
+          </div>
+        </div>
+      `;
+    }
+    
+    alert('✅ پروژه حذف شد');
+    
+  } catch (error) {
+    alert('خطا: ' + error.message);
+    btn.innerHTML = originalText;
+    btn.disabled = false;
+  }
+}
 window.deleteProject = async function(projectId) {
   if (!confirm('⚠️ آیا از حذف این پروژه اطمینان دارید؟')) return;
   
