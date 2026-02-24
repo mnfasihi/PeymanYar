@@ -1391,7 +1391,7 @@ body { background-color: #121212; color: #e0e0e0; }
   <div class="container page-header">
     <div class="d-flex justify-content-between align-items-center mb-4">
       <h2 class="section-title">📋 پروژه‌ها</h2>
-  <button class="btn btn-primary" onclick="window.openNewProjectModal()">
+ <button class="btn btn-primary" onclick="openNewProjectModal()">
   <i class="bi bi-plus-circle me-2"></i>پروژه جدید
 </button>
     </div>
@@ -1487,7 +1487,7 @@ body { background-color: #121212; color: #e0e0e0; }
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">انصراف</button>
-        <button type="button" class="btn btn-primary" onclick="app.createProject()">ایجاد پروژه</button>
+      <button type="button" class="btn btn-primary" onclick="saveProjectToDatabase()">ایجاد پروژه</button>
       </div>
     </div>
   </div>
@@ -6256,8 +6256,6 @@ window.saveProfileChanges = () => app?.saveProfileChanges();
 window.app = app;
 </script>
 <script>
-// ===== حل نهایی مشکل پروژه‌ها =====
-
 // ۱. تابع بررسی کاربر
 function getCurrentUser() {
   try {
@@ -6419,27 +6417,144 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 <script>
-// ===== حل نهایی مشکل پروژه‌ها =====
-// (همون کدی که الان داری)
-</script>
-<script>
-// ===== پنل مدیریت پروژه‌ها - نسخه نهایی و بدون باگ =====
+// ===== توابع مدیریت پروژه - نسخه واحد و بدون تداخل =====
 (function() {
-  // متغیر برای جلوگیری از تداخل
+  // تابع بررسی کاربر
+  function getCurrentUser() {
+    try {
+      const userData = localStorage.getItem('peymanyar_user');
+      return userData ? JSON.parse(userData) : null;
+    } catch (e) {
+      console.error('خطا:', e);
+      return null;
+    }
+  }
+
+  // باز کردن مودال پروژه جدید
+  window.openNewProjectModal = function() {
+    const user = getCurrentUser();
+    
+    if (!user) {
+      alert('❌ لطفا ابتدا وارد حساب کاربری خود شوید');
+      showLogin();
+      return;
+    }
+    
+    if (user.user_type !== 'employer') {
+      alert('❌ ثبت پروژه فقط برای کارفرمایان امکان‌پذیر است');
+      return;
+    }
+    
+    // ذخیره id کاربر برای استفاده در ثبت
+    window.currentUserId = user.id;
+    window.currentUserEmail = user.email;
+    
+    const modal = new bootstrap.Modal(document.getElementById('newProjectModal'));
+    modal.show();
+  }
+
+  // ذخیره پروژه در دیتابیس
+  window.saveProjectToDatabase = async function() {
+    const user = getCurrentUser();
+    
+    if (!user || user.user_type !== 'employer') {
+      alert('❌ شما اجازه ثبت پروژه ندارید');
+      return;
+    }
+    
+    const title = document.getElementById('projectTitle')?.value;
+    const desc = document.getElementById('projectDescription')?.value;
+    
+    if (!title || !desc) {
+      alert('❌ عنوان و توضیحات پروژه را وارد کنید');
+      return;
+    }
+    
+    const btn = document.querySelector('#newProjectModal .btn-primary');
+    const originalText = btn.innerHTML;
+    btn.innerHTML = 'در حال ثبت...';
+    btn.disabled = true;
+    
+    try {
+      const projectData = {
+        title: title,
+        description: desc,
+        employer_id: user.id,
+        category: document.getElementById('projectCategory')?.value || null,
+        budget_range: document.getElementById('projectBudget')?.value || null,
+        location: document.getElementById('projectLocation')?.value || null,
+        timeline: document.getElementById('projectTimeline')?.value || null,
+        status: 'pending',
+        admin_approved: false,
+        created_at: new Date().toISOString()
+      };
+      
+      const { error } = await supabase
+        .from('projects')
+        .insert([projectData]);
+      
+      if (error) throw error;
+      
+      alert(`✅ پروژه "${title}" با موفقیت ثبت شد`);
+      
+      const modal = bootstrap.Modal.getInstance(document.getElementById('newProjectModal'));
+      modal.hide();
+      document.getElementById('newProjectForm').reset();
+      
+    } catch (error) {
+      console.error('خطا:', error);
+      alert('❌ خطا: ' + error.message);
+    } finally {
+      btn.innerHTML = originalText;
+      btn.disabled = false;
+    }
+  }
+
+  // تابع تست برای چک کردن وضعیت کاربر
+  window.checkUserStatus = function() {
+    const user = getCurrentUser();
+    if (user) {
+      console.log('✅ کاربر وارد شده:', user);
+      console.log('نوع کاربر:', user.user_type);
+    } else {
+      console.log('❌ هیچ کاربری وارد نشده');
+    }
+  }
+
+  // تنظیم دکمه‌ها بعد از لود صفحه
+  document.addEventListener('DOMContentLoaded', function() {
+    // اصلاح دکمه پروژه جدید
+    const newProjectBtn = document.querySelector('button[onclick*="openNewProjectModal"]');
+    if (newProjectBtn) {
+      newProjectBtn.onclick = function(e) {
+        e.preventDefault();
+        window.openNewProjectModal();
+      };
+    }
+    
+    // اصلاح دکمه ایجاد پروژه
+    const saveBtn = document.querySelector('#newProjectModal .btn-primary');
+    if (saveBtn) {
+      saveBtn.onclick = function(e) {
+        e.preventDefault();
+        window.saveProjectToDatabase();
+      };
+    }
+  });
+})();
+
+// ===== پنل مدیریت پروژه‌ها =====
+(function() {
   window.adminPanelActive = false;
   
-  // نمایش پنل مدیریت پروژه‌ها
   window.showProjectManagementPanel = function() {
-    console.log('مدیریت پروژه‌ها باز شد');
     window.adminPanelActive = true;
     
-    // مخفی کردن همه صفحه‌ها
     document.querySelectorAll('.page-section').forEach(p => {
       p.style.display = 'none';
       p.classList.remove('active');
     });
     
-    // ساخت پنل اگر وجود نداره
     let panel = document.getElementById('adminProjectsPanel');
     if (!panel) {
       panel = document.createElement('div');
@@ -6448,7 +6563,12 @@ document.addEventListener('DOMContentLoaded', function() {
       panel.style.display = 'block';
       panel.innerHTML = `
         <div class="container page-header">
-          <h2 class="section-title mb-4">مدیریت پروژه‌ها</h2>
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="section-title">مدیریت پروژه‌ها</h2>
+            <button class="btn btn-secondary" onclick="window.closeAdminPanel()">
+              <i class="bi bi-arrow-right me-2"></i>بازگشت
+            </button>
+          </div>
           <div class="row mb-4">
             <div class="col-md-4">
               <div class="card-peymanyar text-center">
@@ -6470,9 +6590,6 @@ document.addEventListener('DOMContentLoaded', function() {
             </div>
           </div>
           <div id="adminProjectsContainer" class="row"></div>
-          <div class="text-center mt-4">
-            <button class="btn btn-secondary" onclick="window.closeAdminPanel()">بازگشت به پنل مدیریت</button>
-          </div>
         </div>
       `;
       document.body.insertBefore(panel, document.querySelector('footer'));
@@ -6480,11 +6597,9 @@ document.addEventListener('DOMContentLoaded', function() {
       panel.style.display = 'block';
     }
     
-    // بارگذاری پروژه‌ها
     loadAdminProjects();
   };
   
-  // بستن پنل مدیریت
   window.closeAdminPanel = function() {
     window.adminPanelActive = false;
     document.getElementById('adminProjectsPanel').style.display = 'none';
@@ -6492,10 +6607,8 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('adminMessages').classList.add('active');
   };
   
-  // بارگذاری پروژه‌ها برای پنل مدیریت
   async function loadAdminProjects() {
     try {
-      // دریافت پروژه‌های در انتظار تایید
       const { data: pending, error } = await supabase
         .from('projects')
         .select('*')
@@ -6504,7 +6617,6 @@ document.addEventListener('DOMContentLoaded', function() {
       
       if (error) throw error;
       
-      // دریافت آمار
       const { count: total } = await supabase
         .from('projects')
         .select('*', { count: 'exact', head: true });
@@ -6514,16 +6626,13 @@ document.addEventListener('DOMContentLoaded', function() {
         .select('*', { count: 'exact', head: true })
         .eq('admin_approved', true);
       
-      // به‌روزرسانی آمار
       document.getElementById('pendingCount').textContent = pending.length;
       document.getElementById('approvedCount').textContent = approved || 0;
       document.getElementById('totalCount').textContent = total || 0;
       
-      // به‌روزرسانی شمارنده روی کارت
       const badge = document.getElementById('pendingProjectsCount');
       if (badge) badge.textContent = pending.length;
       
-      // نمایش پروژه‌ها
       const container = document.getElementById('adminProjectsContainer');
       
       if (pending.length === 0) {
@@ -6547,7 +6656,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 <h5 class="mb-0">${p.title}</h5>
                 <span class="badge bg-warning">در انتظار</span>
               </div>
-              <p>${p.description || 'بدون توضیحات'}</p>
+              <p class="text-muted small">${p.description || 'بدون توضیحات'}</p>
               <div class="d-flex justify-content-between align-items-center mt-3">
                 <small class="text-muted">
                   <i class="bi bi-calendar me-1"></i>
@@ -6571,17 +6680,9 @@ document.addEventListener('DOMContentLoaded', function() {
       
     } catch (error) {
       console.error('خطا:', error);
-      document.getElementById('adminProjectsContainer').innerHTML = `
-        <div class="col-12">
-          <div class="alert alert-danger">
-            خطا در دریافت پروژه‌ها
-          </div>
-        </div>
-      `;
     }
   }
   
-  // تایید پروژه
   window.approveProject = async function(id) {
     if (!confirm('آیا از تایید این پروژه اطمینان دارید؟')) return;
     
@@ -6593,34 +6694,17 @@ document.addEventListener('DOMContentLoaded', function() {
       
       if (error) throw error;
       
-      // حذف پروژه از صفحه
       const projectElement = document.getElementById(`project-${id}`);
-      if (projectElement) {
-        projectElement.remove();
-      }
+      if (projectElement) projectElement.remove();
       
-      // آپدیت آمار
       const pendingSpan = document.getElementById('pendingCount');
       const approvedSpan = document.getElementById('approvedCount');
       
       pendingSpan.textContent = parseInt(pendingSpan.textContent) - 1;
       approvedSpan.textContent = parseInt(approvedSpan.textContent) + 1;
       
-      // بروزرسانی شمارنده روی کارت
       const badge = document.getElementById('pendingProjectsCount');
       if (badge) badge.textContent = pendingSpan.textContent;
-      
-      // اگه لیست خالی شد
-      if (document.getElementById('adminProjectsContainer').children.length === 0) {
-        document.getElementById('adminProjectsContainer').innerHTML = `
-          <div class="col-12">
-            <div class="alert alert-info text-center">
-              <i class="bi bi-check-circle me-2"></i>
-              هیچ پروژه‌ای در انتظار تایید نیست
-            </div>
-          </div>
-        `;
-      }
       
       alert('✅ پروژه با موفقیت تایید شد');
       
@@ -6630,7 +6714,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   };
   
-  // حذف پروژه
   window.deleteProject = async function(id) {
     if (!confirm('⚠️ آیا از حذف این پروژه اطمینان دارید؟')) return;
     
@@ -6642,34 +6725,17 @@ document.addEventListener('DOMContentLoaded', function() {
       
       if (error) throw error;
       
-      // حذف پروژه از صفحه
       const projectElement = document.getElementById(`project-${id}`);
-      if (projectElement) {
-        projectElement.remove();
-      }
+      if (projectElement) projectElement.remove();
       
-      // آپدیت آمار
       const pendingSpan = document.getElementById('pendingCount');
       const totalSpan = document.getElementById('totalCount');
       
       pendingSpan.textContent = parseInt(pendingSpan.textContent) - 1;
       totalSpan.textContent = parseInt(totalSpan.textContent) - 1;
       
-      // بروزرسانی شمارنده روی کارت
       const badge = document.getElementById('pendingProjectsCount');
       if (badge) badge.textContent = pendingSpan.textContent;
-      
-      // اگه لیست خالی شد
-      if (document.getElementById('adminProjectsContainer').children.length === 0) {
-        document.getElementById('adminProjectsContainer').innerHTML = `
-          <div class="col-12">
-            <div class="alert alert-info text-center">
-              <i class="bi bi-check-circle me-2"></i>
-              هیچ پروژه‌ای در انتظار تایید نیست
-            </div>
-          </div>
-        `;
-      }
       
       alert('✅ پروژه حذف شد');
       
