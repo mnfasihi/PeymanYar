@@ -15,7 +15,7 @@
 <meta property="og:url" content="https://peymanyar.com">
 <meta property="og:locale" content="fa_IR">
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
 <style>
@@ -964,7 +964,6 @@ z-index: 9999;
 top: 0;
 }
 
-/* استایل‌های جدید برای سیستم امتیازدهی */
 .rating-stars {
   display: flex;
   gap: 5px;
@@ -1115,9 +1114,7 @@ body { background-color: #121212; color: #e0e0e0; }
 </head>
 <body>
 
-<!-- ========================================================================== -->
 <!-- مودال قوانین و مقررات -->
-<!-- ========================================================================== -->
 <div class="modal fade" id="termsModal" tabindex="-1" aria-labelledby="termsModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
@@ -1143,20 +1140,16 @@ body { background-color: #121212; color: #e0e0e0; }
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">بستن</button>
-        <button type="button" class="btn btn-primary" onclick="app.acceptTerms()">پذیرش قوانین</button>
+        <button type="button" class="btn btn-primary" onclick="window.acceptTerms()">پذیرش قوانین</button>
       </div>
     </div>
   </div>
 </div>
 
-<!-- ========================================================================== -->
 <!-- کانتینر toast برای نمایش پیام‌ها -->
-<!-- ========================================================================== -->
 <div id="toastContainer" style="position: fixed; top: 20px; left: 20px; z-index: 9999;"></div>
 
-<!-- ========================================================================== -->
 <!-- دستیار هوشمند -->
-<!-- ========================================================================== -->
 <div class="assistant-container" role="complementary" aria-label="دستیار هوشمند">
   <div id="assistantWindow" class="assistant-window" aria-hidden="true" aria-label="پنجره دستیار هوشمند">
     <div class="assistant-header">
@@ -1164,7 +1157,7 @@ body { background-color: #121212; color: #e0e0e0; }
         <h5 class="mb-1"><i class="bi bi-robot me-2" aria-hidden="true"></i>دستیار هوشمند پیمان‌یار</h5>
         <small class="opacity-75">برای کمک به شما اینجایم!</small>
       </div>
-      <button class="btn btn-sm btn-light" onclick="app.toggleAssistant()" aria-label="بستن دستیار">
+      <button class="btn btn-sm btn-light" onclick="window.toggleAssistant()" aria-label="بستن دستیار">
         <i class="bi bi-x-lg" aria-hidden="true"></i>
       </button>
     </div>
@@ -1172,7 +1165,7 @@ body { background-color: #121212; color: #e0e0e0; }
     <div class="assistant-input">
       <div class="input-group">
         <input type="text" class="form-control" id="assistantInput" placeholder="سوال خود را بپرسید..." aria-label="پیام برای دستیار هوشمند" aria-describedby="assistantHint">
-        <button class="btn btn-primary" onclick="app.sendAssistantMessage()" aria-label="ارسال پیام">
+        <button class="btn btn-primary" onclick="window.sendAssistantMessage()" aria-label="ارسال پیام">
           <i class="bi bi-send" aria-hidden="true"></i>
         </button>
       </div>
@@ -1182,18 +1175,16 @@ body { background-color: #121212; color: #e0e0e0; }
       </small>
     </div>
   </div>
-  <button class="assistant-toggle" onclick="app.toggleAssistant()" aria-label="باز کردن دستیار هوشمند" aria-expanded="false">
+  <button class="assistant-toggle" onclick="window.toggleAssistant()" aria-label="باز کردن دستیار هوشمند" aria-expanded="false">
     <i class="bi bi-robot" aria-hidden="true"></i>
     <span class="notification-badge" id="assistantNotification" aria-live="polite">۱</span>
   </button>
 </div>
 
-<!-- ========================================================================== -->
 <!-- منوی ناوبری -->
-<!-- ========================================================================== -->
 <nav class="navbar navbar-expand-lg navbar-light fixed-top" aria-label="منوی اصلی">
   <div class="container">
-    <a class="navbar-brand" href="#" onclick="app.showPage('home')" aria-label="پیمان‌یار - بازگشت به صفحه اصلی">
+    <a class="navbar-brand" href="#" onclick="window.showPage('home')" aria-label="پیمان‌یار - بازگشت به صفحه اصلی">
       <span role="img" aria-label="آیکون پیمان‌یار">🏗️</span> پیمان‌یار
     </a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain" aria-controls="navbarMain" aria-expanded="false" aria-label="نمایش/مخفی کردن منو">
@@ -1202,19 +1193,19 @@ body { background-color: #121212; color: #e0e0e0; }
     <div class="collapse navbar-collapse" id="navbarMain">
       <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
         <li class="nav-item">
-          <a class="nav-link active" href="#" onclick="app.showPage('home')" aria-current="page">خانه</a>
+          <a class="nav-link active" href="#" onclick="window.showPage('home')" aria-current="page">خانه</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="#" onclick="app.showPage('features')">ویژگی‌ها</a>
+          <a class="nav-link" href="#" onclick="window.showPage('features')">ویژگی‌ها</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="#" onclick="app.showPage('search')">جستجوی پیمانکار</a>
+          <a class="nav-link" href="#" onclick="window.showPage('search')">جستجوی پیمانکار</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="#" onclick="app.showPage('projects')">پروژه‌ها</a>
+          <a class="nav-link" href="#" onclick="window.showPage('projects')">پروژه‌ها</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="#" onclick="app.showPage('blog')">بلاگ</a>
+          <a class="nav-link" href="#" onclick="window.showPage('blog')">بلاگ</a>
         </li>
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false" id="userMenuDropdown">
@@ -1222,16 +1213,16 @@ body { background-color: #121212; color: #e0e0e0; }
             <span class="d-none d-md-inline">حساب کاربری</span>
           </a>
           <ul class="dropdown-menu" aria-labelledby="userMenuDropdown">
-            <li><a class="dropdown-item" href="#" onclick="app.showPage('profile')">پنل کاربری</a></li>
-            <li><a class="dropdown-item" href="#" onclick="app.showLogin()">ورود</a></li>
+            <li><a class="dropdown-item" href="#" onclick="window.showPage('profile')">پنل کاربری</a></li>
+            <li><a class="dropdown-item" href="#" onclick="window.showLogin()">ورود</a></li>
             <li><hr class="dropdown-divider"></li>
-            <li><a class="dropdown-item" href="#" onclick="app.showEmployerRegistration()">ثبت‌نام کارفرما</a></li>
-            <li><a class="dropdown-item" href="#" onclick="app.showContractorRegistration()">ثبت‌نام پیمانکار</a></li>
+            <li><a class="dropdown-item" href="#" onclick="window.showEmployerRegistration()">ثبت‌نام کارفرما</a></li>
+            <li><a class="dropdown-item" href="#" onclick="window.showContractorRegistration()">ثبت‌نام پیمانکار</a></li>
             <li><hr class="dropdown-divider"></li>
-            <li><a class="dropdown-item admin-only" href="#" onclick="app.showAdminLogin()" style="display: none;">
+            <li><a class="dropdown-item admin-only" href="#" onclick="window.showAdminLogin()" style="display: none;">
               <i class="bi bi-shield-lock me-2"></i>ورود مدیر
             </a></li>
-            <li><a class="dropdown-item admin-only" href="#" onclick="app.showAdminMessages()" style="display: none;">
+            <li><a class="dropdown-item admin-only" href="#" onclick="window.showAdminMessages()" style="display: none;">
               <i class="bi bi-gear me-2"></i>پنل مدیریت
             </a></li>
           </ul>
@@ -1241,9 +1232,7 @@ body { background-color: #121212; color: #e0e0e0; }
   </div>
 </nav>
 
-<!-- ========================================================================== -->
 <!-- صفحه اصلی -->
-<!-- ========================================================================== -->
 <div id="home" class="page-section active" role="main" aria-label="صفحه اصلی">
   <section class="hero-section" aria-label="بخش معرفی" style="padding-top: 100px;">
     <div class="container">
@@ -1259,10 +1248,10 @@ body { background-color: #121212; color: #e0e0e0; }
             با ما، پروژه‌های ساختمانی خود را به دست بهترین متخصصان بسپارید.
           </p>
           <div class="d-flex flex-wrap gap-3 mb-5 animate__animated animate__fadeInUp animate__delay-2s">
-            <button class="btn btn-employer btn-lg" onclick="app.showEmployerRegistration()">
+            <button class="btn btn-employer btn-lg" onclick="window.showEmployerRegistration()">
               <i class="bi bi-briefcase me-2" aria-hidden="true"></i>ثبت‌نام کارفرما
             </button>
-            <button class="btn btn-contractor btn-lg" onclick="app.showContractorRegistration()">
+            <button class="btn btn-contractor btn-lg" onclick="window.showContractorRegistration()">
               <i class="bi bi-tools me-2" aria-hidden="true"></i>ثبت‌نام پیمانکار
             </button>
           </div>
@@ -1298,7 +1287,7 @@ body { background-color: #121212; color: #e0e0e0; }
               </div>
             </div>
             <div class="position-absolute top-0 end-0 mt-4 me-4">
-              <button class="btn btn-peymanyar btn-sm" onclick="app.toggleAssistant()">
+              <button class="btn btn-peymanyar btn-sm" onclick="window.toggleAssistant()">
                 <i class="bi bi-robot me-1" aria-hidden="true"></i>راهنمای هوشمند
               </button>
             </div>
@@ -1343,9 +1332,7 @@ body { background-color: #121212; color: #e0e0e0; }
   </section>
 </div>
 
-<!-- ========================================================================== -->
 <!-- صفحه ویژگی‌ها -->
-<!-- ========================================================================== -->
 <div id="features" class="page-section" role="main" aria-label="صفحه ویژگی‌ها">
   <div class="container page-header">
     <h2 class="section-title mb-4">ویژگی‌های پلتفرم پیمان‌یار</h2>
@@ -1379,9 +1366,7 @@ body { background-color: #121212; color: #e0e0e0; }
   </div>
 </div>
 
-<!-- ========================================================================== -->
 <!-- صفحه جستجوی پیمانکار -->
-<!-- ========================================================================== -->
 <div id="search" class="page-section" role="main" aria-label="صفحه جستجوی پیمانکار">
   <div class="container page-header">
     <h2 class="section-title mb-4">جستجوی پیشرفته پیمانکاران</h2>
@@ -1482,7 +1467,7 @@ body { background-color: #121212; color: #e0e0e0; }
           </select>
         </div>
         <div class="col-12">
-          <button class="btn btn-peymanyar w-100" onclick="app.performSearch()">
+          <button class="btn btn-peymanyar w-100" onclick="window.performSearch()">
             <i class="bi bi-search me-2"></i>جستجوی پیمانکار
           </button>
         </div>
@@ -1492,14 +1477,12 @@ body { background-color: #121212; color: #e0e0e0; }
   </div>
 </div>
 
-<!-- ========================================================================== -->
 <!-- صفحه پروژه‌ها -->
-<!-- ========================================================================== -->
 <div id="projects" class="page-section" role="main" aria-label="صفحه پروژه‌ها">
   <div class="container page-header">
     <div class="d-flex justify-content-between align-items-center mb-4">
       <h2 class="section-title">📋 پروژه‌ها</h2>
-      <button class="btn btn-primary" onclick="app.showNewProjectModal()">
+      <button class="btn btn-primary" onclick="window.showNewProjectModal()">
         <i class="bi bi-plus-circle me-2"></i>پروژه جدید
       </button>
     </div>
@@ -1519,7 +1502,7 @@ body { background-color: #121212; color: #e0e0e0; }
           <input type="text" class="form-control" id="projectSearch" placeholder="جستجو در پروژه‌ها...">
         </div>
         <div class="col-md-4">
-          <button class="btn btn-peymanyar w-100" onclick="app.loadProjects()">
+          <button class="btn btn-peymanyar w-100" onclick="window.loadProjects()">
             <i class="bi bi-search me-2"></i>اعمال فیلتر
           </button>
         </div>
@@ -1531,9 +1514,7 @@ body { background-color: #121212; color: #e0e0e0; }
   </div>
 </div>
 
-<!-- ========================================================================== -->
 <!-- مودال پروژه جدید -->
-<!-- ========================================================================== -->
 <div class="modal fade" id="newProjectModal" tabindex="-1">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
@@ -1595,15 +1576,13 @@ body { background-color: #121212; color: #e0e0e0; }
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">انصراف</button>
-        <button type="button" class="btn btn-primary" onclick="app.createProject()">ایجاد پروژه</button>
+        <button type="button" class="btn btn-primary" onclick="window.createProject()">ایجاد پروژه</button>
       </div>
     </div>
   </div>
 </div>
 
-<!-- ========================================================================== -->
 <!-- مودال امتیازدهی به پیمانکار -->
-<!-- ========================================================================== -->
 <div class="modal fade" id="ratingModal" tabindex="-1">
   <div class="modal-dialog">
     <div class="modal-content">
@@ -1630,15 +1609,13 @@ body { background-color: #121212; color: #e0e0e0; }
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">انصراف</button>
-        <button type="button" class="btn btn-primary" onclick="app.submitRating()">ثبت امتیاز</button>
+        <button type="button" class="btn btn-primary" onclick="window.submitRating()">ثبت امتیاز</button>
       </div>
     </div>
   </div>
 </div>
 
-<!-- ========================================================================== -->
 <!-- صفحه بلاگ -->
-<!-- ========================================================================== -->
 <div id="blog" class="page-section" role="main" aria-label="صفحه بلاگ">
   <div class="container page-header">
     <h2 class="section-title mb-4">مقالات و مطالب آموزشی</h2>
@@ -1726,9 +1703,7 @@ body { background-color: #121212; color: #e0e0e0; }
   </div>
 </div>
 
-<!-- ========================================================================== -->
 <!-- صفحه ورود -->
-<!-- ========================================================================== -->
 <div id="login" class="page-section" role="main" aria-label="صفحه ورود">
   <div class="container page-header">
     <div class="row justify-content-center">
@@ -1748,7 +1723,7 @@ body { background-color: #121212; color: #e0e0e0; }
               <label for="loginPassword" class="form-label required">رمز عبور</label>
               <div class="input-group">
                 <input type="password" class="form-control" id="loginPassword" placeholder="••••••••" required>
-                <button type="button" class="btn btn-outline-secondary" onclick="app.togglePasswordVisibility('loginPassword')">
+                <button type="button" class="btn btn-outline-secondary" onclick="window.togglePasswordVisibility('loginPassword')">
                   <i class="bi bi-eye"></i>
                 </button>
               </div>
@@ -1759,19 +1734,19 @@ body { background-color: #121212; color: #e0e0e0; }
               <label class="form-check-label" for="rememberMe">مرا به خاطر بسپار</label>
             </div>
             <div class="mb-3 text-end">
-              <a href="#" class="text-primary" onclick="app.showForgotPassword()">رمز عبور خود را فراموش کرده‌اید؟</a>
+              <a href="#" class="text-primary" onclick="window.showForgotPassword()">رمز عبور خود را فراموش کرده‌اید؟</a>
             </div>
             <div class="d-grid gap-2">
               <button type="submit" class="btn btn-peymanyar">
                 <i class="bi bi-box-arrow-in-right me-2"></i>ورود به حساب
               </button>
-              <button type="button" class="btn btn-outline-secondary" onclick="app.showMainPage()">بازگشت</button>
+              <button type="button" class="btn btn-outline-secondary" onclick="window.showMainPage()">بازگشت</button>
             </div>
           </form>
           <div class="mt-4 text-center">
             <p class="text-muted small">حساب کاربری ندارید؟
-              <a href="#" class="text-primary" onclick="app.showEmployerRegistration()">ثبت‌نام کارفرما</a> یا
-              <a href="#" class="text-primary" onclick="app.showContractorRegistration()">ثبت‌نام پیمانکار</a>
+              <a href="#" class="text-primary" onclick="window.showEmployerRegistration()">ثبت‌نام کارفرما</a> یا
+              <a href="#" class="text-primary" onclick="window.showContractorRegistration()">ثبت‌نام پیمانکار</a>
             </p>
           </div>
         </div>
@@ -1780,15 +1755,13 @@ body { background-color: #121212; color: #e0e0e0; }
   </div>
 </div>
 
-<!-- ========================================================================== -->
 <!-- صفحه فراموشی رمز عبور -->
-<!-- ========================================================================== -->
 <div id="forgotPassword" class="page-section" role="main" aria-label="صفحه بازیابی رمز عبور">
   <div class="container page-header">
     <div class="row justify-content-center">
       <div class="col-md-6 col-lg-5">
         <div class="card-peymanyar">
-          <button class="btn btn-back mb-3" onclick="app.showPage('login')" aria-label="بازگشت">
+          <button class="btn btn-back mb-3" onclick="window.showPage('login')" aria-label="بازگشت">
             <i class="bi bi-arrow-right me-2"></i>بازگشت به ورود
           </button>
           <div class="text-center mb-4">
@@ -1816,9 +1789,7 @@ body { background-color: #121212; color: #e0e0e0; }
   </div>
 </div>
 
-<!-- ========================================================================== -->
 <!-- صفحه ورود ادمین -->
-<!-- ========================================================================== -->
 <div id="adminLogin" class="page-section" role="main" aria-label="صفحه ورود ادمین">
   <div class="container page-header">
     <div class="row justify-content-center">
@@ -1847,7 +1818,7 @@ body { background-color: #121212; color: #e0e0e0; }
               <button type="submit" class="btn btn-peymanyar">
                 <i class="bi bi-box-arrow-in-right me-2"></i>ورود به پنل
               </button>
-              <button type="button" class="btn btn-outline-secondary" onclick="app.showMainPage()">بازگشت</button>
+              <button type="button" class="btn btn-outline-secondary" onclick="window.showMainPage()">بازگشت</button>
             </div>
           </form>
           <div class="mt-4 text-center">
@@ -1859,9 +1830,7 @@ body { background-color: #121212; color: #e0e0e0; }
   </div>
 </div>
 
-<!-- ========================================================================== -->
 <!-- صفحه پنل مدیریت -->
-<!-- ========================================================================== -->
 <div id="adminMessages" class="page-section" role="main" aria-label="پنل مدیریت">
   <div class="container page-header">
     <div class="d-flex justify-content-between align-items-center mb-4">
@@ -1870,7 +1839,7 @@ body { background-color: #121212; color: #e0e0e0; }
         <p class="text-muted">مدیریت پیشرفته پروژه‌ها و کاربران</p>
       </div>
       <div>
-        <button class="btn btn-outline-danger btn-sm" onclick="app.adminLogout()">
+        <button class="btn btn-outline-danger btn-sm" onclick="window.adminLogout()">
           <i class="bi bi-box-arrow-right me-1"></i>خروج
         </button>
       </div>
@@ -1914,7 +1883,7 @@ body { background-color: #121212; color: #e0e0e0; }
             <span class="badge bg-warning" id="pendingProjectsCount">۰</span>
             <span class="text-muted">پروژه در انتظار تایید</span>
           </div>
-          <button class="btn btn-primary w-100" onclick="app.showProjectManagementPanel()">
+          <button class="btn btn-primary w-100" onclick="window.showProjectManagementPanel()">
             <i class="bi bi-check2-circle me-2"></i>مدیریت پروژه‌ها
           </button>
         </div>
@@ -1929,11 +1898,8 @@ body { background-color: #121212; color: #e0e0e0; }
               <span>میانگین امتیازات</span>
               <span class="fw-bold" id="avgRating">۴.۲</span>
             </div>
-            <div class="rating-stats mt-3" id="ratingStats">
-              <!-- داینامیک پر می‌شود -->
-            </div>
           </div>
-          <button class="btn btn-success w-100" onclick="app.showRatingStats()">
+          <button class="btn btn-success w-100" onclick="window.showRatingStats()">
             <i class="bi bi-graph-up me-2"></i>مشاهده آمار
           </button>
         </div>
@@ -1942,9 +1908,7 @@ body { background-color: #121212; color: #e0e0e0; }
   </div>
 </div>
 
-<!-- ========================================================================== -->
 <!-- صفحه پنل مدیریت پروژه‌ها -->
-<!-- ========================================================================== -->
 <div id="adminProjectsPanel" class="page-section" style="display: none;">
   <div class="container page-header">
     <div class="d-flex justify-content-between align-items-center mb-4">
@@ -1955,10 +1919,10 @@ body { background-color: #121212; color: #e0e0e0; }
         <p class="text-muted">تایید و مدیریت پروژه‌های ثبت شده</p>
       </div>
       <div>
-        <button class="btn btn-outline-primary me-2" onclick="app.loadAllProjects()">
+        <button class="btn btn-outline-primary me-2" onclick="window.loadAllProjects()">
           <i class="bi bi-arrow-repeat me-1"></i>بروزرسانی
         </button>
-        <button class="btn btn-outline-secondary" onclick="app.goBackToAdminPanel()">
+        <button class="btn btn-outline-secondary" onclick="window.goBackToAdminPanel()">
           <i class="bi bi-arrow-right me-1"></i>بازگشت
         </button>
       </div>
@@ -1988,7 +1952,7 @@ body { background-color: #121212; color: #e0e0e0; }
     <div class="card-peymanyar mb-4">
       <div class="row g-3">
         <div class="col-md-4">
-          <select class="form-select" id="projectFilter" onchange="app.filterProjects()">
+          <select class="form-select" id="projectFilter" onchange="window.filterProjects()">
             <option value="pending">در انتظار تایید</option>
             <option value="approved">تایید شده</option>
             <option value="all">همه پروژه‌ها</option>
@@ -1998,7 +1962,7 @@ body { background-color: #121212; color: #e0e0e0; }
           <input type="text" class="form-control" id="projectSearch" placeholder="جستجوی پروژه...">
         </div>
         <div class="col-md-4">
-          <button class="btn btn-peymanyar w-100" onclick="app.filterProjects()">
+          <button class="btn btn-peymanyar w-100" onclick="window.filterProjects()">
             <i class="bi bi-search me-2"></i>اعمال فیلتر
           </button>
         </div>
@@ -2009,9 +1973,7 @@ body { background-color: #121212; color: #e0e0e0; }
   </div>
 </div>
 
-<!-- ========================================================================== -->
 <!-- صفحه پروفایل کاربری پیشرفته -->
-<!-- ========================================================================== -->
 <div id="profile" class="page-section" role="main" aria-label="صفحه پروفایل">
   <div class="container page-header">
     <div style="max-width: 1000px; margin: 0 auto;">
@@ -2020,10 +1982,10 @@ body { background-color: #121212; color: #e0e0e0; }
       <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="section-title" style="margin-bottom: 0;">👤 پروفایل کاربری</h2>
         <div>
-          <button class="btn btn-primary me-2" onclick="app.enableProfileEdit()">
+          <button class="btn btn-primary me-2" onclick="window.enableProfileEdit()">
             <i class="bi bi-pencil me-2"></i>ویرایش پروفایل
           </button>
-          <button class="btn btn-danger" onclick="app.logout()">
+          <button class="btn btn-danger" onclick="window.logout()">
             <i class="bi bi-box-arrow-right me-2"></i>خروج
           </button>
         </div>
@@ -2443,7 +2405,7 @@ body { background-color: #121212; color: #e0e0e0; }
                   <i class="bi bi-images me-2"></i>پروژه‌های نمونه
                 </h6>
                 <div id="editProjectsContainer"></div>
-                <button type="button" class="btn btn-sm btn-outline-primary mt-2" onclick="app.addProjectToEdit()">
+                <button type="button" class="btn btn-sm btn-outline-primary mt-2" onclick="window.addProjectToEdit()">
                   <i class="bi bi-plus-circle me-1"></i>افزودن پروژه جدید
                 </button>
               </div>
@@ -2467,8 +2429,8 @@ body { background-color: #121212; color: #e0e0e0; }
 
             <!-- دکمه‌های فرم -->
             <div class="d-flex gap-2 justify-content-end mt-4">
-              <button type="button" class="btn btn-secondary" onclick="app.cancelProfileEdit()">انصراف</button>
-              <button type="button" class="btn btn-primary" onclick="app.saveProfileChanges()">
+              <button type="button" class="btn btn-secondary" onclick="window.cancelProfileEdit()">انصراف</button>
+              <button type="button" class="btn btn-primary" onclick="window.saveProfileChanges()">
                 <i class="bi bi-check-circle me-1"></i>ذخیره تغییرات
               </button>
             </div>
@@ -2479,13 +2441,11 @@ body { background-color: #121212; color: #e0e0e0; }
   </div>
 </div>
 
-<!-- ========================================================================== -->
 <!-- صفحه ثبت‌نام کارفرما -->
-<!-- ========================================================================== -->
 <div id="employerRegistration" class="page-section" role="main" aria-label="صفحه ثبت‌نام کارفرما">
   <div class="registration-page">
     <div class="container mt-5 pt-5">
-      <button class="btn btn-back" onclick="app.showMainPage()" aria-label="بازگشت به صفحه اصلی">
+      <button class="btn btn-back" onclick="window.showMainPage()" aria-label="بازگشت به صفحه اصلی">
         <i class="bi bi-arrow-right me-2"></i>بازگشت به صفحه اصلی
       </button>
     </div>
@@ -2648,7 +2608,7 @@ body { background-color: #121212; color: #e0e0e0; }
                   <div class="form-check">
                     <input class="form-check-input" type="checkbox" id="employerTerms" required disabled>
                     <label class="form-check-label" for="employerTerms">
-                      <a href="#" onclick="app.showTermsModal(); return false;" class="text-primary">قوانین و مقررات</a> را مطالعه کرده‌ام و می‌پذیرم
+                      <a href="#" onclick="window.showTermsModal(); return false;" class="text-primary">قوانین و مقررات</a> را مطالعه کرده‌ام و می‌پذیرم
                     </label>
                     <div class="invalid-feedback">لطفاً قوانین و مقررات را بپذیرید</div>
                   </div>
@@ -2679,13 +2639,11 @@ body { background-color: #121212; color: #e0e0e0; }
   </div>
 </div>
 
-<!-- ========================================================================== -->
 <!-- صفحه ثبت‌نام پیمانکار -->
-<!-- ========================================================================== -->
 <div id="contractorRegistration" class="page-section" role="main" aria-label="صفحه ثبت‌نام پیمانکار">
   <div class="registration-page">
     <div class="container mt-5 pt-5">
-      <button class="btn btn-back" onclick="app.showMainPage()" aria-label="بازگشت به صفحه اصلی">
+      <button class="btn btn-back" onclick="window.showMainPage()" aria-label="بازگشت به صفحه اصلی">
         <i class="bi bi-arrow-right me-2"></i>بازگشت به صفحه اصلی
       </button>
     </div>
@@ -2989,7 +2947,7 @@ body { background-color: #121212; color: #e0e0e0; }
                 <div class="form-check">
                   <input class="form-check-input" type="checkbox" id="contractorTerms" required disabled>
                   <label class="form-check-label" for="contractorTerms">
-                    <a href="#" onclick="app.showTermsModal(); return false;" class="text-primary">قوانین و مقررات</a> را مطالعه کرده‌ام و می‌پذیرم
+                    <a href="#" onclick="window.showTermsModal(); return false;" class="text-primary">قوانین و مقررات</a> را مطالعه کرده‌ام و می‌پذیرم
                   </label>
                   <div class="invalid-feedback">لطفاً قوانین و مقررات را بپذیرید</div>
                 </div>
@@ -3017,9 +2975,7 @@ body { background-color: #121212; color: #e0e0e0; }
   </div>
 </div>
 
-<!-- ========================================================================== -->
 <!-- فوتر -->
-<!-- ========================================================================== -->
 <footer class="footer" role="contentinfo">
   <div class="container">
     <div class="row">
@@ -3046,11 +3002,11 @@ body { background-color: #121212; color: #e0e0e0; }
         <div class="footer-section">
           <h5 class="footer-title">لینک‌های سریع</h5>
           <ul class="footer-links">
-            <li><a href="#" onclick="app.showPage('home')">خانه</a></li>
-            <li><a href="#" onclick="app.showPage('features')">ویژگی‌ها</a></li>
-            <li><a href="#" onclick="app.showPage('search')">جستجو</a></li>
-            <li><a href="#" onclick="app.showPage('projects')">پروژه‌ها</a></li>
-            <li><a href="#" onclick="app.showPage('blog')">بلاگ</a></li>
+            <li><a href="#" onclick="window.showPage('home')">خانه</a></li>
+            <li><a href="#" onclick="window.showPage('features')">ویژگی‌ها</a></li>
+            <li><a href="#" onclick="window.showPage('search')">جستجو</a></li>
+            <li><a href="#" onclick="window.showPage('projects')">پروژه‌ها</a></li>
+            <li><a href="#" onclick="window.showPage('blog')">بلاگ</a></li>
           </ul>
         </div>
       </div>
@@ -3087,9 +3043,6 @@ body { background-color: #121212; color: #e0e0e0; }
   </div>
 </footer>
 
-<!-- ========================================================================== -->
-<!-- اسکریپت‌های اصلی -->
-<!-- ========================================================================== -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script type="module">
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
@@ -3107,7 +3060,7 @@ const supabase = createClient(supabaseUrl, supabaseAnonKey, {
 window.supabase = supabase
 
 // ==========================================================================
-// کلاس اصلی اپلیکیشن - PeymanyarApp
+// کلاس اصلی اپلیکیشن - تعریف شده قبل از استفاده
 // ==========================================================================
 class PeymanyarApp {
   constructor() {
@@ -3128,10 +3081,6 @@ class PeymanyarApp {
     this.init()
   }
 
-  // ========================================================================
-  // توابع اولیه و راه‌اندازی
-  // ========================================================================
-  
   async init() {
     await this.checkSession()
     this.setupEventListeners()
@@ -3198,10 +3147,6 @@ class PeymanyarApp {
     this.setupIntersectionObserver()
   }
 
-  // ========================================================================
-  // توابع نمایش صفحات
-  // ========================================================================
-  
   showPage(pageId, pushState = true) {
     document.querySelectorAll('.page-section').forEach(page => {
       page.classList.remove('active')
@@ -3286,44 +3231,53 @@ class PeymanyarApp {
     document.getElementById('fileList').innerHTML = ''
     
     const projectContainer = document.getElementById('projectContainer')
-    projectContainer.innerHTML = `
-      <div class="card mb-3 project-card">
-        <div class="card-body">
-          <h6 class="card-title">پروژه نمونه ۱</h6>
-          <div class="row">
-            <div class="col-md-4 mb-3">
-              <label class="form-label">نام پروژه</label>
-              <input type="text" class="form-control" name="projectName[]">
-            </div>
-            <div class="col-md-4 mb-3">
-              <label class="form-label">سال تحویل (شمسی)</label>
-              <select class="form-select" name="projectYear[]">
-                <option value="">-- انتخاب سال --</option>
-              </select>
-            </div>
-            <div class="col-md-4 mb-3">
-              <label class="form-label">مشتری</label>
-              <input type="text" class="form-control" name="projectClient[]" placeholder="نام شرکت یا شخص">
-            </div>
-            <div class="col-12 mb-3">
-              <label class="form-label">تصویر پروژه (حداکثر ۱ تصویر)</label>
-              <input type="file" class="form-control" name="projectImage[]" accept="image/*">
+    if (projectContainer) {
+      projectContainer.innerHTML = `
+        <div class="card mb-3 project-card">
+          <div class="card-body">
+            <h6 class="card-title">پروژه نمونه ۱</h6>
+            <div class="row">
+              <div class="col-md-4 mb-3">
+                <label class="form-label">نام پروژه</label>
+                <input type="text" class="form-control" name="projectName[]">
+              </div>
+              <div class="col-md-4 mb-3">
+                <label class="form-label">سال تحویل (شمسی)</label>
+                <select class="form-select" name="projectYear[]">
+                  <option value="">-- انتخاب سال --</option>
+                </select>
+              </div>
+              <div class="col-md-4 mb-3">
+                <label class="form-label">مشتری</label>
+                <input type="text" class="form-control" name="projectClient[]" placeholder="نام شرکت یا شخص">
+              </div>
+              <div class="col-12 mb-3">
+                <label class="form-label">تصویر پروژه (حداکثر ۱ تصویر)</label>
+                <input type="file" class="form-control" name="projectImage[]" accept="image/*">
+              </div>
             </div>
           </div>
         </div>
-      </div>
-    `
-    
-    const firstYearSelect = document.querySelector('#projectContainer select[name="projectYear[]"]')
-    this.populateProjectYearSelect(firstYearSelect)
+      `
+      
+      const firstYearSelect = document.querySelector('#projectContainer select[name="projectYear[]"]')
+      if (firstYearSelect) {
+        this.populateProjectYearSelect(firstYearSelect)
+      }
+    }
     
     const workArea = document.getElementById('workArea')
-    Array.from(workArea.options).forEach(opt => {
-      opt.disabled = false
-      opt.selected = false
-    })
+    if (workArea) {
+      Array.from(workArea.options).forEach(opt => {
+        opt.disabled = false
+        opt.selected = false
+      })
+    }
     
-    document.getElementById('formSummary').style.display = 'none'
+    const formSummary = document.getElementById('formSummary')
+    if (formSummary) {
+      formSummary.style.display = 'none'
+    }
   }
 
   updateActiveLinks(pageId) {
@@ -3338,30 +3292,29 @@ class PeymanyarApp {
     }
   }
 
-  // ========================================================================
-  // توابع دستیار هوشمند
-  // ========================================================================
-  
   toggleAssistant() {
     const assistantWindow = document.getElementById('assistantWindow')
     const toggleBtn = document.querySelector('.assistant-toggle')
-    if (assistantWindow.classList.contains('active')) {
-      assistantWindow.classList.remove('active')
-      assistantWindow.setAttribute('aria-hidden', 'true')
-      toggleBtn.setAttribute('aria-expanded', 'false')
-    } else {
-      assistantWindow.classList.add('active')
-      assistantWindow.setAttribute('aria-hidden', 'false')
-      toggleBtn.setAttribute('aria-expanded', 'true')
-      this.markAssistantAsRead()
-      setTimeout(() => {
-        document.getElementById('assistantInput')?.focus()
-      }, 100)
+    if (assistantWindow && toggleBtn) {
+      if (assistantWindow.classList.contains('active')) {
+        assistantWindow.classList.remove('active')
+        assistantWindow.setAttribute('aria-hidden', 'true')
+        toggleBtn.setAttribute('aria-expanded', 'false')
+      } else {
+        assistantWindow.classList.add('active')
+        assistantWindow.setAttribute('aria-hidden', 'false')
+        toggleBtn.setAttribute('aria-expanded', 'true')
+        this.markAssistantAsRead()
+        setTimeout(() => {
+          document.getElementById('assistantInput')?.focus()
+        }, 100)
+      }
     }
   }
 
   sendAssistantMessage() {
     const input = document.getElementById('assistantInput')
+    if (!input) return
     const message = input.value.trim()
     if (!message) return
     this.addAssistantMessage('user', message)
@@ -3373,6 +3326,7 @@ class PeymanyarApp {
 
   addAssistantMessage(role, content) {
     const container = document.getElementById('assistantMessages')
+    if (!container) return
     const messageDiv = document.createElement('div')
     messageDiv.className = `message ${role}`
     messageDiv.innerHTML = `<div class="message-bubble">${this.sanitizeHTML(content)}</div>`
@@ -3405,8 +3359,13 @@ class PeymanyarApp {
   loadAssistantMessages() {
     const saved = localStorage.getItem('peymanyar_assistant_messages')
     if (saved) {
-      this.assistantMessages = JSON.parse(saved)
-      this.renderAssistantMessages()
+      try {
+        this.assistantMessages = JSON.parse(saved)
+        this.renderAssistantMessages()
+      } catch (e) {
+        console.error('خطا در لود پیام‌ها:', e)
+        this.addAssistantMessage('assistant', 'سلام! 👋 من دستیار هوشمند پیمان‌یار هستم. چطور می‌تونم کمکتون کنم؟')
+      }
     } else {
       this.addAssistantMessage('assistant', 'سلام! 👋 من دستیار هوشمند پیمان‌یار هستم. چطور می‌تونم کمکتون کنم؟')
     }
@@ -3418,6 +3377,7 @@ class PeymanyarApp {
 
   renderAssistantMessages() {
     const container = document.getElementById('assistantMessages')
+    if (!container) return
     container.innerHTML = ''
     this.assistantMessages.forEach(msg => {
       const messageDiv = document.createElement('div')
@@ -3443,10 +3403,6 @@ class PeymanyarApp {
     }
   }
 
-  // ========================================================================
-  // توابع قوانین و مودال
-  // ========================================================================
-  
   showTermsModal() {
     const termsModal = new bootstrap.Modal(document.getElementById('termsModal'))
     termsModal.show()
@@ -3499,10 +3455,6 @@ class PeymanyarApp {
     }
   }
 
-  // ========================================================================
-  // توابع سیستم امتیازدهی
-  // ========================================================================
-  
   setupRatingSystem() {
     const stars = document.querySelectorAll('.rating-star')
     stars.forEach(star => {
@@ -3544,7 +3496,10 @@ class PeymanyarApp {
   }
 
   setRating(rating) {
-    document.getElementById('selectedRating').textContent = rating
+    const selectedRating = document.getElementById('selectedRating')
+    if (selectedRating) {
+      selectedRating.textContent = rating
+    }
     this.highlightStars(rating)
   }
 
@@ -3561,11 +3516,21 @@ class PeymanyarApp {
     }
     
     this.currentRatingContractor = contractorId
-    document.getElementById('ratingContractorInfo').innerHTML = `
-      <strong>${contractorName}</strong>
-    `
-    document.getElementById('selectedRating').textContent = '۰'
-    document.getElementById('ratingComment').value = ''
+    const infoDiv = document.getElementById('ratingContractorInfo')
+    if (infoDiv) {
+      infoDiv.innerHTML = `<strong>${contractorName}</strong>`
+    }
+    
+    const selectedRating = document.getElementById('selectedRating')
+    if (selectedRating) {
+      selectedRating.textContent = '۰'
+    }
+    
+    const comment = document.getElementById('ratingComment')
+    if (comment) {
+      comment.value = ''
+    }
+    
     this.resetStars()
     
     const modal = new bootstrap.Modal(document.getElementById('ratingModal'))
@@ -3578,13 +3543,15 @@ class PeymanyarApp {
       return
     }
     
-    const rating = parseInt(document.getElementById('selectedRating').textContent)
+    const selectedRating = document.getElementById('selectedRating')
+    const rating = selectedRating ? parseInt(selectedRating.textContent) : 0
+    
     if (rating === 0) {
       this.showToast('لطفاً یک امتیاز انتخاب کنید', 'error')
       return
     }
     
-    const comment = document.getElementById('ratingComment').value
+    const comment = document.getElementById('ratingComment') ? document.getElementById('ratingComment').value : ''
     
     try {
       const { error } = await supabase
@@ -3642,40 +3609,10 @@ class PeymanyarApp {
     }
   }
 
-  displayRatingStats(ratingData) {
-    const container = document.getElementById('ratingStats')
-    if (!container) return
-    
-    if (!ratingData || ratingData.count === 0) {
-      container.innerHTML = '<p class="text-muted text-center">هنوز امتیازی ثبت نشده است</p>'
-      return
-    }
-    
-    let html = ''
-    for (let i = 5; i >= 1; i--) {
-      const count = ratingData.distribution[i] || 0
-      const percentage = (count / ratingData.count) * 100
-      html += `
-        <div class="rating-stat-row">
-          <span class="rating-stat-label">${i} ⭐</span>
-          <div class="rating-stat-bar">
-            <div class="rating-stat-fill" style="width: ${percentage}%"></div>
-          </div>
-          <span class="rating-stat-value">${count}</span>
-        </div>
-      `
-    }
-    container.innerHTML = html
-  }
-
   showRatingStats() {
-    this.showPage('ratingStats')
+    this.showToast('در حال توسعه...', 'info')
   }
 
-  // ========================================================================
-  // توابع پروفایل پیشرفته
-  // ========================================================================
-  
   async loadFullProfile() {
     if (!this.userData || !this.userData.id) {
       this.showToast('لطفاً وارد شوید', 'error')
@@ -3721,16 +3658,27 @@ class PeymanyarApp {
   }
 
   displayFullProfile(profile) {
-    document.getElementById('profileDisplayName').textContent = profile.full_name || profile.company_name || 'کاربر'
-    document.getElementById('profileDisplayEmail').textContent = profile.email || '-'
-    document.getElementById('profileDisplayType').textContent = profile.user_type === 'employer' ? 'کارفرما' : 'پیمانکار'
-    document.getElementById('profileDisplayAccountType').textContent = profile.account_type === 'individual' ? 'شخص حقیقی' : 'شخص حقوقی'
-    document.getElementById('profileDisplayFullName').textContent = profile.full_name || profile.company_name || '-'
-    document.getElementById('profileDisplayNationalId').textContent = profile.national_code || profile.company_id || '-'
-
-    document.getElementById('profileDisplayMobile').textContent = profile.phone || '-'
-    document.getElementById('profileDisplayPhone').textContent = profile.landline || '-'
-    document.getElementById('profileDisplayAddress').textContent = profile.address || '-'
+    const elements = {
+      displayName: document.getElementById('profileDisplayName'),
+      displayEmail: document.getElementById('profileDisplayEmail'),
+      displayType: document.getElementById('profileDisplayType'),
+      displayAccountType: document.getElementById('profileDisplayAccountType'),
+      displayFullName: document.getElementById('profileDisplayFullName'),
+      displayNationalId: document.getElementById('profileDisplayNationalId'),
+      displayMobile: document.getElementById('profileDisplayMobile'),
+      displayPhone: document.getElementById('profileDisplayPhone'),
+      displayAddress: document.getElementById('profileDisplayAddress')
+    }
+    
+    if (elements.displayName) elements.displayName.textContent = profile.full_name || profile.company_name || 'کاربر'
+    if (elements.displayEmail) elements.displayEmail.textContent = profile.email || '-'
+    if (elements.displayType) elements.displayType.textContent = profile.user_type === 'employer' ? 'کارفرما' : 'پیمانکار'
+    if (elements.displayAccountType) elements.displayAccountType.textContent = profile.account_type === 'individual' ? 'شخص حقیقی' : 'شخص حقوقی'
+    if (elements.displayFullName) elements.displayFullName.textContent = profile.full_name || profile.company_name || '-'
+    if (elements.displayNationalId) elements.displayNationalId.textContent = profile.national_code || profile.company_id || '-'
+    if (elements.displayMobile) elements.displayMobile.textContent = profile.phone || '-'
+    if (elements.displayPhone) elements.displayPhone.textContent = profile.landline || '-'
+    if (elements.displayAddress) elements.displayAddress.textContent = profile.address || '-'
 
     const avatar = document.getElementById('profileAvatar')
     if (avatar) {
@@ -3741,11 +3689,18 @@ class PeymanyarApp {
     if (companyFields) {
       if (profile.account_type === 'company') {
         companyFields.style.display = 'block'
-        document.getElementById('profileDisplayCompanyName').textContent = profile.company_name || '-'
-        document.getElementById('profileDisplayRegistrationNo').textContent = profile.registration_no || '-'
-        document.getElementById('profileDisplayCompanyType').textContent = profile.company_type || '-'
-        document.getElementById('profileDisplayWebsite').textContent = profile.website || '-'
-        document.getElementById('profileDisplayCompanyDesc').textContent = profile.company_description || '-'
+        const compElements = {
+          companyName: document.getElementById('profileDisplayCompanyName'),
+          registrationNo: document.getElementById('profileDisplayRegistrationNo'),
+          companyType: document.getElementById('profileDisplayCompanyType'),
+          website: document.getElementById('profileDisplayWebsite'),
+          companyDesc: document.getElementById('profileDisplayCompanyDesc')
+        }
+        if (compElements.companyName) compElements.companyName.textContent = profile.company_name || '-'
+        if (compElements.registrationNo) compElements.registrationNo.textContent = profile.registration_no || '-'
+        if (compElements.companyType) compElements.companyType.textContent = profile.company_type || '-'
+        if (compElements.website) compElements.website.textContent = profile.website || '-'
+        if (compElements.companyDesc) compElements.companyDesc.textContent = profile.company_description || '-'
       } else {
         companyFields.style.display = 'none'
       }
@@ -3755,26 +3710,36 @@ class PeymanyarApp {
     if (contractorFields) {
       if (profile.user_type === 'contractor') {
         contractorFields.style.display = 'block'
-        document.getElementById('profileDisplayMainExpertise').textContent = profile.main_expertise || '-'
-        document.getElementById('profileDisplayStartYear').textContent = profile.start_year || '-'
-        document.getElementById('profileDisplayTeamSize').textContent = profile.team_size || '-'
-        document.getElementById('profileDisplayWorkArea').textContent = profile.work_area ? profile.work_area.join('، ') : '-'
-        document.getElementById('profileDisplayContractMethod').textContent = profile.contract_method || '-'
-        document.getElementById('profileDisplayInsurance').textContent = profile.insurance === 'yes' ? 'دارد' : 'ندارد'
-        document.getElementById('profileDisplayEquipment').textContent = profile.equipment || '-'
+        const contElements = {
+          mainExpertise: document.getElementById('profileDisplayMainExpertise'),
+          startYear: document.getElementById('profileDisplayStartYear'),
+          teamSize: document.getElementById('profileDisplayTeamSize'),
+          workArea: document.getElementById('profileDisplayWorkArea'),
+          contractMethod: document.getElementById('profileDisplayContractMethod'),
+          insurance: document.getElementById('profileDisplayInsurance'),
+          equipment: document.getElementById('profileDisplayEquipment')
+        }
+        if (contElements.mainExpertise) contElements.mainExpertise.textContent = profile.main_expertise || '-'
+        if (contElements.startYear) contElements.startYear.textContent = profile.start_year || '-'
+        if (contElements.teamSize) contElements.teamSize.textContent = profile.team_size || '-'
+        if (contElements.workArea) contElements.workArea.textContent = profile.work_area ? profile.work_area.join('، ') : '-'
+        if (contElements.contractMethod) contElements.contractMethod.textContent = profile.contract_method || '-'
+        if (contElements.insurance) contElements.insurance.textContent = profile.insurance === 'yes' ? 'دارد' : 'ندارد'
+        if (contElements.equipment) contElements.equipment.textContent = profile.equipment || '-'
 
         this.displayProjects(profile.projects)
         this.displayDocuments(profile.documents)
 
         const verificationStatus = document.getElementById('profileVerificationStatus')
-        if (verificationStatus && profile.verification_status) {
+        const verificationText = document.getElementById('profileVerificationText')
+        if (verificationStatus && verificationText && profile.verification_status) {
           verificationStatus.style.display = 'block'
           const statusText = {
             'pending': 'در انتظار بررسی',
             'verified': 'تأیید شده',
             'rejected': 'رد شده'
           }[profile.verification_status] || profile.verification_status
-          document.getElementById('profileVerificationText').textContent = statusText
+          verificationText.textContent = statusText
         }
       } else {
         contractorFields.style.display = 'none'
@@ -3793,12 +3758,23 @@ class PeymanyarApp {
       return
     }
     
+    let starsHtml = ''
+    for (let i = 0; i < 5; i++) {
+      if (i < Math.floor(ratingData.average)) {
+        starsHtml += '<i class="bi bi-star-fill text-warning"></i>'
+      } else if (i === Math.floor(ratingData.average) && ratingData.average % 1 >= 0.5) {
+        starsHtml += '<i class="bi bi-star-half text-warning"></i>'
+      } else {
+        starsHtml += '<i class="bi bi-star text-warning"></i>'
+      }
+    }
+    
     container.innerHTML = `
       <div class="text-center mb-3">
         <span class="display-4 fw-bold">${ratingData.average}</span>
         <span class="text-muted"> از ۵</span>
         <div class="mt-2">
-          ${this.generateStars(parseFloat(ratingData.average))}
+          ${starsHtml}
         </div>
         <span class="text-muted">از ${ratingData.count} رای</span>
       </div>
@@ -3922,33 +3898,27 @@ class PeymanyarApp {
     viewMode.style.display = 'none'
     editMode.style.display = 'block'
 
-    if (document.getElementById('editFullName')) {
-      document.getElementById('editFullName').value = this.userData?.full_name || this.userData?.name || ''
+    const editFields = {
+      fullName: document.getElementById('editFullName'),
+      nationalId: document.getElementById('editNationalId'),
+      email: document.getElementById('editEmail'),
+      mobile: document.getElementById('editMobile'),
+      phone: document.getElementById('editPhone'),
+      address: document.getElementById('editAddress'),
+      postalCode: document.getElementById('editPostalCode'),
+      province: document.getElementById('editProvince'),
+      city: document.getElementById('editCity')
     }
-    if (document.getElementById('editNationalId')) {
-      document.getElementById('editNationalId').value = this.userData?.national_code || this.userData?.company_id || ''
-    }
-    if (document.getElementById('editEmail')) {
-      document.getElementById('editEmail').value = this.userData?.email || ''
-    }
-    if (document.getElementById('editMobile')) {
-      document.getElementById('editMobile').value = this.userData?.phone || this.userData?.mobile || ''
-    }
-    if (document.getElementById('editPhone')) {
-      document.getElementById('editPhone').value = this.userData?.landline || ''
-    }
-    if (document.getElementById('editAddress')) {
-      document.getElementById('editAddress').value = this.userData?.address || ''
-    }
-    if (document.getElementById('editPostalCode')) {
-      document.getElementById('editPostalCode').value = this.userData?.postal_code || ''
-    }
-    if (document.getElementById('editProvince')) {
-      document.getElementById('editProvince').value = this.userData?.province || ''
-    }
-    if (document.getElementById('editCity')) {
-      document.getElementById('editCity').value = this.userData?.city || ''
-    }
+    
+    if (editFields.fullName) editFields.fullName.value = this.userData?.full_name || this.userData?.name || ''
+    if (editFields.nationalId) editFields.nationalId.value = this.userData?.national_code || this.userData?.company_id || ''
+    if (editFields.email) editFields.email.value = this.userData?.email || ''
+    if (editFields.mobile) editFields.mobile.value = this.userData?.phone || this.userData?.mobile || ''
+    if (editFields.phone) editFields.phone.value = this.userData?.landline || ''
+    if (editFields.address) editFields.address.value = this.userData?.address || ''
+    if (editFields.postalCode) editFields.postalCode.value = this.userData?.postal_code || ''
+    if (editFields.province) editFields.province.value = this.userData?.province || ''
+    if (editFields.city) editFields.city.value = this.userData?.city || ''
 
     this.populateEditYears()
 
@@ -3956,21 +3926,18 @@ class PeymanyarApp {
     if (companyFields) {
       if (this.userData?.account_type === 'company') {
         companyFields.style.display = 'flex'
-        if (document.getElementById('editCompanyName')) {
-          document.getElementById('editCompanyName').value = this.userData?.company_name || ''
+        const compFields = {
+          companyName: document.getElementById('editCompanyName'),
+          registrationNo: document.getElementById('editRegistrationNo'),
+          companyType: document.getElementById('editCompanyType'),
+          website: document.getElementById('editWebsite'),
+          companyDesc: document.getElementById('editCompanyDesc')
         }
-        if (document.getElementById('editRegistrationNo')) {
-          document.getElementById('editRegistrationNo').value = this.userData?.registration_no || ''
-        }
-        if (document.getElementById('editCompanyType')) {
-          document.getElementById('editCompanyType').value = this.userData?.company_type || ''
-        }
-        if (document.getElementById('editWebsite')) {
-          document.getElementById('editWebsite').value = this.userData?.website || ''
-        }
-        if (document.getElementById('editCompanyDesc')) {
-          document.getElementById('editCompanyDesc').value = this.userData?.company_description || ''
-        }
+        if (compFields.companyName) compFields.companyName.value = this.userData?.company_name || ''
+        if (compFields.registrationNo) compFields.registrationNo.value = this.userData?.registration_no || ''
+        if (compFields.companyType) compFields.companyType.value = this.userData?.company_type || ''
+        if (compFields.website) compFields.website.value = this.userData?.website || ''
+        if (compFields.companyDesc) compFields.companyDesc.value = this.userData?.company_description || ''
       } else {
         companyFields.style.display = 'none'
       }
@@ -3986,24 +3953,21 @@ class PeymanyarApp {
         projectsSection.style.display = 'block'
         documentsSection.style.display = 'block'
 
-        if (document.getElementById('editMainExpertise')) {
-          document.getElementById('editMainExpertise').value = this.userData?.main_expertise || ''
+        const contFields = {
+          mainExpertise: document.getElementById('editMainExpertise'),
+          startYear: document.getElementById('editStartYear'),
+          teamSize: document.getElementById('editTeamSize'),
+          contractMethod: document.getElementById('editContractMethod'),
+          insurance: document.getElementById('editInsurance'),
+          equipment: document.getElementById('editEquipment')
         }
-        if (document.getElementById('editStartYear')) {
-          document.getElementById('editStartYear').value = this.userData?.start_year || ''
-        }
-        if (document.getElementById('editTeamSize')) {
-          document.getElementById('editTeamSize').value = this.userData?.team_size || ''
-        }
-        if (document.getElementById('editContractMethod')) {
-          document.getElementById('editContractMethod').value = this.userData?.contract_method || ''
-        }
-        if (document.getElementById('editInsurance')) {
-          document.getElementById('editInsurance').value = this.userData?.insurance || ''
-        }
-        if (document.getElementById('editEquipment')) {
-          document.getElementById('editEquipment').value = this.userData?.equipment || ''
-        }
+        
+        if (contFields.mainExpertise) contFields.mainExpertise.value = this.userData?.main_expertise || ''
+        if (contFields.startYear) contFields.startYear.value = this.userData?.start_year || ''
+        if (contFields.teamSize) contFields.teamSize.value = this.userData?.team_size || ''
+        if (contFields.contractMethod) contFields.contractMethod.value = this.userData?.contract_method || ''
+        if (contFields.insurance) contFields.insurance.value = this.userData?.insurance || ''
+        if (contFields.equipment) contFields.equipment.value = this.userData?.equipment || ''
 
         this.displayEditProjects(this.userData?.projects)
       } else {
@@ -4140,10 +4104,6 @@ class PeymanyarApp {
     }
   }
 
-  // ========================================================================
-  // توابع مدیریت پروژه‌ها
-  // ========================================================================
-  
   async loadProjects() {
     try {
       const { data: { session } } = await supabase.auth.getSession()
@@ -4315,19 +4275,16 @@ class PeymanyarApp {
     const modal = bootstrap.Modal.getInstance(document.getElementById('newProjectModal'))
     if (modal) modal.hide()
     
-    document.getElementById('newProjectForm')?.reset()
+    const form = document.getElementById('newProjectForm')
+    if (form) form.reset()
   }
 
-  // ========================================================================
-  // توابع جستجو
-  // ========================================================================
-  
   async performSearch() {
-    const keyword = document.getElementById('searchKeyword').value
-    const specialty = document.getElementById('searchSpecialty').value
+    const keyword = document.getElementById('searchKeyword')?.value || ''
+    const specialty = document.getElementById('searchSpecialty')?.value || ''
     const locationSelect = document.getElementById('searchLocation')
-    const selectedLocations = Array.from(locationSelect.selectedOptions).map(opt => opt.value)
-    const experience = document.getElementById('searchExperience').value
+    const selectedLocations = locationSelect ? Array.from(locationSelect.selectedOptions).map(opt => opt.value) : []
+    const experience = document.getElementById('searchExperience')?.value || ''
 
     try {
       let query = supabase
@@ -4353,8 +4310,12 @@ class PeymanyarApp {
       }))
       
       const filteredResults = contractorsWithRatings.filter(contractor => {
-        if (keyword && !contractor.full_name?.includes(keyword) && !contractor.company_name?.includes(keyword)) return false
-        if (selectedLocations.length > 0) {
+        if (keyword) {
+          const nameMatch = contractor.full_name?.includes(keyword) || false
+          const companyMatch = contractor.company_name?.includes(keyword) || false
+          if (!nameMatch && !companyMatch) return false
+        }
+        if (selectedLocations.length > 0 && selectedLocations[0] !== 'all') {
           const hasLocation = contractor.work_area?.some(loc => selectedLocations.includes(loc))
           if (!hasLocation) return false
         }
@@ -4375,6 +4336,8 @@ class PeymanyarApp {
 
   displaySearchResults(results) {
     const container = document.getElementById('searchResults')
+    if (!container) return
+    
     if (results.length === 0) {
       container.innerHTML = `
         <div class="col-12">
@@ -4387,46 +4350,54 @@ class PeymanyarApp {
       `
       return
     }
-    container.innerHTML = results.map(result => `
-      <div class="col-lg-4 col-md-6 mb-4">
-        <div class="card-peymanyar h-100">
-          <div class="d-flex justify-content-between align-items-start mb-3">
-            <div>
-              <h5 class="mb-1">${result.full_name || result.company_name || 'بدون نام'}</h5>
-              <p class="text-muted mb-1"><i class="bi bi-geo-alt me-1"></i>${result.work_area?.join(', ') || 'سراسر ایران'}</p>
-              <p class="text-muted mb-1"><i class="bi bi-clock-history me-1"></i>${result.start_year ? 1403 - result.start_year + ' سال سابقه' : 'سابقه نامشخص'}</p>
+    container.innerHTML = results.map(result => {
+      const name = result.full_name || result.company_name || 'بدون نام'
+      const workAreas = result.work_area ? result.work_area.join(', ') : 'سراسر ایران'
+      const experience = result.start_year ? (1403 - result.start_year) + ' سال سابقه' : 'سابقه نامشخص'
+      const rating = result.ratings?.average || '۰'
+      const ratingCount = result.ratings?.count || ۰
+      
+      let starsHtml = ''
+      for (let i = 0; i < 5; i++) {
+        if (i < Math.floor(rating)) {
+          starsHtml += '<i class="bi bi-star-fill text-warning"></i>'
+        } else if (i === Math.floor(rating) && rating % 1 >= 0.5) {
+          starsHtml += '<i class="bi bi-star-half text-warning"></i>'
+        } else {
+          starsHtml += '<i class="bi bi-star text-warning"></i>'
+        }
+      }
+      
+      return `
+        <div class="col-lg-4 col-md-6 mb-4">
+          <div class="card-peymanyar h-100">
+            <div class="d-flex justify-content-between align-items-start mb-3">
+              <div>
+                <h5 class="mb-1">${name}</h5>
+                <p class="text-muted mb-1"><i class="bi bi-geo-alt me-1"></i>${workAreas}</p>
+                <p class="text-muted mb-1"><i class="bi bi-clock-history me-1"></i>${experience}</p>
+              </div>
+              <span class="badge bg-success">تأیید شده</span>
             </div>
-            <span class="badge bg-success">تأیید شده</span>
-          </div>
-          <div class="mb-3">
-            <div class="d-flex align-items-center">
-              ${this.generateStars(result.ratings?.average || 0)}
-              <span class="text-muted ms-2">${result.ratings?.average || '۰'} (${result.ratings?.count || ۰} نظر)</span>
+            <div class="mb-3">
+              <div class="d-flex align-items-center">
+                ${starsHtml}
+                <span class="text-muted ms-2">${rating} (${ratingCount} نظر)</span>
+              </div>
             </div>
-          </div>
-          <p class="text-muted mb-3">تخصص: ${result.main_expertise || 'نامشخص'}</p>
-          <div class="d-flex justify-content-between gap-2">
-            <button class="btn btn-sm btn-outline-primary flex-grow-1" onclick="app.viewContractorProfile('${result.user_id}')">
-              مشاهده پروفایل
-            </button>
-            <button class="btn btn-sm btn-warning" onclick="app.showRatingModal('${result.user_id}', '${result.full_name || result.company_name}')">
-              ⭐ امتیاز
-            </button>
+            <p class="text-muted mb-3">تخصص: ${result.main_expertise || 'نامشخص'}</p>
+            <div class="d-flex justify-content-between gap-2">
+              <button class="btn btn-sm btn-outline-primary flex-grow-1" onclick="window.viewContractorProfile('${result.user_id}')">
+                مشاهده پروفایل
+              </button>
+              <button class="btn btn-sm btn-warning" onclick="window.showRatingModal('${result.user_id}', '${name}')">
+                ⭐ امتیاز
+              </button>
+            </div>
           </div>
         </div>
-      </div>
-    `).join('')
-  }
-
-  generateStars(rating) {
-    let stars = ''
-    const fullStars = Math.floor(rating)
-    const hasHalfStar = rating % 1 >= 0.5
-    for (let i = 0; i < fullStars; i++) stars += '<i class="bi bi-star-fill text-warning"></i>'
-    if (hasHalfStar) stars += '<i class="bi bi-star-half text-warning"></i>'
-    const remaining = 5 - fullStars - (hasHalfStar ? 1 : 0)
-    for (let i = 0; i < remaining; i++) stars += '<i class="bi bi-star text-warning"></i>'
-    return stars
+      `
+    }).join('')
   }
 
   viewContractorProfile(id) {
@@ -4436,10 +4407,6 @@ class PeymanyarApp {
     }, 1000)
   }
 
-  // ========================================================================
-  // توابع مدیریت فرم‌ها
-  // ========================================================================
-  
   setupForms() {
     this.setupEmployerForm()
     this.setupContractorForm()
@@ -4452,13 +4419,22 @@ class PeymanyarApp {
       accountTypeSelect.addEventListener('change', () => this.updateEmployerFields())
       this.updateEmployerFields()
     }
-    document.getElementById('employerNextBtn').addEventListener('click', () => this.nextEmployerStep())
-    document.getElementById('employerPrevBtn').addEventListener('click', () => this.prevEmployerStep())
-    document.getElementById('employerForm').addEventListener('submit', (e) => this.submitEmployerForm(e))
+    const nextBtn = document.getElementById('employerNextBtn')
+    if (nextBtn) {
+      nextBtn.addEventListener('click', () => this.nextEmployerStep())
+    }
+    const prevBtn = document.getElementById('employerPrevBtn')
+    if (prevBtn) {
+      prevBtn.addEventListener('click', () => this.prevEmployerStep())
+    }
+    const form = document.getElementById('employerForm')
+    if (form) {
+      form.addEventListener('submit', (e) => this.submitEmployerForm(e))
+    }
   }
 
   updateEmployerFields() {
-    const accountType = document.getElementById('employerAccountType').value
+    const accountType = document.getElementById('employerAccountType')?.value
     const dynamicFields = document.getElementById('employerDynamicFields')
     const companyFields = document.getElementById('employerCompanyFields')
     if (!dynamicFields) return
@@ -4535,9 +4511,11 @@ class PeymanyarApp {
   nextEmployerStep() {
     if (this.validateEmployerStep(this.employerCurrentStep)) {
       if (this.employerCurrentStep < this.employerTotalSteps) {
-        document.getElementById(`employerSection${this.employerCurrentStep}`).style.display = 'none'
+        const currentSection = document.getElementById(`employerSection${this.employerCurrentStep}`)
+        if (currentSection) currentSection.style.display = 'none'
         this.employerCurrentStep++
-        document.getElementById(`employerSection${this.employerCurrentStep}`).style.display = 'block'
+        const nextSection = document.getElementById(`employerSection${this.employerCurrentStep}`)
+        if (nextSection) nextSection.style.display = 'block'
         this.updateEmployerNavigation()
         this.updateEmployerSummary()
       }
@@ -4546,9 +4524,11 @@ class PeymanyarApp {
 
   prevEmployerStep() {
     if (this.employerCurrentStep > 1) {
-      document.getElementById(`employerSection${this.employerCurrentStep}`).style.display = 'none'
+      const currentSection = document.getElementById(`employerSection${this.employerCurrentStep}`)
+      if (currentSection) currentSection.style.display = 'none'
       this.employerCurrentStep--
-      document.getElementById(`employerSection${this.employerCurrentStep}`).style.display = 'block'
+      const prevSection = document.getElementById(`employerSection${this.employerCurrentStep}`)
+      if (prevSection) prevSection.style.display = 'block'
       this.updateEmployerNavigation()
     }
   }
@@ -4559,10 +4539,10 @@ class PeymanyarApp {
 
     switch(step) {
       case 1:
-        const accountType = document.getElementById('employerAccountType').value
-        const email = document.getElementById('employerEmail').value
-        const password = document.getElementById('employerPassword').value
-        const confirmPassword = document.getElementById('employerConfirmPassword').value
+        const accountType = document.getElementById('employerAccountType')?.value
+        const email = document.getElementById('employerEmail')?.value
+        const password = document.getElementById('employerPassword')?.value
+        const confirmPassword = document.getElementById('employerConfirmPassword')?.value
         
         if (!accountType) {
           this.showValidationError('employerAccountType', 'لطفاً نوع شخصیت را انتخاب کنید')
@@ -4621,8 +4601,8 @@ class PeymanyarApp {
         break
 
       case 2:
-        const mobile = document.getElementById('employerMobile').value
-        const address = document.getElementById('employerAddress').value
+        const mobile = document.getElementById('employerMobile')?.value
+        const address = document.getElementById('employerAddress')?.value
         
         if (!mobile || !this.isValidMobile(mobile)) {
           this.showValidationError('employerMobile', 'لطفاً شماره موبایل معتبر وارد کنید')
@@ -4634,7 +4614,7 @@ class PeymanyarApp {
           isValid = false
         }
         
-        const accType = document.getElementById('employerAccountType').value
+        const accType = document.getElementById('employerAccountType')?.value
         if (accType === 'company') {
           const companyId = document.getElementById('employerCompanyId')?.value
           const registrationNo = document.getElementById('employerRegistrationNo')?.value
@@ -4677,23 +4657,20 @@ class PeymanyarApp {
     const prevBtn = document.getElementById('employerPrevBtn')
     const nextBtn = document.getElementById('employerNextBtn')
     const submitBtn = document.getElementById('employerSubmitBtn')
-    if (this.employerCurrentStep === 1) {
-      prevBtn.style.display = 'none'
-    } else {
-      prevBtn.style.display = 'block'
+    if (prevBtn) {
+      prevBtn.style.display = this.employerCurrentStep === 1 ? 'none' : 'block'
     }
-    if (this.employerCurrentStep === this.employerTotalSteps) {
-      nextBtn.style.display = 'none'
-      submitBtn.style.display = 'block'
-    } else {
-      nextBtn.style.display = 'block'
-      submitBtn.style.display = 'none'
+    if (nextBtn) {
+      nextBtn.style.display = this.employerCurrentStep === this.employerTotalSteps ? 'none' : 'block'
+    }
+    if (submitBtn) {
+      submitBtn.style.display = this.employerCurrentStep === this.employerTotalSteps ? 'block' : 'none'
     }
   }
 
   updateEmployerSummary() {
     if (this.employerCurrentStep === 4) {
-      const accountType = document.getElementById('employerAccountType').value
+      const accountType = document.getElementById('employerAccountType')?.value
       let name = ''
       let identifier = ''
       if (accountType === 'individual') {
@@ -4708,7 +4685,8 @@ class PeymanyarApp {
       const address = document.getElementById('employerAddress')?.value || '-'
       const selectedProjects = []
       document.querySelectorAll('input[name="projectType"]:checked').forEach(cb => {
-        selectedProjects.push(cb.nextElementSibling.textContent)
+        const label = cb.nextElementSibling
+        if (label) selectedProjects.push(label.textContent)
       })
       const summaryHtml = `
         <div class="row">
@@ -4724,7 +4702,8 @@ class PeymanyarApp {
           </div>
         </div>
       `
-      document.getElementById('employerSummary').innerHTML = summaryHtml
+      const summary = document.getElementById('employerSummary')
+      if (summary) summary.innerHTML = summaryHtml
     }
   }
 
@@ -4735,19 +4714,21 @@ class PeymanyarApp {
       return
     }
 
-    const terms = document.getElementById('employerTerms').checked
+    const terms = document.getElementById('employerTerms')?.checked
     if (!terms) {
       this.showToast('لطفاً با قوانین و مقررات موافقت کنید.', 'error')
       return
     }
 
-    const accountType = document.getElementById('employerAccountType').value
-    const email = document.getElementById('employerEmail').value
-    const password = document.getElementById('employerPassword').value
-    const mobile = document.getElementById('employerMobile').value
-    const address = document.getElementById('employerAddress').value
+    const accountType = document.getElementById('employerAccountType')?.value
+    const email = document.getElementById('employerEmail')?.value
+    const password = document.getElementById('employerPassword')?.value
+    const mobile = document.getElementById('employerMobile')?.value
+    const address = document.getElementById('employerAddress')?.value
 
     const submitBtn = document.getElementById('employerSubmitBtn')
+    if (!submitBtn) return
+    
     const originalText = submitBtn.innerHTML
     submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>در حال ثبت‌نام...'
     submitBtn.disabled = true
@@ -4925,37 +4906,76 @@ class PeymanyarApp {
 
   setupContractorForm() {
     this.populateYearSelect('startYear', 1350, 1403)
-    document.getElementById('accountType').addEventListener('change', () => this.updateContractorFields())
-    document.getElementById('mainExpertise').addEventListener('change', () => this.updateSubExpertise())
-    document.getElementById('workArea').addEventListener('change', (e) => this.handleWorkAreaSelection(e))
-    document.getElementById('radius').addEventListener('input', (e) => {
-      document.getElementById('radiusValue').textContent = e.target.value + ' کیلومتر'
-    })
-    document.getElementById('areaUnit').addEventListener('change', () => this.updateAreaUnitLabel())
-    document.getElementById('docUploadArea').addEventListener('click', () => {
-      document.getElementById('documentUpload').click()
-    })
-    document.getElementById('documentUpload').addEventListener('change', (e) => this.handleFileUpload(e))
-    document.getElementById('addProject').addEventListener('click', () => this.addProject())
-    document.getElementById('insurance').addEventListener('change', (e) => {
-      const expiryField = document.getElementById('insuranceExpiryField')
-      if (e.target.value === 'yes') {
-        expiryField.style.display = 'block'
-        expiryField.classList.add('show')
-      } else {
-        expiryField.style.display = 'none'
-        expiryField.classList.remove('show')
-      }
-    })
-    document.getElementById('nextBtn').addEventListener('click', () => this.nextContractorStep())
-    document.getElementById('prevBtn').addEventListener('click', () => this.prevContractorStep())
-    document.getElementById('contractorForm').addEventListener('submit', (e) => this.submitContractorForm(e))
+    const accountTypeSelect = document.getElementById('accountType')
+    if (accountTypeSelect) {
+      accountTypeSelect.addEventListener('change', () => this.updateContractorFields())
+    }
+    const mainExpertiseSelect = document.getElementById('mainExpertise')
+    if (mainExpertiseSelect) {
+      mainExpertiseSelect.addEventListener('change', () => this.updateSubExpertise())
+    }
+    const workAreaSelect = document.getElementById('workArea')
+    if (workAreaSelect) {
+      workAreaSelect.addEventListener('change', (e) => this.handleWorkAreaSelection(e))
+    }
+    const radiusInput = document.getElementById('radius')
+    if (radiusInput) {
+      radiusInput.addEventListener('input', (e) => {
+        const radiusValue = document.getElementById('radiusValue')
+        if (radiusValue) radiusValue.textContent = e.target.value + ' کیلومتر'
+      })
+    }
+    const areaUnitSelect = document.getElementById('areaUnit')
+    if (areaUnitSelect) {
+      areaUnitSelect.addEventListener('change', () => this.updateAreaUnitLabel())
+    }
+    const docUploadArea = document.getElementById('docUploadArea')
+    if (docUploadArea) {
+      docUploadArea.addEventListener('click', () => {
+        document.getElementById('documentUpload')?.click()
+      })
+    }
+    const documentUpload = document.getElementById('documentUpload')
+    if (documentUpload) {
+      documentUpload.addEventListener('change', (e) => this.handleFileUpload(e))
+    }
+    const addProjectBtn = document.getElementById('addProject')
+    if (addProjectBtn) {
+      addProjectBtn.addEventListener('click', () => this.addProject())
+    }
+    const insuranceSelect = document.getElementById('insurance')
+    if (insuranceSelect) {
+      insuranceSelect.addEventListener('change', (e) => {
+        const expiryField = document.getElementById('insuranceExpiryField')
+        if (expiryField) {
+          if (e.target.value === 'yes') {
+            expiryField.style.display = 'block'
+            expiryField.classList.add('show')
+          } else {
+            expiryField.style.display = 'none'
+            expiryField.classList.remove('show')
+          }
+        }
+      })
+    }
+    const nextBtn = document.getElementById('nextBtn')
+    if (nextBtn) {
+      nextBtn.addEventListener('click', () => this.nextContractorStep())
+    }
+    const prevBtn = document.getElementById('prevBtn')
+    if (prevBtn) {
+      prevBtn.addEventListener('click', () => this.prevContractorStep())
+    }
+    const form = document.getElementById('contractorForm')
+    if (form) {
+      form.addEventListener('submit', (e) => this.submitContractorForm(e))
+    }
     this.updateContractorFields()
     this.updateContractorNavigation()
   }
 
   updateContractorFields() {
-    const accountType = document.getElementById('accountType').value
+    const accountType = document.getElementById('accountType')?.value
     const dynamicFields = document.getElementById('dynamicFields')
     if (!dynamicFields) return
     dynamicFields.innerHTML = ''
@@ -5028,7 +5048,7 @@ class PeymanyarApp {
   }
 
   updateSubExpertise() {
-    const mainExpertise = document.getElementById('mainExpertise').value
+    const mainExpertise = document.getElementById('mainExpertise')?.value
     const subContainer = document.getElementById('subExpertiseContainer')
     if (!subContainer) return
 
@@ -5065,7 +5085,7 @@ class PeymanyarApp {
   }
 
   updateAreaUnitLabel() {
-    const areaUnit = document.getElementById('areaUnit').value
+    const areaUnit = document.getElementById('areaUnit')?.value
     const formText = document.querySelector('.project-scale-row .form-text')
     if (formText) {
       if (areaUnit === 'sqm') {
@@ -5098,6 +5118,7 @@ class PeymanyarApp {
   handleFileUpload(e) {
     const files = e.target.files
     const fileList = document.getElementById('fileList')
+    if (!fileList) return
     if (files.length > 5) {
       this.showToast('حداکثر ۵ فایل می‌توانید آپلود کنید.', 'error')
       return
@@ -5123,6 +5144,7 @@ class PeymanyarApp {
 
   removeFile(index) {
     const input = document.getElementById('documentUpload')
+    if (!input) return
     const files = Array.from(input.files)
     files.splice(index, 1)
     const dt = new DataTransfer()
@@ -5133,6 +5155,8 @@ class PeymanyarApp {
 
   addProject() {
     const container = document.getElementById('projectContainer')
+    if (!container) return
+    
     const projectCount = container.children.length + 1
     
     if (projectCount > 5) {
@@ -5185,7 +5209,7 @@ class PeymanyarApp {
     const projectCard = button.closest('.project-card')
     const container = document.getElementById('projectContainer')
     
-    if (container.children.length > 1) {
+    if (container && container.children.length > 1) {
       projectCard.remove()
       this.showAutoSaveStatus('پروژه حذف شد.', 'success')
     } else {
@@ -5196,9 +5220,11 @@ class PeymanyarApp {
   nextContractorStep() {
     if (this.validateContractorStep(this.contractorCurrentStep)) {
       if (this.contractorCurrentStep < this.contractorTotalSteps) {
-        document.getElementById(`section${this.contractorCurrentStep}`).style.display = 'none'
+        const currentSection = document.getElementById(`section${this.contractorCurrentStep}`)
+        if (currentSection) currentSection.style.display = 'none'
         this.contractorCurrentStep++
-        document.getElementById(`section${this.contractorCurrentStep}`).style.display = 'block'
+        const nextSection = document.getElementById(`section${this.contractorCurrentStep}`)
+        if (nextSection) nextSection.style.display = 'block'
         this.updateProgressBar()
         this.updateStepIndicator()
         this.updateContractorNavigation()
@@ -5211,9 +5237,11 @@ class PeymanyarApp {
 
   prevContractorStep() {
     if (this.contractorCurrentStep > 1) {
-      document.getElementById(`section${this.contractorCurrentStep}`).style.display = 'none'
+      const currentSection = document.getElementById(`section${this.contractorCurrentStep}`)
+      if (currentSection) currentSection.style.display = 'none'
       this.contractorCurrentStep--
-      document.getElementById(`section${this.contractorCurrentStep}`).style.display = 'block'
+      const prevSection = document.getElementById(`section${this.contractorCurrentStep}`)
+      if (prevSection) prevSection.style.display = 'block'
       this.updateProgressBar()
       this.updateStepIndicator()
       this.updateContractorNavigation()
@@ -5226,12 +5254,12 @@ class PeymanyarApp {
 
     switch(step) {
       case 1:
-        const accountType = document.getElementById('accountType').value
-        const contactPerson = document.getElementById('contactPerson').value
-        const mobile = document.getElementById('mobile').value
-        const email = document.getElementById('contractorEmail').value
-        const password = document.getElementById('contractorPassword').value
-        const confirmPassword = document.getElementById('contractorConfirmPassword').value
+        const accountType = document.getElementById('accountType')?.value
+        const contactPerson = document.getElementById('contactPerson')?.value
+        const mobile = document.getElementById('mobile')?.value
+        const email = document.getElementById('contractorEmail')?.value
+        const password = document.getElementById('contractorPassword')?.value
+        const confirmPassword = document.getElementById('contractorConfirmPassword')?.value
         
         if (!accountType) {
           this.showValidationError('accountType', 'لطفاً نوع شخصیت را انتخاب کنید')
@@ -5300,9 +5328,9 @@ class PeymanyarApp {
         break
 
       case 2:
-        const mainExpertise = document.getElementById('mainExpertise').value
+        const mainExpertise = document.getElementById('mainExpertise')?.value
         const workArea = document.getElementById('workArea')
-        const selectedAreas = Array.from(workArea.selectedOptions).map(opt => opt.value)
+        const selectedAreas = workArea ? Array.from(workArea.selectedOptions).map(opt => opt.value) : []
         
         if (!mainExpertise) {
           this.showValidationError('mainExpertise', 'لطفاً تخصص اصلی را انتخاب کنید')
@@ -5326,7 +5354,7 @@ class PeymanyarApp {
         break
         
       case 3:
-        const startYear = document.getElementById('startYear').value
+        const startYear = document.getElementById('startYear')?.value
         if (!startYear) {
           this.showValidationError('startYear', 'لطفاً سال آغاز فعالیت را انتخاب کنید')
           isValid = false
@@ -5350,18 +5378,23 @@ class PeymanyarApp {
   }
 
   updateProgressBar() {
-    const progress = (this.contractorCurrentStep / this.contractorTotalSteps) * 100
-    document.getElementById('progressBarFill').style.width = progress + '%'
-    document.getElementById('progressBarFill').setAttribute('aria-valuenow', progress)
+    const progressBar = document.getElementById('progressBarFill')
+    if (progressBar) {
+      const progress = (this.contractorCurrentStep / this.contractorTotalSteps) * 100
+      progressBar.style.width = progress + '%'
+      progressBar.setAttribute('aria-valuenow', progress)
+    }
   }
 
   updateStepIndicator() {
     for (let i = 1; i <= this.contractorTotalSteps; i++) {
       const step = document.getElementById(`step${i}`)
-      if (i <= this.contractorCurrentStep) {
-        step.classList.add('active')
-      } else {
-        step.classList.remove('active')
+      if (step) {
+        if (i <= this.contractorCurrentStep) {
+          step.classList.add('active')
+        } else {
+          step.classList.remove('active')
+        }
       }
     }
   }
@@ -5370,22 +5403,19 @@ class PeymanyarApp {
     const prevBtn = document.getElementById('prevBtn')
     const nextBtn = document.getElementById('nextBtn')
     const submitBtn = document.getElementById('submitBtn')
-    if (this.contractorCurrentStep === 1) {
-      prevBtn.style.display = 'none'
-    } else {
-      prevBtn.style.display = 'block'
+    if (prevBtn) {
+      prevBtn.style.display = this.contractorCurrentStep === 1 ? 'none' : 'block'
     }
-    if (this.contractorCurrentStep === this.contractorTotalSteps) {
-      nextBtn.style.display = 'none'
-      submitBtn.style.display = 'block'
-    } else {
-      nextBtn.style.display = 'block'
-      submitBtn.style.display = 'none'
+    if (nextBtn) {
+      nextBtn.style.display = this.contractorCurrentStep === this.contractorTotalSteps ? 'none' : 'block'
+    }
+    if (submitBtn) {
+      submitBtn.style.display = this.contractorCurrentStep === this.contractorTotalSteps ? 'block' : 'none'
     }
   }
 
   updateContractorSummary() {
-    const accountType = document.getElementById('accountType').value
+    const accountType = document.getElementById('accountType')?.value
     let name = ''
     if (accountType === 'individual') {
       name = document.getElementById('fullName')?.value || '-'
@@ -5393,11 +5423,12 @@ class PeymanyarApp {
       name = document.getElementById('companyName')?.value || '-'
     }
     const contactPerson = document.getElementById('contactPerson')?.value || '-'
-    const mainExpertise = document.getElementById('mainExpertise')?.options[document.getElementById('mainExpertise').selectedIndex]?.text || '-'
+    const mainExpertiseSelect = document.getElementById('mainExpertise')
+    const mainExpertise = mainExpertiseSelect ? mainExpertiseSelect.options[mainExpertiseSelect.selectedIndex]?.text || '-' : '-'
     const startYear = document.getElementById('startYear')?.value || '-'
     const teamSize = document.getElementById('teamSize')?.value || '-'
     const workAreaSelect = document.getElementById('workArea')
-    const selectedAreas = Array.from(workAreaSelect.selectedOptions).map(opt => opt.text)
+    const selectedAreas = workAreaSelect ? Array.from(workAreaSelect.selectedOptions).map(opt => opt.text) : []
     const workAreas = selectedAreas.length > 0 ? selectedAreas.join('، ') : '-'
     const areaValue = document.getElementById('projectArea')?.value || '-'
     const areaUnit = document.getElementById('areaUnit')?.value === 'sqm' ? 'متر مربع' : 'متر مکعب'
@@ -5418,8 +5449,10 @@ class PeymanyarApp {
         </div>
       </div>
     `
-    document.getElementById('summaryContent').innerHTML = summaryHtml
-    document.getElementById('formSummary').style.display = 'block'
+    const summaryContent = document.getElementById('summaryContent')
+    if (summaryContent) summaryContent.innerHTML = summaryHtml
+    const formSummary = document.getElementById('formSummary')
+    if (formSummary) formSummary.style.display = 'block'
   }
 
   async submitContractorForm(e) {
@@ -5429,21 +5462,23 @@ class PeymanyarApp {
       return
     }
 
-    const terms = document.getElementById('contractorTerms').checked
+    const terms = document.getElementById('contractorTerms')?.checked
     if (!terms) {
       this.showToast('لطفاً با قوانین و مقررات موافقت کنید.', 'error')
       return
     }
 
-    const accountType = document.getElementById('accountType').value
-    const email = document.getElementById('contractorEmail').value
-    const password = document.getElementById('contractorPassword').value
-    const mobile = document.getElementById('mobile').value
-    const contactPerson = document.getElementById('contactPerson').value
-    const mainExpertise = document.getElementById('mainExpertise').value
+    const accountType = document.getElementById('accountType')?.value
+    const email = document.getElementById('contractorEmail')?.value
+    const password = document.getElementById('contractorPassword')?.value
+    const mobile = document.getElementById('mobile')?.value
+    const contactPerson = document.getElementById('contactPerson')?.value
+    const mainExpertise = document.getElementById('mainExpertise')?.value
     const phone = document.getElementById('phone')?.value || ''
 
     const submitBtn = document.getElementById('submitBtn')
+    if (!submitBtn) return
+    
     const originalText = submitBtn.innerHTML
     submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>در حال ثبت‌نام...'
     submitBtn.disabled = true
@@ -5515,7 +5550,7 @@ class PeymanyarApp {
           }
 
           const workAreaSelect = document.getElementById('workArea')
-          const selectedAreas = Array.from(workAreaSelect.selectedOptions).map(opt => opt.value)
+          const selectedAreas = workAreaSelect ? Array.from(workAreaSelect.selectedOptions).map(opt => opt.value) : []
           if (selectedAreas.length > 0) {
             profileData.work_area = selectedAreas
           }
@@ -5638,7 +5673,7 @@ class PeymanyarApp {
       }
 
       const workAreaSelect = document.getElementById('workArea')
-      const selectedAreas = Array.from(workAreaSelect.selectedOptions).map(opt => opt.value)
+      const selectedAreas = workAreaSelect ? Array.from(workAreaSelect.selectedOptions).map(opt => opt.value) : []
       if (selectedAreas.length > 0) {
         profileData.work_area = selectedAreas
       }
@@ -5857,10 +5892,6 @@ class PeymanyarApp {
     return div.innerHTML
   }
 
-  // ========================================================================
-  // توابع مدیریت کاربر و احراز هویت
-  // ========================================================================
-  
   setupLoginForms() {
     const loginForm = document.getElementById('loginForm')
     if (loginForm) {
@@ -5879,8 +5910,13 @@ class PeymanyarApp {
   }
 
   async handleLogin() {
-    const email = document.getElementById('loginEmail').value
-    const password = document.getElementById('loginPassword').value
+    const email = document.getElementById('loginEmail')?.value
+    const password = document.getElementById('loginPassword')?.value
+
+    if (!email || !password) {
+      this.showToast('ایمیل و رمز عبور را وارد کنید', 'error')
+      return
+    }
 
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
@@ -5935,10 +5971,12 @@ class PeymanyarApp {
 
   togglePasswordVisibility(id) {
     const input = document.getElementById(id)
-    if (input.type === 'password') {
-      input.type = 'text'
-    } else {
-      input.type = 'password'
+    if (input) {
+      if (input.type === 'password') {
+        input.type = 'text'
+      } else {
+        input.type = 'password'
+      }
     }
   }
 
@@ -6031,10 +6069,6 @@ class PeymanyarApp {
     }
   }
 
-  // ========================================================================
-  // توابع مدیریت و ادمین
-  // ========================================================================
-  
   setupAdminSystem() {
     this.checkAdminStatus()
   }
@@ -6146,21 +6180,26 @@ class PeymanyarApp {
         .from('ratings')
         .select('*', { count: 'exact', head: true })
       
-      document.getElementById('adminTotalUsers').textContent = totalUsers || 0
-      document.getElementById('adminTotalProjects').textContent = totalProjects || 0
-      document.getElementById('adminPendingProjects').textContent = pendingProjects || 0
-      document.getElementById('adminTotalRatings').textContent = totalRatings || 0
-      document.getElementById('pendingProjectsCount').textContent = pendingProjects || 0
+      const totalUsersEl = document.getElementById('adminTotalUsers')
+      if (totalUsersEl) totalUsersEl.textContent = totalUsers || 0
+      
+      const totalProjectsEl = document.getElementById('adminTotalProjects')
+      if (totalProjectsEl) totalProjectsEl.textContent = totalProjects || 0
+      
+      const pendingProjectsEl = document.getElementById('adminPendingProjects')
+      if (pendingProjectsEl) pendingProjectsEl.textContent = pendingProjects || 0
+      
+      const totalRatingsEl = document.getElementById('adminTotalRatings')
+      if (totalRatingsEl) totalRatingsEl.textContent = totalRatings || 0
+      
+      const pendingCountEl = document.getElementById('pendingProjectsCount')
+      if (pendingCountEl) pendingCountEl.textContent = pendingProjects || 0
       
     } catch (error) {
       console.error('خطا در بارگذاری آمار مدیریت:', error)
     }
   }
 
-  // ========================================================================
-  // توابع پنل مدیریت پروژه‌ها
-  // ========================================================================
-  
   showProjectManagementPanel() {
     console.log('مدیریت پروژه‌ها باز شد')
     
@@ -6194,19 +6233,25 @@ class PeymanyarApp {
         throw error
       }
       
-      const pending = projects.filter(p => !p.admin_approved).length
-      const approved = projects.filter(p => p.admin_approved).length
+      const pending = projects ? projects.filter(p => !p.admin_approved).length : 0
+      const approved = projects ? projects.filter(p => p.admin_approved).length : 0
+      const total = projects ? projects.length : 0
       
-      document.getElementById('statPending').textContent = pending
-      document.getElementById('statApproved').textContent = approved
-      document.getElementById('statTotal').textContent = projects.length
+      const statPending = document.getElementById('statPending')
+      if (statPending) statPending.textContent = pending
+      
+      const statApproved = document.getElementById('statApproved')
+      if (statApproved) statApproved.textContent = approved
+      
+      const statTotal = document.getElementById('statTotal')
+      if (statTotal) statTotal.textContent = total
       
       const badge = document.getElementById('pendingProjectsCount')
       if (badge) badge.textContent = pending
       
-      this.projectsData = projects
+      this.projectsData = projects || []
       
-      const pendingProjects = projects.filter(p => !p.admin_approved)
+      const pendingProjects = this.projectsData.filter(p => !p.admin_approved)
       this.displayProjectsList(pendingProjects)
       
       const filterSelect = document.getElementById('projectFilter')
@@ -6214,13 +6259,16 @@ class PeymanyarApp {
       
     } catch (error) {
       console.error('خطا:', error)
-      document.getElementById('projectsAdminList').innerHTML = `
-        <div class="col-12">
-          <div class="alert alert-danger">
-            خطا در دریافت پروژه‌ها: ${error.message}
+      const container = document.getElementById('projectsAdminList')
+      if (container) {
+        container.innerHTML = `
+          <div class="col-12">
+            <div class="alert alert-danger">
+              خطا در دریافت پروژه‌ها: ${error.message}
+            </div>
           </div>
-        </div>
-      `
+        `
+      }
     }
   }
 
@@ -6282,11 +6330,11 @@ class PeymanyarApp {
               </small>
               <div>
                 ${!project.admin_approved ? `
-                  <button class="btn btn-sm btn-success me-2" onclick="app.approveProject('${project.id}')">
+                  <button class="btn btn-sm btn-success me-2" onclick="window.approveProject('${project.id}')">
                     <i class="bi bi-check-circle me-1"></i>تایید
                   </button>
                 ` : ''}
-                <button class="btn btn-sm btn-outline-danger" onclick="app.deleteProject('${project.id}')">
+                <button class="btn btn-sm btn-outline-danger" onclick="window.deleteProject('${project.id}')">
                   <i class="bi bi-trash"></i>
                 </button>
               </div>
@@ -6345,10 +6393,6 @@ class PeymanyarApp {
     await this.loadAllProjects()
   }
 
-  // ========================================================================
-  // توابع آمار
-  // ========================================================================
-  
   async loadRealStats() {
     try {
       const { count: realContractors } = await supabase
@@ -6406,10 +6450,6 @@ class PeymanyarApp {
     }
   }
 
-  // ========================================================================
-  // توابع کمکی و UI
-  // ========================================================================
-  
   animateCounters() {
     const counters = document.querySelectorAll('.stat-value[data-count]')
     const observer = new IntersectionObserver((entries) => {
@@ -6520,10 +6560,6 @@ class PeymanyarApp {
     toast.addEventListener('hidden.bs.toast', () => { toast.remove() })
   }
 
-  // ========================================================================
-  // توابع اسلایدر
-  // ========================================================================
-  
   setupHeroSlider() {
     this.heroSlides = document.querySelectorAll('.hero-slide')
     this.heroSlideDots = document.querySelectorAll('.hero-slide-dot')
@@ -6595,10 +6631,6 @@ class PeymanyarApp {
     this.setupAssistantEvents()
   }
 
-  // ========================================================================
-  // توابع کمکی
-  // ========================================================================
-  
   getBudgetText(budget) {
     const budgets = {
       'under100': 'زیر ۱۰۰ میلیون',
@@ -6626,7 +6658,7 @@ class PeymanyarApp {
 // ایجاد نمونه اصلی و توابع گلوبال
 // ==========================================================================
 
-console.log('PeymanyarApp class defined?', typeof PeymanyarApp)
+console.log('Creating PeymanyarApp instance...')
 
 let app
 document.addEventListener('DOMContentLoaded', () => {
@@ -6634,6 +6666,42 @@ document.addEventListener('DOMContentLoaded', () => {
   try {
     app = new PeymanyarApp()
     window.app = app
+    
+    // تنظیم توابع گلوبال
+    window.showPage = (pageId) => app?.showPage(pageId)
+    window.showMainPage = () => app?.showMainPage()
+    window.showLogin = () => app?.showLogin()
+    window.showForgotPassword = () => app?.showForgotPassword()
+    window.showEmployerRegistration = () => app?.showEmployerRegistration()
+    window.showContractorRegistration = () => app?.showContractorRegistration()
+    window.toggleAssistant = () => app?.toggleAssistant()
+    window.sendAssistantMessage = () => app?.sendAssistantMessage()
+    window.performSearch = () => app?.performSearch()
+    window.logout = () => app?.logout()
+    window.showNewProjectModal = () => app?.showNewProjectModal()
+    window.createProject = () => app?.createProject()
+    window.togglePasswordVisibility = (id) => app?.togglePasswordVisibility(id)
+    window.showTermsModal = () => app?.showTermsModal()
+    window.acceptTerms = () => app?.acceptTerms()
+    window.enableProfileEdit = () => app?.enableProfileEdit()
+    window.cancelProfileEdit = () => app?.cancelProfileEdit()
+    window.saveProfileChanges = () => app?.saveProfileChanges()
+    window.approveProject = (id) => app?.approveProject(id)
+    window.deleteProject = (id) => app?.deleteProject(id)
+    window.loadAllProjects = () => app?.loadAllProjects()
+    window.goBackToAdminPanel = () => app?.goBackToAdminPanel()
+    window.filterProjects = () => app?.filterProjects()
+    window.showProjectManagementPanel = () => app?.showProjectManagementPanel()
+    window.adminLogout = () => app?.adminLogout()
+    window.showAdminLogin = () => app?.showAdminLogin()
+    window.showAdminMessages = () => app?.showAdminMessages()
+    window.showRatingModal = (id, name) => app?.showRatingModal(id, name)
+    window.submitRating = () => app?.submitRating()
+    window.loadProjects = () => app?.loadProjects()
+    window.viewContractorProfile = (id) => app?.viewContractorProfile(id)
+    window.addProjectToEdit = () => app?.addProjectToEdit()
+    window.showRatingStats = () => app?.showRatingStats()
+    
     console.log('App created successfully')
     
     // تنظیم دکمه‌ها
@@ -6642,7 +6710,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (newBtn) {
         newBtn.onclick = function(e) {
           e.preventDefault()
-          app.showNewProjectModal()
+          app?.showNewProjectModal()
         }
         console.log('✅ دکمه پروژه جدید تنظیم شد')
       }
@@ -6651,7 +6719,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (saveBtn) {
         saveBtn.onclick = function(e) {
           e.preventDefault()
-          app.createProject()
+          app?.createProject()
         }
         console.log('✅ دکمه ایجاد پروژه تنظیم شد')
       }
@@ -6671,60 +6739,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (notification) notification.style.display = 'flex'
   }, 2000)
 })
-
-window.showPage = (pageId) => app?.showPage(pageId)
-window.showMainPage = () => app?.showMainPage()
-window.showLogin = () => app?.showLogin()
-window.showForgotPassword = () => app?.showForgotPassword()
-window.showEmployerRegistration = () => app?.showEmployerRegistration()
-window.showContractorRegistration = () => app?.showContractorRegistration()
-window.toggleAssistant = () => app?.toggleAssistant()
-window.sendAssistantMessage = () => app?.sendAssistantMessage()
-window.performSearch = () => app?.performSearch()
-window.logout = () => app?.logout()
-window.createNewProject = () => app?.createNewProject()
-window.togglePasswordVisibility = (id) => app?.togglePasswordVisibility(id)
-window.showTermsModal = () => app?.showTermsModal()
-window.closeTermsModal = () => app?.closeTermsModal()
-window.acceptTerms = () => app?.acceptTerms()
-window.enableProfileEdit = () => app?.enableProfileEdit()
-window.cancelProfileEdit = () => app?.cancelProfileEdit()
-window.saveProfileChanges = () => app?.saveProfileChanges()
-window.showNewProjectModal = () => app?.showNewProjectModal()
-window.approveProject = (id) => app?.approveProject(id)
-window.deleteProject = (id) => app?.deleteProject(id)
-
-// توابع پنل مدیریت
-window.loadPendingProjects = () => app?.loadPendingProjects()
-window.goBackToAdminPanel = () => app?.goBackToAdminPanel()
-window.filterProjects = () => app?.filterProjects()
-window.showProjectManagementPanel = () => app?.showProjectManagementPanel()
-window.adminLogout = () => app?.adminLogout()
-window.showAdminLogin = () => app?.showAdminLogin()
-window.showAdminMessages = () => app?.showAdminMessages()
-window.showRatingModal = (id, name) => app?.showRatingModal(id, name)
-
-// توابع پیام‌یار (فقط برای پنل مدیریت)
-window.analyzeMessages = () => app?.analyzeMessages?.()
-window.sendGroupMessage = () => app?.sendGroupMessage?.()
-window.searchMessages = () => app?.searchMessages?.()
-window.showStatistics = () => app?.showStatistics?.()
-window.openSettings = () => app?.openSettings?.()
-window.syncData = () => app?.syncData?.()
-window.cleanupStorage = () => app?.cleanupStorage?.()
-window.showHelp = () => app?.showHelp?.()
-window.changeMessagesTheme = () => app?.changeMessagesTheme?.()
-window.resetMessagesSettings = () => app?.resetMessagesSettings?.()
-window.exportMessagesData = () => app?.exportMessagesData?.()
-window.adminAnalyzeMessages = () => app?.adminAnalyzeMessages?.()
-window.adminSendBroadcast = () => app?.adminSendBroadcast?.()
-window.adminAdvancedSearch = () => app?.adminAdvancedSearch?.()
-window.adminSystemStats = () => app?.adminSystemStats?.()
-window.adminSystemSettings = () => app?.adminSystemSettings?.()
-window.adminUserManagement = () => app?.adminUserManagement?.()
-window.adminAdvancedCleanup = () => app?.adminAdvancedCleanup?.()
-window.adminViewLogs = () => app?.adminViewLogs?.()
-window.executeCleanup = () => app?.executeCleanup?.()
 </script>
 
 </body>
