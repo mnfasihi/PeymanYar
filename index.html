@@ -1391,9 +1391,9 @@ body { background-color: #121212; color: #e0e0e0; }
   <div class="container page-header">
     <div class="d-flex justify-content-between align-items-center mb-4">
       <h2 class="section-title">📋 پروژه‌ها</h2>
-      <button class="btn btn-primary" onclick="app.showNewProjectModal()">
-        <i class="bi bi-plus-circle me-2"></i>پروژه جدید
-      </button>
+     <button class="btn btn-primary" onclick="showNewProjectModal()">
+  <i class="bi bi-plus-circle me-2"></i>پروژه جدید
+</button>
     </div>
 
     <!-- فیلترها -->
@@ -6385,9 +6385,9 @@ window.showContractorRegistration = () => app?.showContractorRegistration();
 window.toggleAssistant = () => app?.toggleAssistant();
 window.sendAssistantMessage = () => app?.sendAssistantMessage();
 window.performSearch = () => app?.performSearch();
-window.createNewProject = () => app?.createNewProject();
 window.logout = () => app?.logout();
 window.PeymanYar = () => app?.PeymanYar?.();
+window.createNewProject = () => app?.createNewProject();
 window.analyzeMessages = () => app?.analyzeMessages();
 window.sendGroupMessage = () => app?.sendGroupMessage();
 window.searchMessages = () => app?.searchMessages();
@@ -6421,5 +6421,14 @@ window.cancelProfileEdit = () => app?.cancelProfileEdit();
 window.saveProfileChanges = () => app?.saveProfileChanges();
 window.app = app;
 </script>
+// تابع گلوبال برای نمایش مودال پروژه جدید
+window.showNewProjectModal = function() {
+  if (app) {
+    app.showNewProjectModal();
+  } else {
+    console.error('app not initialized');
+    alert('خطا در بارگذاری برنامه. لطفاً صفحه را مجدداً بارگذاری کنید.');
+  }
+}
 </body>
 </html>
