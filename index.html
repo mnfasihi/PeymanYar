@@ -4355,7 +4355,7 @@ class PeymanyarApp {
       const workAreas = result.work_area ? result.work_area.join(', ') : 'سراسر ایران'
       const experience = result.start_year ? (1403 - result.start_year) + ' سال سابقه' : 'سابقه نامشخص'
       const rating = result.ratings?.average || '۰'
-      const ratingCount = result.ratings?.count || ۰
+      const ratingCount = result.ratings?.count || 0
       
       let starsHtml = ''
       for (let i = 0; i < 5; i++) {
