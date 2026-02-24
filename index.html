@@ -6609,98 +6609,72 @@ document.addEventListener('DOMContentLoaded', function() {
 <script>
 // ===== پنل مدیریت پروژه‌ها برای پیام‌یار =====
 window.showProjectManagementPanel = function() {
-    if (window.showProjectManagementPanel.executed) return;
-    window.showProjectManagementPanel.executed = true;
-  console.log('مدیریت پروژه‌ها باز شد');
-  
-  document.querySelectorAll('.page-section').forEach(p => p.style.display = 'none');
-  
-  let projectPanel = document.getElementById('adminProjectsPanel');
-  if (!projectPanel) {
-    projectPanel = document.createElement('div');
-    projectPanel.id = 'adminProjectsPanel';
-    projectPanel.className = 'page-section';
-    projectPanel.innerHTML = `
-      <div class="container page-header">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-          <div>
-            <h2 class="section-title mb-1">
-              <i class="bi bi-building me-2"></i>مدیریت پروژه‌ها
-            </h2>
-            <p class="text-muted">تایید و مدیریت پروژه‌های ثبت شده</p>
-          </div>
-          <div>
-            <button class="btn btn-outline-primary me-2" onclick="loadPendingProjects()">
-              <i class="bi bi-arrow-repeat me-1"></i>بروزرسانی
-            </button>
-            <button class="btn btn-outline-secondary" onclick="goBackToAdminPanel()">
-              <i class="bi bi-arrow-right me-1"></i>بازگشت
-            </button>
-          </div>
-        </div>
-
-        <div class="row mb-4">
-          <div class="col-md-4">
-            <div class="card-peymanyar text-center">
-              <div class="h3 mb-2" id="statPending">0</div>
-              <div class="text-muted">در انتظار تایید</div>
-            </div>
-          </div>
-          <div class="col-md-4">
-            <div class="card-peymanyar text-center">
-              <div class="h3 mb-2" id="statApproved">0</div>
-              <div class="text-muted">تایید شده</div>
-            </div>
-          </div>
-          <div class="col-md-4">
-            <div class="card-peymanyar text-center">
-              <div class="h3 mb-2" id="statTotal">0</div>
-              <div class="text-muted">کل پروژه‌ها</div>
-            </div>
-          </div>
-        </div>
-
-        <div class="card-peymanyar mb-4">
-          <div class="row g-3">
-            <div class="col-md-4">
-              <select class="form-select" id="projectFilter" onchange="filterProjects()">
-                <option value="pending">در انتظار تایید</option>
-                <option value="approved">تایید شده</option>
-                <option value="all">همه پروژه‌ها</option>
-              </select>
-            </div>
-            <div class="col-md-4">
-              <input type="text" class="form-control" id="projectSearch" placeholder="جستجوی پروژه...">
-            </div>
-            <div class="col-md-4">
-              <button class="btn btn-peymanyar w-100" onclick="filterProjects()">
-                <i class="bi bi-search me-2"></i>اعمال فیلتر
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <div id="projectsAdminList" class="row"></div>
-      </div>
-    `;
+    // مخفی کردن همه صفحات
+    document.querySelectorAll('.page-section').forEach(p => {
+        p.style.display = 'none';
+        p.classList.remove('active');
+    });
     
-    const footer = document.querySelector('footer');
-    if (footer) {
-      document.body.insertBefore(projectPanel, footer);
-    } else {
-      document.body.appendChild(projectPanel);
-    }
-  }
-  
-  projectPanel.style.display = 'block';
-  loadAllProjects();
-}
+    // ساخت پنل اگر وجود نداره
+    let projectPanel = document.getElementById('adminProjectsPanel');
+    if (!projectPanel) {
+        projectPanel = document.createElement('div');
+        projectPanel.id = 'adminProjectsPanel';
+        projectPanel.className = 'page-section';
+        projectPanel.innerHTML = \`
+            <div class="container page-header">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div>
+                        <h2 class="section-title mb-1">
+                            <i class="bi bi-building me-2"></i>مدیریت پروژه‌ها
+                        </h2>
+                        <p class="text-muted">تایید و مدیریت پروژه‌های ثبت شده</p>
+                    </div>
+                    <div>
+                        <button class="btn btn-outline-secondary" onclick="goBackToAdminPanel()">
+                            <i class="bi bi-arrow-right me-1"></i>بازگشت
+                        </button>
+                    </div>
+                </div>
 
+                <div class="row mb-4">
+                    <div class="col-md-4">
+                        <div class="card-peymanyar text-center">
+                            <div class="h3 mb-2" id="statPending">0</div>
+                            <div class="text-muted">در انتظار تایید</div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card-peymanyar text-center">
+                            <div class="h3 mb-2" id="statApproved">0</div>
+                            <div class="text-muted">تایید شده</div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card-peymanyar text-center">
+                            <div class="h3 mb-2" id="statTotal">0</div>
+                            <div class="text-muted">کل پروژه‌ها</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="projectsAdminList" class="row"></div>
+            </div>
+        \`;
+        document.body.appendChild(projectPanel);
+    }
+    
+    // نمایش پنل
+    projectPanel.style.display = 'block';
+    projectPanel.classList.add('active');
+    
+    // بارگذاری پروژه‌ها
+    loadAllProjects();
+}
 window.goBackToAdminPanel = function() {
-    event.preventDefault();
-    event.stopPropagation();
-  document.querySelectorAll('.page-section').forEach(p => p.style.display = 'none');
-  document.getElementById('adminMessages').style.display = 'block';
+    document.getElementById('adminProjectsPanel').style.display = 'none';
+    document.getElementById('adminMessages').style.display = 'block';
+    document.getElementById('adminMessages').classList.add('active');
 }
 
 window.loadAllProjects = async function() {
