@@ -6697,6 +6697,8 @@ window.showProjectManagementPanel = function() {
 }
 
 window.goBackToAdminPanel = function() {
+    event.preventDefault();
+    event.stopPropagation();
   document.querySelectorAll('.page-section').forEach(p => p.style.display = 'none');
   document.getElementById('adminMessages').style.display = 'block';
 }
