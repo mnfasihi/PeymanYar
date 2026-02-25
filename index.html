@@ -6353,6 +6353,7 @@ function escapeHtml(text) {
     return div.innerHTML;
 }
 
+// ===== توابع جدید و اصلاح شده =====
 window.approveProject = async function(projectId) {
     if (!confirm('آیا از تایید این پروژه اطمینان دارید؟')) return;
     
@@ -6361,39 +6362,49 @@ window.approveProject = async function(projectId) {
     btn.innerHTML = 'در حال تایید...';
     btn.disabled = true;
     
+    console.log('🔄 در حال تایید پروژه با ID:', projectId);
+    
     try {
-        const { error } = await supabase
+        const { data, error } = await supabase
             .from('projects')
-            .update({ admin_approved: true, status: 'open' })
-            .eq('id', projectId);
+            .update({ 
+                admin_approved: true, 
+                status: 'open' 
+            })
+            .eq('id', projectId)
+            .select();
         
         if (error) throw error;
         
+        console.log('✅ پروژه تایید شد:', data);
+        
         // آپدیت دیتای محلی
-        if (projectsData) {
-            const projectIndex = projectsData.findIndex(p => p.id == projectId);
+        if (window.projectsData) {
+            const projectIndex = window.projectsData.findIndex(p => p.id == projectId);
             if (projectIndex !== -1) {
-                projectsData[projectIndex].admin_approved = true;
-                projectsData[projectIndex].status = 'open';
+                window.projectsData[projectIndex].admin_approved = true;
+                window.projectsData[projectIndex].status = 'open';
             }
         }
         
-        // حذف پروژه از صفحه
+        // حذف کارت پروژه
         const projectCard = document.getElementById(`project-${projectId}`);
         if (projectCard) {
             projectCard.remove();
         }
         
         // آپدیت آمار
-        document.getElementById('statPending').textContent = projectsData.filter(p => !p.admin_approved).length;
-        document.getElementById('statApproved').textContent = projectsData.filter(p => p.admin_approved).length;
+        updateStats();
         
-        const badge = document.getElementById('pendingProjectsCount');
-        if (badge) badge.textContent = projectsData.filter(p => !p.admin_approved).length;
+        // بروزرسانی صفحه اصلی پروژه‌ها
+        if (typeof window.loadApprovedProjects === 'function') {
+            setTimeout(() => window.loadApprovedProjects(), 500);
+        }
         
         alert('✅ پروژه با موفقیت تایید شد');
         
     } catch (error) {
+        console.error('❌ خطا:', error);
         alert('خطا: ' + error.message);
         btn.innerHTML = originalText;
         btn.disabled = false;
@@ -6417,136 +6428,62 @@ window.deleteProject = async function(projectId) {
         if (error) throw error;
         
         // آپدیت دیتای محلی
-        if (projectsData) {
-            projectsData = projectsData.filter(p => p.id != projectId);
+        if (window.projectsData) {
+            window.projectsData = window.projectsData.filter(p => p.id != projectId);
         }
         
-        // حذف پروژه از صفحه
+        // حذف کارت پروژه
         const projectCard = document.getElementById(`project-${projectId}`);
         if (projectCard) {
             projectCard.remove();
         }
         
         // آپدیت آمار
-        document.getElementById('statPending').textContent = projectsData.filter(p => !p.admin_approved).length;
-        document.getElementById('statApproved').textContent = projectsData.filter(p => p.admin_approved).length;
-        document.getElementById('statTotal').textContent = projectsData.length;
+        updateStats();
         
-        const badge = document.getElementById('pendingProjectsCount');
-        if (badge) badge.textContent = projectsData.filter(p => !p.admin_approved).length;
+        // بروزرسانی صفحه اصلی پروژه‌ها
+        if (typeof window.loadApprovedProjects === 'function') {
+            setTimeout(() => window.loadApprovedProjects(), 500);
+        }
         
         alert('✅ پروژه حذف شد');
         
     } catch (error) {
+        console.error('❌ خطا:', error);
         alert('خطا: ' + error.message);
         btn.innerHTML = originalText;
         btn.disabled = false;
     }
 }
 
-window.deleteProject = async function(projectId) {
-  if (!confirm('⚠️ آیا از حذف این پروژه اطمینان دارید؟')) return;
-  
-  const btn = event.target;
-  const originalText = btn.innerHTML;
-  btn.innerHTML = 'در حال حذف...';
-  btn.disabled = true;
-  
-  try {
-    const { error } = await supabase
-      .from('projects')
-      .delete()
-      .eq('id', projectId);
+// تابع آپدیت آمار
+function updateStats() {
+    if (!window.projectsData) return;
     
-    if (error) throw error;
+    const pending = window.projectsData.filter(p => !p.admin_approved).length;
+    const approved = window.projectsData.filter(p => p.admin_approved).length;
     
-    // آپدیت دیتای محلی
-    if (projectsData) {
-      projectsData = projectsData.filter(p => p.id !== projectId);
-    }
+    const statPending = document.getElementById('statPending');
+    const statApproved = document.getElementById('statApproved');
+    const statTotal = document.getElementById('statTotal');
     
-    // حذف پروژه از صفحه
-    const projectCard = document.getElementById(`project-${projectId}`);
-    if (projectCard) {
-      projectCard.remove();
-    }
-    
-    // آپدیت آمار
-    updateStats();
-    
-    // اگه هیچ پروژه‌ای نموند، پیام مناسب نشون بده
-    const container = document.getElementById('projectsAdminList');
-    if (container.children.length === 0) {
-      container.innerHTML = `
-        <div class="col-12">
-          <div class="card-peymanyar text-center py-5">
-            <i class="bi bi-folder-x display-4 text-muted mb-3"></i>
-            <h4>پروژه‌ای یافت نشد</h4>
-            <p class="text-muted">همه پروژه‌ها حذف شده‌اند.</p>
-          </div>
-        </div>
-      `;
-    }
-    
-    alert('✅ پروژه حذف شد');
-    
-  } catch (error) {
-    alert('خطا: ' + error.message);
-    btn.innerHTML = originalText;
-    btn.disabled = false;
-  }
-}
-window.deleteProject = async function(projectId) {
-  if (!confirm('⚠️ آیا از حذف این پروژه اطمینان دارید؟')) return;
-  
-  const btn = event.target;
-  const originalText = btn.innerHTML;
-  btn.innerHTML = 'در حال حذف...';
-  btn.disabled = true;
-  
-  try {
-    const { error } = await supabase
-      .from('projects')
-      .delete()
-      .eq('id', projectId);
-    
-    if (error) throw error;
-    
-    const projectCard = btn.closest('.col-md-6');
-    if (projectCard) {
-      projectCard.remove();
-    }
-    
-    const pendingSpan = document.getElementById('statPending');
-    const currentPending = parseInt(pendingSpan.textContent);
-    pendingSpan.textContent = currentPending - 1;
-    
-    const totalSpan = document.getElementById('statTotal');
-    totalSpan.textContent = parseInt(totalSpan.textContent) - 1;
+    if (statPending) statPending.textContent = pending;
+    if (statApproved) statApproved.textContent = approved;
+    if (statTotal) statTotal.textContent = window.projectsData.length;
     
     const badge = document.getElementById('pendingProjectsCount');
-    if (badge) badge.textContent = currentPending - 1;
+    if (badge) badge.textContent = pending;
+}
+
+// تابع تست برای چک کردن
+window.checkProjectInDB = async function(projectId) {
+    const { data, error } = await supabase
+        .from('projects')
+        .select('*')
+        .eq('id', projectId);
     
-    const container = document.getElementById('projectsAdminList');
-    if (container.children.length === 0) {
-      container.innerHTML = `
-        <div class="col-12">
-          <div class="card-peymanyar text-center py-5">
-            <i class="bi bi-folder-x display-4 text-muted mb-3"></i>
-            <h4>پروژه‌ای یافت نشد</h4>
-            <p class="text-muted">همه پروژه‌ها حذف شده‌اند.</p>
-          </div>
-        </div>
-      `;
-    }
-    
-    alert('✅ پروژه حذف شد');
-    
-  } catch (error) {
-    alert('خطا: ' + error.message);
-    btn.innerHTML = originalText;
-    btn.disabled = false;
-  }
+    console.log('🔍 نتیجه بررسی:', data);
+    return data;
 }
 </script>
 // تابع مخصوص برای لود پروژه‌های تایید شده در صفحه اصلی
