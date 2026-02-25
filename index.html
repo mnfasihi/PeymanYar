@@ -6621,8 +6621,7 @@ window.goBackToAdminPanel = function() {
 // وقتی از پنل مدیریت پروژه‌ها تایید می‌کنی، بعدش پروژه‌های تایید شده رو لود کن
 const originalApproveProject = window.approveProject;
 window.approveProject = async function(projectId) {
-    console.log('🔥 تابع approveProject صدا زده شد');
-    console.log('📦 projectId دریافتی:', projectId);
+    console.log('1️⃣ آیدی دریافتی:', projectId, 'نوع:', typeof projectId);
     
     if (!confirm('آیا از تایید این پروژه اطمینان دارید؟')) return;
     
@@ -6632,70 +6631,64 @@ window.approveProject = async function(projectId) {
     btn.disabled = true;
     
     try {
-        // قدم 1: ببینیم اصلاً این پروژه وجود داره
-        console.log('1️⃣ چک کردن وجود پروژه...');
-        const { data: checkData, error: checkError } = await supabase
-            .from('projects')
-            .select('*')
-            .eq('id', projectId);
+        // تبدیل به عدد (چون تو دیتابیس number هست)
+        const numericId = Number(projectId);
+        console.log('2️⃣ آیدی عددی:', numericId, 'نوع:', typeof numericId);
         
-        console.log('2️⃣ نتیجه چک:', checkData);
-        
-        if (checkError) throw checkError;
-        if (!checkData || checkData.length === 0) {
-            throw new Error('پروژه با این آیدی پیدا نشد');
-        }
-        
-        // قدم 2: آپدیت کن
-        console.log('3️⃣ در حال آپدیت پروژه...');
-        const { data: updateData, error: updateError } = await supabase
+        // آپدیت با عدد
+        const { data, error } = await supabase
             .from('projects')
             .update({ 
                 admin_approved: true, 
-                status: 'open' 
+                status: 'open',
+                reviewed_at: new Date().toISOString()
             })
-            .eq('id', projectId)
+            .eq('id', numericId)  // اینجا عدد می‌فرستیم
             .select();
         
-        console.log('4️⃣ نتیجه آپدیت:', updateData);
+        console.log('3️⃣ نتیجه آپدیت:', { data, error });
         
-        if (updateError) throw updateError;
+        if (error) {
+            console.error('❌ خطای Supabase:', error);
+            throw error;
+        }
         
-        // قدم 3: دوباره چک کن ببینیم آپدیت شده یا نه
-        const { data: finalCheck } = await supabase
+        // چک کنیم واقعاً آپدیت شده
+        const { data: check } = await supabase
             .from('projects')
-            .select('admin_approved')
-            .eq('id', projectId);
+            .select('admin_approved, status')
+            .eq('id', numericId);
         
-        console.log('5️⃣ وضعیت نهایی:', finalCheck);
+        console.log('4️⃣ وضعیت نهایی:', check);
         
-        if (!finalCheck || finalCheck.length === 0 || !finalCheck[0].admin_approved) {
+        if (check && check[0]?.admin_approved === true) {
+            alert('✅ پروژه با موفقیت تایید شد');
+            
+            // حذف کارت
+            const projectCard = document.getElementById(`project-${projectId}`);
+            if (projectCard) projectCard.remove();
+            
+            // آپدیت آمار
+            if (window.projectsData) {
+                window.projectsData = window.projectsData.map(p => 
+                    p.id == projectId ? {...p, admin_approved: true, status: 'open'} : p
+                );
+            }
+            
+            // آپدیت آمار
+            if (typeof updateStats === 'function') updateStats();
+            
+            // رفرش لیست
+            setTimeout(() => {
+                if (typeof loadAllProjects === 'function') loadAllProjects();
+            }, 1000);
+        } else {
             throw new Error('پروژه آپدیت نشد!');
         }
         
-        // آپدیت دیتای محلی
-        if (window.projectsData) {
-            const projectIndex = window.projectsData.findIndex(p => p.id == projectId);
-            if (projectIndex !== -1) {
-                window.projectsData[projectIndex].admin_approved = true;
-                window.projectsData[projectIndex].status = 'open';
-            }
-        }
-        
-        // حذف کارت پروژه
-        const projectCard = document.getElementById(`project-${projectId}`);
-        if (projectCard) {
-            projectCard.remove();
-        }
-        
-        // آپدیت آمار
-        if (typeof updateStats === 'function') updateStats();
-        
-        alert(`✅ پروژه "${checkData[0].title}" با موفقیت تایید شد`);
-        
     } catch (error) {
         console.error('❌ خطا:', error);
-        alert('خطا: ' + error.message);
+        alert('خطا در تایید پروژه: ' + error.message);
         btn.innerHTML = originalText;
         btn.disabled = false;
     }
