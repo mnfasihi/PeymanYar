@@ -6621,14 +6621,9 @@ window.goBackToAdminPanel = function() {
 // وقتی از پنل مدیریت پروژه‌ها تایید می‌کنی، بعدش پروژه‌های تایید شده رو لود کن
 const originalApproveProject = window.approveProject;
 window.approveProject = async function(projectId) {
-    // ========== خطوط دیباگ ==========
     console.log('🔥 تابع approveProject صدا زده شد');
     console.log('📦 projectId دریافتی:', projectId);
-    console.log('📦 نوع projectId:', typeof projectId);
-    console.log('📦 event.target:', event?.target);
-    console.log('📦 stack trace:', new Error().stack);
-    // =================================
-
+    
     if (!confirm('آیا از تایید این پروژه اطمینان دارید؟')) return;
     
     const btn = event.target;
@@ -6637,9 +6632,23 @@ window.approveProject = async function(projectId) {
     btn.disabled = true;
     
     try {
-        console.log('🔄 در حال تایید پروژه با ID:', projectId);
+        // قدم 1: ببینیم اصلاً این پروژه وجود داره
+        console.log('1️⃣ چک کردن وجود پروژه...');
+        const { data: checkData, error: checkError } = await supabase
+            .from('projects')
+            .select('*')
+            .eq('id', projectId);
         
-        const { data, error } = await supabase
+        console.log('2️⃣ نتیجه چک:', checkData);
+        
+        if (checkError) throw checkError;
+        if (!checkData || checkData.length === 0) {
+            throw new Error('پروژه با این آیدی پیدا نشد');
+        }
+        
+        // قدم 2: آپدیت کن
+        console.log('3️⃣ در حال آپدیت پروژه...');
+        const { data: updateData, error: updateError } = await supabase
             .from('projects')
             .update({ 
                 admin_approved: true, 
@@ -6648,11 +6657,21 @@ window.approveProject = async function(projectId) {
             .eq('id', projectId)
             .select();
         
-        console.log('📦 پاسخ supabase:', { data, error });
+        console.log('4️⃣ نتیجه آپدیت:', updateData);
         
-        if (error) throw error;
+        if (updateError) throw updateError;
         
-        console.log('✅ پروژه تایید شد:', data);
+        // قدم 3: دوباره چک کن ببینیم آپدیت شده یا نه
+        const { data: finalCheck } = await supabase
+            .from('projects')
+            .select('admin_approved')
+            .eq('id', projectId);
+        
+        console.log('5️⃣ وضعیت نهایی:', finalCheck);
+        
+        if (!finalCheck || finalCheck.length === 0 || !finalCheck[0].admin_approved) {
+            throw new Error('پروژه آپدیت نشد!');
+        }
         
         // آپدیت دیتای محلی
         if (window.projectsData) {
@@ -6670,9 +6689,9 @@ window.approveProject = async function(projectId) {
         }
         
         // آپدیت آمار
-        updateStats();
+        if (typeof updateStats === 'function') updateStats();
         
-        alert('✅ پروژه با موفقیت تایید شد');
+        alert(`✅ پروژه "${checkData[0].title}" با موفقیت تایید شد`);
         
     } catch (error) {
         console.error('❌ خطا:', error);
