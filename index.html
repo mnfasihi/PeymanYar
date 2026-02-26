@@ -6339,11 +6339,25 @@ await this.loadMessageHistory();
 
 async loadTopUsers() {
   try {
+    // اول تعداد پیام‌های هر کاربر رو حساب کن
     const { data, error } = await supabase
       .from('messages')
-      .select('user_id, count')
-      .order('count', { ascending: false })
-      .limit(3);
+      .select('user_id')
+      .then(result => {
+        // اینجا باید گروه‌بندی و شمارش رو انجام بدیم
+        const counts = {};
+        result.data?.forEach(msg => {
+          counts[msg.user_id] = (counts[msg.user_id] || 0) + 1;
+        });
+        
+        // تبدیل به آرایه و مرتب‌سازی
+        const sorted = Object.entries(counts)
+          .map(([user_id, count]) => ({ user_id, count }))
+          .sort((a, b) => b.count - a.count)
+          .slice(0, 3);
+        
+        return { data: sorted, error: null };
+      });
     
     if (error) throw error;
     
