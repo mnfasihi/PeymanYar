@@ -6283,26 +6283,92 @@ async showAdminMessages() {
     this.showToast('خطا در بررسی دسترسی', 'error');
   }
 }
-loadAdminStats() {
-  // آمار واقعی از دیتابیس
-  setTimeout(async () => {
-    try {
-      const { count: messages } = await supabase
-        .from('messages')
-        .select('*', { count: 'exact', head: true });
-      
-      const { count: users } = await supabase
-        .from('profiles')
-        .select('*', { count: 'exact', head: true });
-      
-      document.getElementById('adminTotalMessages').textContent = (messages || 1245).toLocaleString('fa-IR');
-      document.getElementById('adminActiveUsers').textContent = (users || 89).toLocaleString('fa-IR');
-      document.getElementById('adminStorageUsed').textContent = '2.4 GB';
-      document.getElementById('adminSystemHealth').textContent = '100%';
-    } catch (error) {
-      console.error('خطا در دریافت آمار:', error);
+async loadAdminStats() {
+  try {
+    // کل پیام‌ها
+    const { count: totalMessages } = await supabase
+      .from('messages')
+      .select('*', { count: 'exact', head: true });
+    
+    // پیام‌های امروز
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    const { count: todayMessages } = await supabase
+      .from('messages')
+      .select('*', { count: 'exact', head: true })
+      .gte('created_at', today.toISOString());
+    
+    // پیام‌های دیروز
+    const yesterday = new Date(today);
+    yesterday.setDate(yesterday.getDate() - 1);
+    
+    const { count: yesterdayMessages } = await supabase
+      .from('messages')
+      .select('*', { count: 'exact', head: true })
+      .gte('created_at', yesterday.toISOString())
+      .lt('created_at', today.toISOString());
+    
+    // کل کاربران فعال (کسانی که در ۷ روز اخیر لاگین داشتند)
+    const weekAgo = new Date();
+    weekAgo.setDate(weekAgo.getDate() - 7);
+    
+    const { count: activeUsers } = await supabase
+      .from('profiles')
+      .select('*', { count: 'exact', head: true })
+      .gte('last_login', weekAgo.toISOString());
+    
+    // به‌روزرسانی کارت‌های آمار
+    document.getElementById('adminTotalMessages').textContent = (totalMessages || 0).toLocaleString('fa-IR');
+    document.getElementById('adminActiveUsers').textContent = (activeUsers || 0).toLocaleString('fa-IR');
+    
+    // به‌روزرسانی آمار در تب تحلیل پیام‌ها
+    document.getElementById('totalMessagesStat').textContent = (totalMessages || 1245).toLocaleString('fa-IR');
+    document.getElementById('todayMessagesStat').textContent = (todayMessages || 0).toLocaleString('fa-IR');
+    document.getElementById('yesterdayMessagesStat').textContent = (yesterdayMessages || 0).toLocaleString('fa-IR');
+    
+    // فعال‌ترین کاربران در ارسال پیام
+    await this.loadTopUsers();
+await this.loadMessageHistory();
+    
+  } catch (error) {
+    console.error('خطا در دریافت آمار:', error);
+  }
+}
+
+async loadTopUsers() {
+  try {
+    const { data, error } = await supabase
+      .from('messages')
+      .select('user_id, count')
+      .order('count', { ascending: false })
+      .limit(3);
+    
+    if (error) throw error;
+    
+    const tbody = document.getElementById('topUsersTable');
+    if (tbody && data && data.length > 0) {
+      let html = '';
+      for (const item of data) {
+        const { data: user } = await supabase
+          .from('profiles')
+          .select('full_name, company_name')
+          .eq('user_id', item.user_id)
+          .single();
+        
+        html += `
+          <tr>
+            <td>${user?.full_name || user?.company_name || 'کاربر'}</td>
+            <td>${item.count}</td>
+            <td>${new Date().toLocaleDateString('fa-IR')}</td>
+          </tr>
+        `;
+      }
+      tbody.innerHTML = html;
     }
-  }, 100);
+  } catch (error) {
+    console.error('خطا:', error);
+  }
 }
 
 adminLoadMessageChart(period) {
@@ -6334,7 +6400,40 @@ adminSendMessage() {
     this.showToast('متن پیام را وارد کنید', 'error');
     return;
   }
-  
+  async loadMessageHistory() {
+  try {
+    const { data, error } = await supabase
+      .from('admin_messages')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .limit(5);
+    
+    if (error) throw error;
+    
+    const container = document.querySelector('#tab2 .col-md-4 div');
+    if (container && data) {
+      let html = '';
+      data.forEach(msg => {
+        const recipients = {
+          'all': 'همه کاربران',
+          'employers': 'کارفرمایان',
+          'contractors': 'پیمانکاران'
+        }[msg.recipient_type] || msg.recipient_type;
+        
+        html += `
+          <div class="border p-2 mb-2">
+            <small class="text-muted">${new Date(msg.created_at).toLocaleDateString('fa-IR')}</small>
+            <div class="fw-bold">${msg.title}</div>
+            <small>ارسال به: ${recipients}</small>
+          </div>
+        `;
+      });
+      container.innerHTML = html || '<p class="text-muted">پیامی ارسال نشده</p>';
+    }
+  } catch (error) {
+    console.error('خطا:', error);
+  }
+}
   this.showAdminLoading(true);
   setTimeout(() => {
     this.showAdminResult(`✅ پیام با عنوان "${title || 'بدون عنوان'}" به ${recipients === 'all' ? 'همه کاربران' : recipients} ارسال شد.`);
@@ -6368,65 +6467,89 @@ adminGlobalSearch() {
   }, 1000);
 }
 
-adminRefreshStats() {
+async adminRefreshStats() {
   this.showAdminLoading(true);
-  setTimeout(() => {
-    this.showAdminResult('📊 آمار به‌روزرسانی شد');
+  
+  try {
+    // آمار کاربران
+    const { count: totalUsers } = await supabase
+      .from('profiles')
+      .select('*', { count: 'exact', head: true });
+    
+    const { count: employers } = await supabase
+      .from('profiles')
+      .select('*', { count: 'exact', head: true })
+      .eq('user_type', 'employer');
+    
+    const { count: contractors } = await supabase
+      .from('profiles')
+      .select('*', { count: 'exact', head: true })
+      .eq('user_type', 'contractor');
+    
+    // آمار پروژه‌ها
+    const { count: totalProjects } = await supabase
+      .from('projects')
+      .select('*', { count: 'exact', head: true });
+    
+    const { count: pendingProjects } = await supabase
+      .from('projects')
+      .select('*', { count: 'exact', head: true })
+      .eq('admin_approved', false);
+    
+    const { count: inProgress } = await supabase
+      .from('projects')
+      .select('*', { count: 'exact', head: true })
+      .eq('status', 'in_progress');
+    
+    const { count: completed } = await supabase
+      .from('projects')
+      .select('*', { count: 'exact', head: true })
+      .eq('status', 'completed');
+    
+    // ثبت‌نام امروز
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    const { count: todayRegistrations } = await supabase
+      .from('profiles')
+      .select('*', { count: 'exact', head: true })
+      .gte('created_at', today.toISOString());
+    
+    // ثبت‌نام این ماه
+    const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+    
+    const { count: monthRegistrations } = await supabase
+      .from('profiles')
+      .select('*', { count: 'exact', head: true })
+      .gte('created_at', firstDayOfMonth.toISOString());
+    
+    // به‌روزرسانی مقادیر در صفحه
+    document.querySelector('#tab4 table tr:first-child td:last-child').textContent = totalUsers?.toLocaleString('fa-IR') || '۰';
+    document.querySelector('#tab4 table tr:nth-child(2) td:last-child').textContent = employers?.toLocaleString('fa-IR') || '۰';
+    document.querySelector('#tab4 table tr:nth-child(3) td:last-child').textContent = contractors?.toLocaleString('fa-IR') || '۰';
+    document.querySelector('#tab4 table tr:nth-child(4) td:last-child').textContent = todayRegistrations?.toLocaleString('fa-IR') || '۰';
+    document.querySelector('#tab4 table tr:nth-child(5) td:last-child').textContent = monthRegistrations?.toLocaleString('fa-IR') || '۰';
+    
+    // آمار پروژه‌ها
+    const projectTable = document.querySelectorAll('#tab4 table')[1];
+    if (projectTable) {
+      const rows = projectTable.querySelectorAll('tr');
+      if (rows.length >= 4) {
+        rows[0].querySelector('td:last-child').textContent = totalProjects?.toLocaleString('fa-IR') || '۰';
+        rows[1].querySelector('td:last-child').textContent = inProgress?.toLocaleString('fa-IR') || '۰';
+        rows[2].querySelector('td:last-child').textContent = completed?.toLocaleString('fa-IR') || '۰';
+        rows[3].querySelector('td:last-child').textContent = pendingProjects?.toLocaleString('fa-IR') || '۰';
+      }
+    }
+    
+    this.showAdminResult('📊 آمار سیستم با موفقیت به‌روزرسانی شد');
+    
+  } catch (error) {
+    console.error('خطا:', error);
+    this.showToast('خطا در دریافت آمار', 'error');
+  } finally {
     this.showAdminLoading(false);
-  }, 1000);
-}
-
-adminSaveSettings() {
-  const siteName = document.getElementById('siteName')?.value;
-  const sessionTimeout = document.getElementById('sessionTimeout')?.value;
-  const maxUpload = document.getElementById('maxUploadSize')?.value;
-  
-  this.showToast('تنظیمات با موفقیت ذخیره شد', 'success');
-  this.showAdminResult(`⚙️ تنظیمات ذخیره شد (نام سایت: ${siteName}, زمان نشست: ${sessionTimeout} دقیقه)`);
-}
-
-adminFilterUsers() {
-  const search = document.getElementById('userSearch')?.value;
-  const type = document.getElementById('userTypeFilter')?.value;
-  const status = document.getElementById('userStatusFilter')?.value;
-  
-  this.showToast(`فیلتر اعمال شد: ${search || 'همه'} - ${type} - ${status}`, 'success');
-}
-
-adminViewUserDetails(userId) {
-  const modal = new bootstrap.Modal(document.getElementById('userDetailsModal'));
-  document.getElementById('userDetailsContent').innerHTML = `
-    <p><strong>شناسه کاربر:</strong> ${userId}</p>
-    <p><strong>نام:</strong> علی محمدی</p>
-    <p><strong>ایمیل:</strong> ali@example.com</p>
-    <p><strong>نوع:</strong> کارفرما</p>
-    <p><strong>وضعیت:</strong> فعال</p>
-    <p><strong>تاریخ عضویت:</strong> ۱۴۰۲/۱۲/۰۱</p>
-    <p><strong>پروژه‌ها:</strong> ۳ پروژه</p>
-  `;
-  modal.show();
-}
-
-adminEditUser(userId) {
-  this.showToast(`ویرایش کاربر ${userId}`, 'info');
-}
-
-adminToggleUser(userId) {
-  this.showToast(`وضعیت کاربر ${userId} تغییر کرد`, 'success');
-}
-
-adminMakeAdmin(userId) {
-  if (confirm(`آیا از تبدیل کاربر ${userId} به مدیر اطمینان دارید؟`)) {
-    this.showToast(`کاربر ${userId} به مدیر ارتقا یافت`, 'success');
   }
-}
-
-adminLoadMoreUsers() {
-  this.showAdminLoading(true);
-  setTimeout(() => {
-    this.showAdminResult('👥 ۱۰ کاربر دیگر بارگذاری شدند');
-    this.showAdminLoading(false);
-  }, 1000);
 }
 
 adminClearCache() {
