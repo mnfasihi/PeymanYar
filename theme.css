@@ -754,3 +754,102 @@ h1, h2, h3, h4, h5, h6 {
     border-bottom-color: var(--gray-700);
   }
 }
+/* بهبود استایل متن و دکمه‌ها */
+.hero-content-wrapper {
+  max-width: 90%;
+  margin-left: auto;
+}
+
+.hero-title {
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.hero-title .gradient-text {
+  background: linear-gradient(135deg, var(--primary-600), var(--secondary-600));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-size: 3.5rem;
+}
+
+.hero-title .accent-text {
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: var(--accent-600);
+}
+
+.hero-subtitle {
+  font-size: 1.1rem;
+  color: var(--gray-600);
+  max-width: 90%;
+  line-height: 1.8;
+}
+
+/* دکمه‌ها با عرض یکسان */
+.d-flex.gap-3 .btn {
+  min-width: 180px;
+  padding: 14px 24px;
+  font-size: 1rem;
+}
+
+/* افزایش طول عکس */
+.hero-image-slider {
+  height: 600px !important;
+  border-radius: 32px;
+  overflow: hidden;
+  box-shadow: 0 30px 50px -15px rgba(0, 0, 0, 0.2);
+}
+
+/* تنظیم نوار آمار */
+.stats-row {
+  margin-top: 40px !important;
+  width: 100%;
+}
+
+/* ریسپانسیو برای موبایل */
+@media (max-width: 992px) {
+  .hero-content-wrapper {
+    max-width: 100%;
+    text-align: center;
+    margin-bottom: 40px;
+  }
+  
+  .hero-title .gradient-text {
+    font-size: 2.8rem;
+  }
+  
+  .hero-subtitle {
+    max-width: 100%;
+  }
+  
+  .d-flex.gap-3 {
+    justify-content: center;
+  }
+  
+  .hero-image-slider {
+    height: 450px !important;
+  }
+}
+
+@media (max-width: 576px) {
+  .hero-title .gradient-text {
+    font-size: 2.2rem;
+  }
+  
+  .hero-title .accent-text {
+    font-size: 1.4rem;
+  }
+  
+  .d-flex.gap-3 {
+    flex-direction: column;
+  }
+  
+  .d-flex.gap-3 .btn {
+    width: 100%;
+  }
+  
+  .hero-image-slider {
+    height: 350px !important;
+  }
+}
