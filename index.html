@@ -3552,13 +3552,13 @@ class PeymanyarApp {
   }
 
   // ========== متدهای کمکی برای بررسی وجود المنت‌ها ==========
-  getElement(id) {
+ getElement(id) {
   const el = document.getElementById(id);
   if (!el) {
-    // فقط برای المنت‌های مهم لاگ بزن، نه همه
-    const importantElements = ['heroSlider', 'adminChart', 'adminUsersList', 'projectsAdminList'];
-    if (importantElements.includes(id)) {
-      console.warn(`⚠️ المنت مهم "${id}" در صفحه پیدا نشد`);
+    // فقط برای المنت‌هایی که باید با ID باشند هشدار بده
+    const mustHaveId = ['adminChart', 'adminUsersList', 'projectsAdminList'];
+    if (mustHaveId.includes(id)) {
+      console.warn(`⚠️ المنت "${id}" با ID پیدا نشد`);
     }
   }
   return el;
@@ -5169,25 +5169,20 @@ async checkAdminStatus() {
   }
 
   // ========== اسلایدر ==========
-  // در متد startHeroSlider، این تغییر رو اعمال کن:
-startHeroSlider() {
-  // اول با ID جدید جستجو کن (اگه عوض کردی)
+  startHeroSlider() {
+  // اول با ID جستجو کن
   let slider = this.getElement('heroSlider');
   
-  // اگر با ID پیدا نشد، با کلاس‌های موجود جستجو کن
+  // اگر با ID پیدا نشد، با کلاس جستجو کن
   if (!slider) {
     slider = document.querySelector('.hero-image-slider');
-    console.log('اسلایدر با کلاس hero-image-slider پیدا شد:', slider);
-  }
-  
-  // بازم پیدا نشد؟ شاید اسم کلاس فرق داره
-  if (!slider) {
-    slider = document.querySelector('[class*="slider"]');
-    console.log('اسلایدر با کلاس دارای کلمه slider:', slider);
+    if (slider) {
+      console.log('اسلایدر با کلاس hero-image-slider پیدا شد');
+    }
   }
   
   if (!slider) {
-    console.warn('⚠️ اسلایدر در صفحه پیدا نشد');
+    console.warn('اسلایدر در صفحه پیدا نشد');
     return;
   }
   
