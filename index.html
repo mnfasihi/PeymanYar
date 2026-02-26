@@ -3553,15 +3553,16 @@ class PeymanyarApp {
 
   // ========== متدهای کمکی برای بررسی وجود المنت‌ها ==========
   getElement(id) {
-    const el = document.getElementById(id)
-    if (!el) console.warn(`Element with id "${id}" not found`)
-    return el
+  const el = document.getElementById(id);
+  if (!el) {
+    // فقط برای المنت‌های مهم لاگ بزن، نه همه
+    const importantElements = ['heroSlider', 'adminChart', 'adminUsersList', 'projectsAdminList'];
+    if (importantElements.includes(id)) {
+      console.warn(`⚠️ المنت مهم "${id}" در صفحه پیدا نشد`);
+    }
   }
-
-  getElementValue(id) {
-    const el = this.getElement(id)
-    return el ? el.value : null
-  }
+  return el;
+}
 
   // ========== مدیریت کاربر ==========
   async loadUser() {
@@ -4802,12 +4803,39 @@ async checkAdminStatus() {
     await this.loadAdminPanel()
   }
 
-  async loadAdminPanel() {
-    await this.loadAdminStats()
-    this.loadAdminUsers()
-    this.loadAdminProjects()
-    this.initAdminChart()
+ async loadAdminPanel() {
+  console.log('بارگذاری پنل ادمین...');
+  
+  // اول آمار رو لود کن (مهم نیست المنت باشه یا نه)
+  await this.loadAdminStats();
+  
+  // بررسی وجود المنت‌ها قبل از صدا زدن توابع
+  const usersListEl = this.getElement('adminUsersList');
+  const projectsListEl = this.getElement('adminProjectsList');
+  const chartEl = this.getElement('adminChart');
+  
+  // فقط اگه المنت وجود داشت، تابع مربوطه رو صدا کن
+  if (usersListEl) {
+    console.log('✅ لود لیست کاربران');
+    this.loadAdminUsers();
+  } else {
+    console.warn('⚠️ المنت adminUsersList در صفحه وجود ندارد - شاید تب مربوطه باز نشده');
   }
+  
+  if (projectsListEl) {
+    console.log('✅ لود لیست پروژه‌ها');
+    this.loadAdminProjects();
+  } else {
+    console.warn('⚠️ المنت adminProjectsList در صفحه وجود ندارد - شاید تب مربوطه باز نشده');
+  }
+  
+  if (chartEl) {
+    console.log('✅ لود نمودار');
+    this.initAdminChart();
+  } else {
+    console.warn('⚠️ المنت adminChart در صفحه وجود ندارد - شاید تب مربوطه باز نشده');
+  }
+}
 
   async loadAdminStats() {
     try {
@@ -5141,19 +5169,30 @@ async checkAdminStatus() {
   }
 
   // ========== اسلایدر ==========
-  startHeroSlider() {
-    const slider = this.getElement('heroSlider')
-    if (!slider) {
-      // اگر اسلایدر با این آیدی پیدا نشد، از کلاس hero-image-slider استفاده کن
-      const oldSlider = document.querySelector('.hero-image-slider')
-      if (oldSlider) {
-        this.setupHeroSlider(oldSlider)
-      }
-      return
-    }
-    
-    this.setupHeroSlider(slider)
+  // در متد startHeroSlider، این تغییر رو اعمال کن:
+startHeroSlider() {
+  // اول با ID جدید جستجو کن (اگه عوض کردی)
+  let slider = this.getElement('heroSlider');
+  
+  // اگر با ID پیدا نشد، با کلاس‌های موجود جستجو کن
+  if (!slider) {
+    slider = document.querySelector('.hero-image-slider');
+    console.log('اسلایدر با کلاس hero-image-slider پیدا شد:', slider);
   }
+  
+  // بازم پیدا نشد؟ شاید اسم کلاس فرق داره
+  if (!slider) {
+    slider = document.querySelector('[class*="slider"]');
+    console.log('اسلایدر با کلاس دارای کلمه slider:', slider);
+  }
+  
+  if (!slider) {
+    console.warn('⚠️ اسلایدر در صفحه پیدا نشد');
+    return;
+  }
+  
+  this.setupHeroSlider(slider);
+}
 
   setupHeroSlider(slider) {
     const images = [
@@ -5667,15 +5706,5 @@ window.showPage = window.showPage || window.fallbackShowPage;
 </script>
 
 <!-- سرویس ورکر برای PWA (آپشنال) -->
-<script>
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js').catch(err => {
-      console.log('ServiceWorker registration failed: ', err);
-    });
-  });
-}
-</script>
-
 </body>
 </html>
