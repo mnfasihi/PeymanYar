@@ -5584,3 +5584,88 @@ window.adminToggleUser = (id) => window.app?.adminToggleUser(id)
 window.adminMakeAdmin = (id) => window.app?.adminMakeAdmin(id)
 window.adminClearCache = () => window.app?.adminClearCache()
 window.adminClearOldLogs = () => window.app
+window.adminClearOldLogs = () => window.app?.adminClearOldLogs()
+window.adminClearOldMessages = () => window.app?.adminClearOldMessages()
+window.adminClearTempFiles = () => window.app?.adminClearTempFiles()
+window.adminOptimizeDB = () => window.app?.adminOptimizeDB()
+window.adminFullCleanup = () => window.app?.adminFullCleanup()
+window.adminFilterLogs = () => window.app?.adminFilterLogs()
+window.adminExportLogs = () => window.app?.adminExportLogs()
+window.adminRefreshLogs = () => window.app?.adminRefreshLogs()
+window.openNewProjectModal = () => window.app?.openNewProjectModal()
+window.saveProject = () => window.app?.saveProject()
+window.filterProjects = () => window.app?.filterProjects()
+window.addProjectToEdit = () => window.app?.addProjectToEdit()
+</script>
+
+<!-- اسکریپت‌های اضافی برای اطمینان از اجرا -->
+<script>
+// اطمینان از اینکه app بعد از لود کامل صفحه ساخته شده
+document.addEventListener('DOMContentLoaded', function() {
+  console.log('DOM fully loaded');
+  
+  // راه‌اندازی اسلایدر اگر app وجود نداشت
+  setTimeout(function() {
+    if (!window.app) {
+      console.warn('App not loaded, initializing basic slider');
+      const slider = document.querySelector('.hero-image-slider');
+      if (slider) {
+        const slides = slider.querySelectorAll('.hero-slide');
+        const dots = slider.querySelectorAll('.hero-slide-dot');
+        if (slides.length > 0) {
+          let current = 0;
+          setInterval(() => {
+            slides[current].classList.remove('active');
+            dots[current].classList.remove('active');
+            current = (current + 1) % slides.length;
+            slides[current].classList.add('active');
+            dots[current].classList.add('active');
+          }, 5000);
+          
+          dots.forEach((dot, i) => {
+            dot.addEventListener('click', () => {
+              slides.forEach(s => s.classList.remove('active'));
+              dots.forEach(d => d.classList.remove('active'));
+              current = i;
+              slides[current].classList.add('active');
+              dots[current].classList.add('active');
+            });
+          });
+        }
+      }
+    }
+  }, 1000);
+});
+
+// تابع fallback برای نمایش صفحات در صورت عدم وجود app
+window.fallbackShowPage = function(pageId) {
+  console.log('Fallback showPage:', pageId);
+  document.querySelectorAll('.page-section').forEach(page => {
+    page.classList.remove('active');
+    page.style.display = 'none';
+  });
+  const target = document.getElementById(pageId);
+  if (target) {
+    target.classList.add('active');
+    target.style.display = 'block';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+};
+
+// اتصال توابع به window اگر app وجود نداشت
+window.showPage = window.showPage || window.fallbackShowPage;
+</script>
+
+<!-- سرویس ورکر برای PWA (آپشنال) -->
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').catch(err => {
+      console.log('ServiceWorker registration failed: ', err);
+    });
+  });
+}
+</script>
+
+</body>
+</html>
