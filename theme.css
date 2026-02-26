@@ -295,22 +295,6 @@ h1, h2, h3, h4, h5, h6 {
   border-color: rgba(245, 158, 11, 0.2);
 }
 
-/* ===== اعداد و آمار ===== */
-.stat-value {
-  font-size: 2.5rem;
-  font-weight: 800;
-  color: var(--gray-900);
-  margin-bottom: 0.25rem;
-  line-height: 1.2;
-  font-feature-settings: "tnum";
-}
-
-.stat-label {
-  color: var(--gray-600);
-  font-size: 0.95rem;
-  font-weight: 500;
-}
-
 /* ===== هدر و ناوبری ===== */
 .navbar {
   background: rgba(255, 255, 255, 0.8);
@@ -471,13 +455,53 @@ h1, h2, h3, h4, h5, h6 {
   margin: 2rem 0;
 }
 
-/* ===== استایل‌های جدید برای صفحه اصلی - اسلایدر بزرگتر و آمار افقی ===== */
+/* ===== استایل‌های صفحه اصلی ===== */
 
-/* اسلایدر بزرگتر */
+/* بهبود استایل متن و دکمه‌ها */
+.hero-content-wrapper {
+  max-width: 90%;
+  margin-left: auto;
+}
+
+.hero-title {
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.hero-title .gradient-text {
+  background: linear-gradient(135deg, var(--primary-600), var(--secondary-600));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-size: 3.5rem;
+  line-height: 1.2;
+}
+
+.hero-title .accent-text {
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: var(--accent-600);
+}
+
+.hero-subtitle {
+  font-size: 1.1rem;
+  color: var(--gray-600);
+  max-width: 90%;
+  line-height: 1.8;
+}
+
+/* دکمه‌ها با عرض یکسان */
+.d-flex.gap-3 .btn {
+  min-width: 180px;
+  padding: 14px 24px;
+  font-size: 1rem;
+}
+
+/* ===== اسلایدر ===== */
 .hero-image-slider {
   position: relative;
   width: 100%;
-  height: 550px;
+  height: 600px;
   overflow: hidden;
   border-radius: 32px;
   box-shadow: 0 30px 50px -15px rgba(0, 0, 0, 0.2);
@@ -548,7 +572,7 @@ h1, h2, h3, h4, h5, h6 {
   transform: translateY(-3px);
 }
 
-/* ===== نوار آمار افقی جدید ===== */
+/* ===== نوار آمار ===== */
 .stats-row {
   display: flex;
   align-items: center;
@@ -556,7 +580,7 @@ h1, h2, h3, h4, h5, h6 {
   background: white;
   border-radius: 60px;
   padding: 16px 32px;
-  margin-top: 30px;
+  margin-top: 40px;
   box-shadow: 0 15px 35px -10px rgba(37, 99, 235, 0.15);
   border: 1px solid rgba(0, 0, 0, 0.03);
   position: relative;
@@ -592,6 +616,7 @@ h1, h2, h3, h4, h5, h6 {
   height: 35px;
   background: linear-gradient(180deg, transparent, var(--gray-300), transparent);
 }
+
 .stat-box .stat-value {
   font-size: 2.2rem;
   font-weight: 800;
@@ -608,8 +633,48 @@ h1, h2, h3, h4, h5, h6 {
   font-weight: 500;
 }
 
+/* ===== اعداد و آمار (قدیمی - برای سازگاری) ===== */
+.stat-value {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: var(--gray-900);
+  margin-bottom: 0.25rem;
+  line-height: 1.2;
+  font-feature-settings: "tnum";
+}
+
+.stat-label {
+  color: var(--gray-600);
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
 /* ===== ریسپانسیو ===== */
+@media (max-width: 1200px) {
+  .hero-image-slider {
+    height: 500px;
+  }
+}
+
 @media (max-width: 992px) {
+  .hero-content-wrapper {
+    max-width: 100%;
+    text-align: center;
+    margin-bottom: 40px;
+  }
+  
+  .hero-title .gradient-text {
+    font-size: 2.8rem;
+  }
+  
+  .hero-subtitle {
+    max-width: 100%;
+  }
+  
+  .d-flex.gap-3 {
+    justify-content: center;
+  }
+  
   .hero-image-slider {
     height: 450px;
   }
@@ -627,10 +692,6 @@ h1, h2, h3, h4, h5, h6 {
   
   .stat-box:not(:last-child)::after {
     display: none;
-  }
-  
-  .stat-box:nth-child(even) {
-    border-right: none;
   }
   
   .stat-box:nth-child(1),
@@ -653,7 +714,11 @@ h1, h2, h3, h4, h5, h6 {
     padding: 0.625rem 1.5rem;
   }
   
-  .stat-value {
+  .hero-image-slider {
+    height: 400px;
+  }
+  
+  .stat-box .stat-value {
     font-size: 2rem;
   }
 }
@@ -670,6 +735,22 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 @media (max-width: 576px) {
+  .hero-title .gradient-text {
+    font-size: 2.2rem;
+  }
+  
+  .hero-title .accent-text {
+    font-size: 1.4rem;
+  }
+  
+  .d-flex.gap-3 {
+    flex-direction: column;
+  }
+  
+  .d-flex.gap-3 .btn {
+    width: 100%;
+  }
+  
   .hero-image-slider {
     height: 350px;
     border-radius: 24px;
@@ -698,7 +779,7 @@ h1, h2, h3, h4, h5, h6 {
   }
 }
 
-/* ===== دارک مود بهبود یافته ===== */
+/* ===== دارک مود ===== */
 @media (prefers-color-scheme: dark) {
   body {
     background: var(--gray-900);
@@ -753,103 +834,18 @@ h1, h2, h3, h4, h5, h6 {
   .stat-box:nth-child(2) {
     border-bottom-color: var(--gray-700);
   }
-}
-/* بهبود استایل متن و دکمه‌ها */
-.hero-content-wrapper {
-  max-width: 90%;
-  margin-left: auto;
-}
-
-.hero-title {
-  font-weight: 800;
-  letter-spacing: -0.02em;
-}
-
-.hero-title .gradient-text {
-  background: linear-gradient(135deg, var(--primary-600), var(--secondary-600));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  font-size: 3.5rem;
-}
-
-.hero-title .accent-text {
-  font-size: 1.8rem;
-  font-weight: 600;
-  color: var(--accent-600);
-}
-
-.hero-subtitle {
-  font-size: 1.1rem;
-  color: var(--gray-600);
-  max-width: 90%;
-  line-height: 1.8;
-}
-
-/* دکمه‌ها با عرض یکسان */
-.d-flex.gap-3 .btn {
-  min-width: 180px;
-  padding: 14px 24px;
-  font-size: 1rem;
-}
-
-/* افزایش طول عکس */
-.hero-image-slider {
-  height: 600px !important;
-  border-radius: 32px;
-  overflow: hidden;
-  box-shadow: 0 30px 50px -15px rgba(0, 0, 0, 0.2);
-}
-
-/* تنظیم نوار آمار */
-.stats-row {
-  margin-top: 40px !important;
-  width: 100%;
-}
-
-/* ریسپانسیو برای موبایل */
-@media (max-width: 992px) {
-  .hero-content-wrapper {
-    max-width: 100%;
-    text-align: center;
-    margin-bottom: 40px;
-  }
-  
-  .hero-title .gradient-text {
-    font-size: 2.8rem;
-  }
   
   .hero-subtitle {
-    max-width: 100%;
+    color: var(--gray-400);
   }
   
-  .d-flex.gap-3 {
-    justify-content: center;
+  .btn-employer {
+    background: var(--gray-800);
+    color: var(--primary-400);
+    border-color: var(--gray-700);
   }
   
-  .hero-image-slider {
-    height: 450px !important;
-  }
-}
-
-@media (max-width: 576px) {
-  .hero-title .gradient-text {
-    font-size: 2.2rem;
-  }
-  
-  .hero-title .accent-text {
-    font-size: 1.4rem;
-  }
-  
-  .d-flex.gap-3 {
-    flex-direction: column;
-  }
-  
-  .d-flex.gap-3 .btn {
-    width: 100%;
-  }
-  
-  .hero-image-slider {
-    height: 350px !important;
+  .btn-employer:hover {
+    background: var(--gray-700);
   }
 }
