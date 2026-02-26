@@ -1739,52 +1739,6 @@ body { background-color: #121212; color: #e0e0e0; }
 </div>
 </div>
 </div>
-
-<!-- صفحه پنل مدیریت - توسعه کامل ۸ زبانه با قابلیت‌های پیشرفته -->
-<div id="adminMessages" class="page-section" role="main" aria-label="پنل مدیریت پیام‌یار">
-<div class="container page-header">
-<div class="d-flex justify-content-between align-items-center mb-4">
-<div>
-<h2 class="section-title mb-1">🦉 پنل مدیریت پیام‌یار</h2>
-<p class="text-muted">مدیریت پیشرفته سیستم پیام‌یار هوشمند</p>
-</div>
-<div>
-<button class="btn btn-outline-danger btn-sm" onclick="adminLogout()">
-<i class="bi bi-box-arrow-right me-1"></i>خروج
-</button>
-</div>
-</div>
-
-<!-- کارت‌های آمار -->
-<div class="card-peymanyar mb-4">
-<div class="row">
-<div class="col-md-3 col-6 mb-3">
-<div class="text-center p-3 border rounded">
-<div class="h4 mb-2" id="adminTotalMessages">0</div>
-<div class="text-muted small">کل پیام‌ها</div>
-</div>
-</div>
-<div class="col-md-3 col-6 mb-3">
-<div class="text-center p-3 border rounded">
-<div class="h4 mb-2" id="adminActiveUsers">0</div>
-<div class="text-muted small">کاربران فعال</div>
-</div>
-</div>
-<div class="col-md-3 col-6 mb-3">
-<div class="text-center p-3 border rounded">
-<div class="h4 mb-2" id="adminStorageUsed">0</div>
-<div class="text-muted small">فضای استفاده شده</div>
-</div>
-</div>
-<div class="col-md-3 col-6 mb-3">
-<div class="text-center p-3 border rounded">
-<div class="h4 mb-2" id="adminSystemHealth">100%</div>
-<div class="text-muted small">سلامت سیستم</div>
-</div>
-</div>
-</div>
-</div>
-
 <!-- صفحه پنل مدیریت - توسعه کامل ۹ زبانه با قابلیت‌های پیشرفته -->
 <div id="adminMessages" class="page-section" role="main" aria-label="پنل مدیریت پیام‌یار">
 <div class="container page-header">
@@ -6237,11 +6191,9 @@ const bsToast = new bootstrap.Toast(toast, { animation: true, autohide: true, de
 bsToast.show();
 toast.addEventListener('hidden.bs.toast', () => { toast.remove(); });
 }
-
 setupAdminSystem() {
   this.checkAdminStatus();
 }
-
 async checkAdminStatus() {
   if (this.userData && this.userData.id) {
     try {
@@ -6318,7 +6270,10 @@ async showAdminMessages() {
     if (profile?.role === 'admin') {
       this.isAdmin = true;
       this.showPage('adminMessages');
-      setTimeout(() => this.loadAdminStats(), 100);
+      setTimeout(() => {
+        this.loadAdminStats();
+        this.adminLoadProjects(); // ← این خط رو اضافه کنید
+      }, 100);
     } else {
       this.showToast('شما دسترسی ادمین ندارید', 'error');
       this.showPage('home');
@@ -6328,7 +6283,6 @@ async showAdminMessages() {
     this.showToast('خطا در بررسی دسترسی', 'error');
   }
 }
-
 loadAdminStats() {
   // آمار واقعی از دیتابیس
   setTimeout(async () => {
