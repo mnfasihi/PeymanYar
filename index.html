@@ -6400,6 +6400,12 @@ adminSendMessage() {
     this.showToast('متن پیام را وارد کنید', 'error');
     return;
   }
+  this.showAdminLoading(true);
+  setTimeout(() => {
+    this.showAdminResult(`✅ پیام با عنوان "${title || 'بدون عنوان'}" به ${recipients === 'all' ? 'همه کاربران' : recipients} ارسال شد.`);
+    this.showAdminLoading(false);
+  }, 1500);
+}
   async loadMessageHistory() {
   try {
     const { data, error } = await supabase
@@ -6434,13 +6440,6 @@ adminSendMessage() {
     console.error('خطا:', error);
   }
 }
-  this.showAdminLoading(true);
-  setTimeout(() => {
-    this.showAdminResult(`✅ پیام با عنوان "${title || 'بدون عنوان'}" به ${recipients === 'all' ? 'همه کاربران' : recipients} ارسال شد.`);
-    this.showAdminLoading(false);
-  }, 1500);
-}
-
 adminGlobalSearch() {
   const query = document.getElementById('globalSearch')?.value;
   if (!query) {
