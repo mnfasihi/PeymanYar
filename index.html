@@ -1785,6 +1785,51 @@ body { background-color: #121212; color: #e0e0e0; }
 </div>
 </div>
 
+<!-- صفحه پنل مدیریت - توسعه کامل ۹ زبانه با قابلیت‌های پیشرفته -->
+<div id="adminMessages" class="page-section" role="main" aria-label="پنل مدیریت پیام‌یار">
+<div class="container page-header">
+<div class="d-flex justify-content-between align-items-center mb-4">
+<div>
+<h2 class="section-title mb-1">🦉 پنل مدیریت پیام‌یار</h2>
+<p class="text-muted">مدیریت پیشرفته سیستم پیام‌یار هوشمند</p>
+</div>
+<div>
+<button class="btn btn-outline-danger btn-sm" onclick="adminLogout()">
+<i class="bi bi-box-arrow-right me-1"></i>خروج
+</button>
+</div>
+</div>
+
+<!-- کارت‌های آمار -->
+<div class="card-peymanyar mb-4">
+<div class="row">
+<div class="col-md-3 col-6 mb-3">
+<div class="text-center p-3 border rounded">
+<div class="h4 mb-2" id="adminTotalMessages">0</div>
+<div class="text-muted small">کل پیام‌ها</div>
+</div>
+</div>
+<div class="col-md-3 col-6 mb-3">
+<div class="text-center p-3 border rounded">
+<div class="h4 mb-2" id="adminActiveUsers">0</div>
+<div class="text-muted small">کاربران فعال</div>
+</div>
+</div>
+<div class="col-md-3 col-6 mb-3">
+<div class="text-center p-3 border rounded">
+<div class="h4 mb-2" id="adminStorageUsed">0</div>
+<div class="text-muted small">فضای استفاده شده</div>
+</div>
+</div>
+<div class="col-md-3 col-6 mb-3">
+<div class="text-center p-3 border rounded">
+<div class="h4 mb-2" id="adminSystemHealth">100%</div>
+<div class="text-muted small">سلامت سیستم</div>
+</div>
+</div>
+</div>
+</div>
+
 <!-- تب‌های پنل مدیریت با قابلیت‌های پیشرفته -->
 <ul class="nav nav-tabs mb-4" id="adminTabs" role="tablist">
   <li class="nav-item" role="presentation">
@@ -1810,6 +1855,9 @@ body { background-color: #121212; color: #e0e0e0; }
   </li>
   <li class="nav-item" role="presentation">
     <button class="nav-link" id="tab8-tab" data-bs-toggle="tab" data-bs-target="#tab8" type="button" role="tab">📚 لاگ و گزارش‌ها</button>
+  </li>
+  <li class="nav-item" role="presentation">
+    <button class="nav-link" id="tab9-tab" data-bs-toggle="tab" data-bs-target="#tab9" type="button" role="tab">📋 مدیریت پروژه‌ها</button>
   </li>
 </ul>
 
@@ -2378,6 +2426,48 @@ body { background-color: #121212; color: #e0e0e0; }
       <div class="mt-3">
         <button class="btn btn-peymanyar" onclick="adminExportLogs()">خروجی لاگ‌ها</button>
         <button class="btn btn-outline-secondary" onclick="adminRefreshLogs()">بروزرسانی</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- تب 9: مدیریت پروژه‌ها (همون چیزی که تو کد اصلی بود) -->
+  <div class="tab-pane fade" id="tab9" role="tabpanel">
+    <div class="card-peymanyar">
+      <div class="row mb-4">
+        <div class="col-md-4">
+          <div class="card-peymanyar text-center p-3">
+            <h3 id="statPending">0</h3>
+            <p>در انتظار تایید</p>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="card-peymanyar text-center p-3">
+            <h3 id="statApproved">0</h3>
+            <p>تایید شده</p>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="card-peymanyar text-center p-3">
+            <h3 id="statTotal">0</h3>
+            <p>کل پروژه‌ها</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="row mb-3">
+        <div class="col-md-8">
+          <input type="text" class="form-control" id="projectSearchAdmin" placeholder="جستجوی پروژه‌ها...">
+        </div>
+        <div class="col-md-4">
+          <select class="form-select" id="projectFilterAdmin">
+            <option value="pending">در انتظار تایید</option>
+            <option value="all">همه پروژه‌ها</option>
+          </select>
+        </div>
+      </div>
+      
+      <div id="projectsAdminList" class="row">
+        <!-- پروژه‌ها اینجا نمایش داده می‌شوند -->
       </div>
     </div>
   </div>
@@ -6451,6 +6541,116 @@ adminExportLogs() {
 
 adminRefreshLogs() {
   this.showToast('لاگ‌ها به‌روزرسانی شدند', 'success');
+adminLoadProjects() {
+  this.showAdminLoading(true);
+  setTimeout(async () => {
+    try {
+      const { data: projects } = await supabase
+        .from('projects')
+        .select('*')
+        .order('created_at', { ascending: false });
+      
+      const projectsData = projects || [];
+      
+      document.getElementById('statPending').textContent = projectsData.filter(p => !p.admin_approved).length;
+      document.getElementById('statApproved').textContent = projectsData.filter(p => p.admin_approved).length;
+      document.getElementById('statTotal').textContent = projectsData.length;
+      
+      this.displayAdminProjects(projectsData);
+    } catch (error) {
+      console.error('خطا:', error);
+    }
+    this.showAdminLoading(false);
+  }, 500);
+}
+
+displayAdminProjects(projects) {
+  const container = document.getElementById('projectsAdminList');
+  if (!container) return;
+  
+  const filter = document.getElementById('projectFilterAdmin')?.value || 'pending';
+  const search = document.getElementById('projectSearchAdmin')?.value || '';
+  
+  let filtered = [...projects];
+  
+  if (filter === 'pending') {
+    filtered = filtered.filter(p => !p.admin_approved);
+  }
+  
+  if (search) {
+    filtered = filtered.filter(p => 
+      p.title?.toLowerCase().includes(search.toLowerCase()) ||
+      p.description?.toLowerCase().includes(search.toLowerCase())
+    );
+  }
+  
+  if (filtered.length === 0) {
+    container.innerHTML = '<div class="col-12"><div class="alert alert-info">پروژه‌ای یافت نشد</div></div>';
+    return;
+  }
+  
+  let html = '';
+  filtered.forEach(project => {
+    const statusClass = project.admin_approved ? 'bg-success' : 'bg-warning';
+    const statusText = project.admin_approved ? 'تایید شده' : 'در انتظار تایید';
+    
+    html += `
+      <div class="col-md-6 mb-4" id="admin-project-${project.id}">
+        <div class="card-peymanyar">
+          <div class="d-flex justify-content-between align-items-start mb-3">
+            <h5>${project.title}</h5>
+            <span class="badge ${statusClass}">${statusText}</span>
+          </div>
+          <p>${project.description || 'بدون توضیحات'}</p>
+          <div class="mt-3 pt-3 border-top d-flex justify-content-between align-items-center">
+            <small class="text-muted">
+              <i class="bi bi-calendar me-1"></i>
+              ${new Date(project.created_at).toLocaleDateString('fa-IR')}
+            </small>
+            <div>
+              ${!project.admin_approved ? 
+                `<button class="btn btn-sm btn-success me-2" onclick="app.approveAdminProject('${project.id}')">تایید</button>` : ''}
+              <button class="btn btn-sm btn-danger" onclick="app.deleteAdminProject('${project.id}')">حذف</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  });
+  
+  container.innerHTML = html;
+}
+
+async approveAdminProject(projectId) {
+  if (!confirm('آیا از تایید این پروژه اطمینان دارید؟')) return;
+  
+  try {
+    await supabase
+      .from('projects')
+      .update({ admin_approved: true, status: 'open' })
+      .eq('id', projectId);
+    
+    this.showToast('پروژه با موفقیت تایید شد', 'success');
+    this.adminLoadProjects();
+  } catch (error) {
+    this.showToast('خطا در تایید پروژه', 'error');
+  }
+}
+
+async deleteAdminProject(projectId) {
+  if (!confirm('آیا از حذف این پروژه اطمینان دارید؟ این عملیات غیرقابل بازگشت است.')) return;
+  
+  try {
+    await supabase
+      .from('projects')
+      .delete()
+      .eq('id', projectId);
+    
+    this.showToast('پروژه با موفقیت حذف شد', 'success');
+    this.adminLoadProjects();
+  } catch (error) {
+    this.showToast('خطا در حذف پروژه', 'error');
+  }
 }
 
 showAdminLoading(show) {
