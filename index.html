@@ -1185,37 +1185,69 @@ body { background-color: #121212; color: #e0e0e0; }
 <i class="bi bi-tools me-2" aria-hidden="true"></i>ثبت‌نام پیمانکار
 </button>
 </div>
-<div class="row text-center">
-<div class="col-6 col-md-3 mb-4">
-<div class="stat-value" data-count="1250">0</div>
-<div class="stat-label">پیمانکار ثبت‌نامی</div>
-</div>
-<div class="col-6 col-md-3 mb-4">
-<div class="stat-value" data-count="540">0</div>
-<div class="stat-label">پروژه تکمیل شده</div>
-</div>
-<div class="col-6 col-md-3 mb-4">
-<div class="stat-value" data-count="320">0</div>
-<div class="stat-label">کارفرمای فعال</div>
-</div>
-<div class="col-6 col-md-3 mb-4">
-<div class="stat-value" data-count="98">0</div>
-<div class="stat-label">رضایت‌مندی</div>
-</div>
-</div>
+<div class="stats-wrapper animate__animated animate__fadeInUp animate__delay-1s">
+  <div class="stats-container">
+    <div class="stat-item">
+      <div class="stat-icon">
+        <i class="bi bi-person-workspace"></i>
+      </div>
+      <div class="stat-content">
+        <div class="stat-value" data-count="1250">۰</div>
+        <div class="stat-label">پیمانکار ثبت‌نامی</div>
+      </div>
+    </div>
+    
+    <div class="stat-divider"></div>
+    
+    <div class="stat-item">
+      <div class="stat-icon">
+        <i class="bi bi-building-check"></i>
+      </div>
+      <div class="stat-content">
+        <div class="stat-value" data-count="540">۰</div>
+        <div class="stat-label">پروژه تکمیل شده</div>
+      </div>
+    </div>
+    
+    <div class="stat-divider"></div>
+    
+    <div class="stat-item">
+      <div class="stat-icon">
+        <i class="bi bi-briefcase-fill"></i>
+      </div>
+      <div class="stat-content">
+        <div class="stat-value" data-count="320">۰</div>
+        <div class="stat-label">کارفرمای فعال</div>
+      </div>
+    </div>
+    
+    <div class="stat-divider"></div>
+    
+    <div class="stat-item">
+      <div class="stat-icon">
+        <i class="bi bi-star-fill"></i>
+      </div>
+      <div class="stat-content">
+        <div class="stat-value" data-count="98">۰</div>
+        <div class="stat-label">رضایت‌مندی</div>
+      </div>
+    </div>
+  </div>
 </div>
 <div class="col-lg-6">
 <div class="position-relative">
+<!-- این بخش رو جایگزین hero-image-slider کن (حدود خط 2300) -->
 <div class="hero-image-slider">
-<img src="https://fycyznoykgxpaatjsawi.supabase.co/storage/v1/object/public/peymanyar-images/photo1.jpg">
-<img src="https://fycyznoykgxpaatjsawi.supabase.co/storage/v1/object/public/peymanyar-images/photo2.jpg">
-<img src="https://fycyznoykgxpaatjsawi.supabase.co/storage/v1/object/public/peymanyar-images/photo3.jpg">
-<img src="https://fycyznoykgxpaatjsawi.supabase.co/storage/v1/object/public/peymanyar-images/photo4.jpg">
-<div class="hero-slide-controls">
-<div class="hero-slide-dot active" data-slide="0"></div>
-<div class="hero-slide-dot" data-slide="1"></div>
-<div class="hero-slide-dot" data-slide="2"></div>
-</div>
+  <img src="https://fycyznoykgxpaatjsawi.supabase.co/storage/v1/object/public/peymanyar-images/photo1.jpg" alt="تیم ساختمانی در حال همکاری" class="hero-slide active">
+  <img src="https://fycyznoykgxpaatjsawi.supabase.co/storage/v1/object/public/peymanyar-images/photo2.jpg" alt="پروژه ساختمانی در حال اجرا" class="hero-slide">
+  <img src="https://fycyznoykgxpaatjsawi.supabase.co/storage/v1/object/public/peymanyar-images/photo3.jpg" alt="معمار در حال طراحی پروژه" class="hero-slide">
+  <img src="https://fycyznoykgxpaatjsawi.supabase.co/storage/v1/object/public/peymanyar-images/photo4.jpg" alt="پروژه مدرن ساختمانی" class="hero-slide">
+  <div class="hero-slide-controls">
+    <div class="hero-slide-dot active" data-slide="0"></div>
+    <div class="hero-slide-dot" data-slide="1"></div>
+    <div class="hero-slide-dot" data-slide="2"></div>
+    <div class="hero-slide-dot" data-slide="3"></div>
+  </div>
 </div>
 <div class="position-absolute top-0 end-0 mt-4 me-4">
 <button class="btn btn-peymanyar btn-sm" onclick="toggleAssistant()">
@@ -3539,6 +3571,7 @@ this.setupAdminSystem();
 this.loadRealStats();
 this.setupLoginForms();
 this.setupPasswordValidation();
+this.startHeroSlider(); // ✅ این خط اضافه شده
 if (this.currentPage === 'projects') {
 this.loadProjects();
 }
@@ -3556,6 +3589,69 @@ this.closeAllModals();
 }
 });
 this.setupIntersectionObserver();
+}
+// ===== متد جدید برای اسلایدر =====
+startHeroSlider() {
+  const slides = document.querySelectorAll('.hero-slide');
+  const dots = document.querySelectorAll('.hero-slide-dot');
+  
+  if (slides.length === 0) return;
+  
+  // اگر interval قبلی هست، پاکش کن
+  if (this.heroSlideInterval) {
+    clearInterval(this.heroSlideInterval);
+  }
+  
+  this.heroSlideIndex = 0;
+  
+  // هر ۵ ثانیه عکس عوض شه
+  this.heroSlideInterval = setInterval(() => {
+    // مخفی کردن همه
+    slides.forEach(slide => slide.classList.remove('active'));
+    dots.forEach(dot => dot.classList.remove('active'));
+    
+    // رفتن به بعدی
+    this.heroSlideIndex = (this.heroSlideIndex + 1) % slides.length;
+    
+    // نمایش عکس جدید
+    slides[this.heroSlideIndex].classList.add('active');
+    dots[this.heroSlideIndex].classList.add('active');
+  }, 5000);
+  
+  // اضافه کردن event listener برای دکمه‌ها
+  dots.forEach((dot, index) => {
+    dot.addEventListener('click', () => {
+      clearInterval(this.heroSlideInterval);
+      
+      slides.forEach(slide => slide.classList.remove('active'));
+      dots.forEach(d => d.classList.remove('active'));
+      
+      this.heroSlideIndex = index;
+      slides[index].classList.add('active');
+      dots[index].classList.add('active');
+      
+      // restart interval
+      this.startHeroSlider();
+    });
+  });
+}
+
+// ===== متد اصلاح‌شده برای شمارنده با اعداد فارسی =====
+animateCounter(element, target) {
+  let count = 0;
+  const increment = target / 50;
+  const step = () => {
+    if (count < target) {
+      count += increment;
+      // اصلاح این خط - استفاده از toLocaleString('fa-IR')
+      element.textContent = Math.ceil(count).toLocaleString('fa-IR');
+      requestAnimationFrame(step);
+    } else {
+      // اصلاح این خط
+      element.textContent = target.toLocaleString('fa-IR') + (element.getAttribute('data-count') === '98' ? '٪' : '');
+    }
+  };
+  requestAnimationFrame(step);
 }
 
 showTermsModal() {
