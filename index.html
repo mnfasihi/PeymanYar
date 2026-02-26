@@ -6348,27 +6348,35 @@ async loadTopUsers() {
     if (error) throw error;
     
     const tbody = document.getElementById('topUsersTable');
-    if (tbody && data && data.length > 0) {
-      let html = '';
-      for (const item of data) {
-        const { data: user } = await supabase
-          .from('profiles')
-          .select('full_name, company_name')
-          .eq('user_id', item.user_id)
-          .single();
-        
-        html += `
-          <tr>
-            <td>${user?.full_name || user?.company_name || 'کاربر'}</td>
-            <td>${item.count}</td>
-            <td>${new Date().toLocaleDateString('fa-IR')}</td>
-          </tr>
-        `;
+    if (tbody) {
+      if (data && data.length > 0) {
+        let html = '';
+        for (const item of data) {
+          const { data: user } = await supabase
+            .from('profiles')
+            .select('full_name, company_name')
+            .eq('user_id', item.user_id)
+            .single();
+          
+          html += `
+            <tr>
+              <td>${user?.full_name || user?.company_name || 'کاربر'}</td>
+              <td>${item.count}</td>
+              <td>${new Date().toLocaleDateString('fa-IR')}</td>
+            </tr>
+          `;
+        }
+        tbody.innerHTML = html;
+      } else {
+        tbody.innerHTML = '<tr><td colspan="3" class="text-center">هنوز پیامی ارسال نشده</td></tr>';
       }
-      tbody.innerHTML = html;
     }
   } catch (error) {
     console.error('خطا:', error);
+    const tbody = document.getElementById('topUsersTable');
+    if (tbody) {
+      tbody.innerHTML = '<tr><td colspan="3" class="text-center">خطا در دریافت اطلاعات</td></tr>';
+    }
   }
 }
 
