@@ -1170,28 +1170,33 @@ body { background-color: #121212; color: #e0e0e0; }
   <div class="row align-items-center">
     <!-- ستون متن (سمت راست) -->
     <div class="col-lg-6">
-      <h1 class="hero-title mb-4 animate__animated animate__fadeInUp">
-        پلتفرم هوشمند <span style="color: var(--primary-color);">پیمان‌یار</span>
-        <br><span style="color: var(--accent-color);">اتصال کارفرمایان و پیمانکاران</span>
-      </h1>
-      <p class="hero-subtitle mb-4 animate__animated animate__fadeInUp animate__delay-1s">
-        پلتفرم تخصصی برای یافتن، بررسی و استخدام پیمانکاران معتبر ساختمانی.
-        با ما، پروژه‌های ساختمانی خود را به دست بهترین متخصصان بسپارید.
-      </p>
-      <div class="d-flex flex-wrap gap-3 mb-5 animate__animated animate__fadeInUp animate__delay-2s">
-        <button class="btn btn-employer btn-lg" onclick="showEmployerRegistration()">
-          <i class="bi bi-briefcase me-2" aria-hidden="true"></i>ثبت‌نام کارفرما
-        </button>
-        <button class="btn btn-contractor btn-lg" onclick="showContractorRegistration()">
-          <i class="bi bi-tools me-2" aria-hidden="true"></i>ثبت‌نام پیمانکار
-        </button>
+      <div class="hero-content-wrapper">
+        <h1 class="hero-title mb-4 animate__animated animate__fadeInUp">
+          <span class="d-block">پلتفرم هوشمند</span>
+          <span class="gradient-text d-block" style="font-size: 3.5rem; line-height: 1.2;">پیمان‌یار</span>
+          <span class="accent-text d-block mt-2" style="color: var(--accent-color); font-size: 1.8rem;">اتصال کارفرمایان و پیمانکاران</span>
+        </h1>
+        
+        <p class="hero-subtitle mb-5 animate__animated animate__fadeInUp animate__delay-1s" style="max-width: 90%; line-height: 1.8;">
+          پلتفرم تخصصی برای یافتن، بررسی و استخدام پیمانکاران معتبر ساختمانی. 
+          با ما، پروژه‌های ساختمانی خود را به دست بهترین متخصصان بسپارید.
+        </p>
+        
+        <div class="d-flex gap-3 mb-5 animate__animated animate__fadeInUp animate__delay-2s">
+          <button class="btn btn-employer btn-lg flex-grow-1" onclick="showEmployerRegistration()">
+            <i class="bi bi-briefcase me-2" aria-hidden="true"></i>ثبت‌نام کارفرما
+          </button>
+          <button class="btn btn-contractor btn-lg flex-grow-1" onclick="showContractorRegistration()">
+            <i class="bi bi-tools me-2" aria-hidden="true"></i>ثبت‌نام پیمانکار
+          </button>
+        </div>
       </div>
     </div>
     
-    <!-- ستون عکس (سمت چپ) - با کلاس order-lg-2 عکس می‌ره سمت چپ -->
-    <div class="col-lg-6 order-lg-2">
+    <!-- ستون عکس (سمت چپ) -->
+    <div class="col-lg-6">
       <div class="position-relative">
-        <div class="hero-image-slider">
+        <div class="hero-image-slider" style="height: 600px;"> <!-- افزایش طول عکس -->
           <img src="https://fycyznoykgxpaatjsawi.supabase.co/storage/v1/object/public/peymanyar-images/photo1.jpg" alt="تیم ساختمانی در حال همکاری" class="hero-slide active">
           <img src="https://fycyznoykgxpaatjsawi.supabase.co/storage/v1/object/public/peymanyar-images/photo2.jpg" alt="پروژه ساختمانی در حال اجرا" class="hero-slide">
           <img src="https://fycyznoykgxpaatjsawi.supabase.co/storage/v1/object/public/peymanyar-images/photo3.jpg" alt="معمار در حال طراحی پروژه" class="hero-slide">
@@ -1212,8 +1217,8 @@ body { background-color: #121212; color: #e0e0e0; }
     </div>
   </div>
   
-  <!-- نوار آمار - خارج از ردیف اصلی، زیر عکس و متن -->
-  <div class="stats-row animate__animated animate__fadeInUp animate__delay-1s">
+  <!-- نوار آمار -->
+  <div class="stats-row animate__animated animate__fadeInUp animate__delay-1s mt-5">
     <div class="stat-box">
       <div class="stat-value" data-count="1250">۰</div>
       <div class="stat-label">پیمانکار ثبت‌نامی</div>
@@ -1231,10 +1236,9 @@ body { background-color: #121212; color: #e0e0e0; }
       <div class="stat-label">رضایت‌مندی</div>
     </div>
   </div>
-  
-</div> <!-- بسته شدن container -->
+</div>
 </section>
-
+</div>
 <!-- بخش "چرا پیمان‌یار" - این بخش کاملاً جدا از بخش بالاست -->
 <section class="py-5" aria-label="ویژگی‌های کلیدی">
 <div class="container">
@@ -3612,7 +3616,6 @@ startHeroSlider() {
   });
 }
 
-// ===== متد اصلاح‌شده برای شمارنده با اعداد فارسی =====
 animateCounter(element, target) {
   let count = 0;
   const increment = target / 50;
