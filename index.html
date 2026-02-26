@@ -3582,32 +3582,42 @@ class PeymanyarApp {
     }
   }
 
-  async checkAdminStatus() {
-    if (!this.currentUser) {
-      this.isAdmin = false
-      this.hideAdminControls()
-      return
-    }
-
-    try {
-      // استفاده از RPC برای امنیت بیشتر
-      const { data, error } = await this.supabase
-        .rpc('is_admin', { user_id: this.currentUser.id })
-      
-      if (error) throw error
-      
-      this.isAdmin = !!data
-      if (this.isAdmin) {
-        this.showAdminControls()
-      } else {
-        this.hideAdminControls()
-      }
-    } catch (error) {
-      console.error('خطا در بررسی ادمین:', error)
-      this.isAdmin = false
-      this.hideAdminControls()
-    }
+// جایگزین متد checkAdminStatus با این کد
+async checkAdminStatus() {
+  if (!this.currentUser) {
+    this.isAdmin = false;
+    this.hideAdminControls();
+    return;
   }
+
+  try {
+    // مستقیم از جدول profiles چک کن
+    const { data, error } = await this.supabase
+      .from('profiles')
+      .select('role')
+      .eq('user_id', this.currentUser.id)
+      .maybeSingle();
+
+    if (error) {
+      console.error('خطا در دریافت نقش:', error);
+      this.isAdmin = false;
+    } else {
+      this.isAdmin = data?.role === 'admin';
+      console.log('نقش کاربر:', data?.role, 'آیا ادمین است؟', this.isAdmin);
+    }
+    
+    if (this.isAdmin) {
+      this.showAdminControls();
+    } else {
+      this.hideAdminControls();
+    }
+    
+  } catch (error) {
+    console.error('خطا در بررسی ادمین:', error);
+    this.isAdmin = false;
+    this.hideAdminControls();
+  }
+}
 
   showAdminControls() {
     document.querySelectorAll('.admin-only').forEach(el => {
