@@ -1163,117 +1163,120 @@ body { background-color: #121212; color: #e0e0e0; }
 </nav>
 <!-- صفحه اصلی -->
 <div id="home" class="page-section active" role="main" aria-label="صفحه اصلی">
-<section class="hero-section" aria-label="بخش معرفی" style="padding-top: 100px;">
-<div class="container">
-  
-  <!-- ردیف اصلی برای متن و عکس -->
-  <div class="row align-items-center">
-    <!-- ستون متن (سمت راست) -->
-    <div class="col-lg-6">
-      <div class="hero-content-wrapper">
-        <h1 class="hero-title mb-4 animate__animated animate__fadeInUp">
-          <span class="d-block">پلتفرم هوشمند</span>
-          <span class="gradient-text d-block" style="font-size: 3.5rem; line-height: 1.2;">پیمان‌یار</span>
-          <span class="accent-text d-block mt-2" style="color: var(--accent-color); font-size: 1.8rem;">اتصال کارفرمایان و پیمانکاران</span>
-        </h1>
-        
-        <p class="hero-subtitle mb-5 animate__animated animate__fadeInUp animate__delay-1s" style="max-width: 90%; line-height: 1.8;">
-          پلتفرم تخصصی برای یافتن، بررسی و استخدام پیمانکاران معتبر ساختمانی. 
-          با ما، پروژه‌های ساختمانی خود را به دست بهترین متخصصان بسپارید.
-        </p>
-        
-        <div class="d-flex gap-3 mb-5 animate__animated animate__fadeInUp animate__delay-2s">
-          <button class="btn btn-employer btn-lg flex-grow-1" onclick="showEmployerRegistration()">
-            <i class="bi bi-briefcase me-2" aria-hidden="true"></i>ثبت‌نام کارفرما
-          </button>
-          <button class="btn btn-contractor btn-lg flex-grow-1" onclick="showContractorRegistration()">
-            <i class="bi bi-tools me-2" aria-hidden="true"></i>ثبت‌نام پیمانکار
-          </button>
-        </div>
-      </div>
-    </div>
-    
-    <!-- ستون عکس (سمت چپ) -->
-    <div class="col-lg-6">
-      <div class="position-relative">
-        <div class="hero-image-slider" style="height: 600px;"> <!-- افزایش طول عکس -->
-          <img src="https://fycyznoykgxpaatjsawi.supabase.co/storage/v1/object/public/peymanyar-images/photo1.jpg" alt="تیم ساختمانی در حال همکاری" class="hero-slide active">
-          <img src="https://fycyznoykgxpaatjsawi.supabase.co/storage/v1/object/public/peymanyar-images/photo2.jpg" alt="پروژه ساختمانی در حال اجرا" class="hero-slide">
-          <img src="https://fycyznoykgxpaatjsawi.supabase.co/storage/v1/object/public/peymanyar-images/photo3.jpg" alt="معمار در حال طراحی پروژه" class="hero-slide">
-          <img src="https://fycyznoykgxpaatjsawi.supabase.co/storage/v1/object/public/peymanyar-images/photo4.jpg" alt="پروژه مدرن ساختمانی" class="hero-slide">
-          <div class="hero-slide-controls">
-            <div class="hero-slide-dot active" data-slide="0"></div>
-            <div class="hero-slide-dot" data-slide="1"></div>
-            <div class="hero-slide-dot" data-slide="2"></div>
-            <div class="hero-slide-dot" data-slide="3"></div>
+
+  <!-- بخش اول - هدر با عکس و آمار -->
+  <section class="hero-section" aria-label="بخش معرفی" style="padding-top: 100px;">
+    <div class="container">
+      
+      <!-- ردیف اصلی برای متن و عکس -->
+      <div class="row align-items-center">
+        <!-- ستون متن (سمت راست) -->
+        <div class="col-lg-6">
+          <div class="hero-content-wrapper">
+            <h1 class="hero-title mb-4 animate__animated animate__fadeInUp">
+              <span class="d-block">پلتفرم هوشمند</span>
+              <span class="gradient-text d-block" style="font-size: 3.5rem; line-height: 1.2;">پیمان‌یار</span>
+              <span class="accent-text d-block mt-2" style="color: var(--accent-color); font-size: 1.8rem;">اتصال کارفرمایان و پیمانکاران</span>
+            </h1>
+            
+            <p class="hero-subtitle mb-5 animate__animated animate__fadeInUp animate__delay-1s" style="max-width: 90%; line-height: 1.8;">
+              پلتفرم تخصصی برای یافتن، بررسی و استخدام پیمانکاران معتبر ساختمانی. 
+              با ما، پروژه‌های ساختمانی خود را به دست بهترین متخصصان بسپارید.
+            </p>
+            
+            <div class="d-flex gap-3 mb-5 animate__animated animate__fadeInUp animate__delay-2s">
+              <button class="btn btn-employer btn-lg flex-grow-1" onclick="showEmployerRegistration()">
+                <i class="bi bi-briefcase me-2" aria-hidden="true"></i>ثبت‌نام کارفرما
+              </button>
+              <button class="btn btn-contractor btn-lg flex-grow-1" onclick="showContractorRegistration()">
+                <i class="bi bi-tools me-2" aria-hidden="true"></i>ثبت‌نام پیمانکار
+              </button>
+            </div>
           </div>
         </div>
-        <div class="position-absolute top-0 end-0 mt-4 me-4">
-          <button class="btn btn-peymanyar btn-sm" onclick="toggleAssistant()">
-            <i class="bi bi-robot me-1" aria-hidden="true"></i>راهنمای هوشمند
-          </button>
+        
+        <!-- ستون عکس (سمت چپ) -->
+        <div class="col-lg-6">
+          <div class="position-relative">
+            <div class="hero-image-slider" style="height: 600px;">
+              <img src="https://fycyznoykgxpaatjsawi.supabase.co/storage/v1/object/public/peymanyar-images/photo1.jpg" alt="تیم ساختمانی در حال همکاری" class="hero-slide active">
+              <img src="https://fycyznoykgxpaatjsawi.supabase.co/storage/v1/object/public/peymanyar-images/photo2.jpg" alt="پروژه ساختمانی در حال اجرا" class="hero-slide">
+              <img src="https://fycyznoykgxpaatjsawi.supabase.co/storage/v1/object/public/peymanyar-images/photo3.jpg" alt="معمار در حال طراحی پروژه" class="hero-slide">
+              <img src="https://fycyznoykgxpaatjsawi.supabase.co/storage/v1/object/public/peymanyar-images/photo4.jpg" alt="پروژه مدرن ساختمانی" class="hero-slide">
+              <div class="hero-slide-controls">
+                <div class="hero-slide-dot active" data-slide="0"></div>
+                <div class="hero-slide-dot" data-slide="1"></div>
+                <div class="hero-slide-dot" data-slide="2"></div>
+                <div class="hero-slide-dot" data-slide="3"></div>
+              </div>
+            </div>
+            <div class="position-absolute top-0 end-0 mt-4 me-4">
+              <button class="btn btn-peymanyar btn-sm" onclick="toggleAssistant()">
+                <i class="bi bi-robot me-1" aria-hidden="true"></i>راهنمای هوشمند
+              </button>
+            </div>
+          </div>
         </div>
       </div>
-    </div>
-  </div>
-  
-  <!-- نوار آمار -->
-  <div class="stats-row animate__animated animate__fadeInUp animate__delay-1s mt-5">
-    <div class="stat-box">
-      <div class="stat-value" data-count="1250">۰</div>
-      <div class="stat-label">پیمانکار ثبت‌نامی</div>
-    </div>
-    <div class="stat-box">
-      <div class="stat-value" data-count="540">۰</div>
-      <div class="stat-label">پروژه تکمیل شده</div>
-    </div>
-    <div class="stat-box">
-      <div class="stat-value" data-count="320">۰</div>
-      <div class="stat-label">کارفرمای فعال</div>
-    </div>
-    <div class="stat-box">
-      <div class="stat-value" data-count="98">۰</div>
-      <div class="stat-label">رضایت‌مندی</div>
-    </div>
-  </div>
-</div>
-</section>
-</div>
-<!-- بخش "چرا پیمان‌یار" - این بخش کاملاً جدا از بخش بالاست -->
-<section class="py-5" aria-label="ویژگی‌های کلیدی">
-<div class="container">
-<h2 class="section-title text-center mb-5">چرا پیمان‌یار؟</h2>
-<div class="row">
-<div class="col-md-4 mb-4">
-<div class="card-peymanyar text-center">
-<div class="stat-icon mb-4">
-<i class="bi bi-shield-check" aria-hidden="true" style="font-size: 3rem; color: var(--primary-color);"></i>
-</div>
-<h4 class="mb-3">اعتبارسنجی هوشمند</h4>
-<p class="text-muted">بررسی کامل مدارک و سوابق پیمانکاران توسط تیم تخصصی</p>
-</div>
-</div>
-<div class="col-md-4 mb-4">
-<div class="card-peymanyar text-center">
-<div class="stat-icon mb-4">
-<i class="bi bi-search-heart" aria-hidden="true" style="font-size: 3rem; color: var(--primary-color);"></i>
-</div>
-<h4 class="mb-3">جستجوی پیشرفته</h4>
-<p class="text-muted">یافتن پیمانکار مناسب با فیلترهای متنوع و هوشمند</p>
-</div>
-</div>
-<div class="col-md-4 mb-4">
-<div class="card-peymanyar text-center">
-<div class="stat-icon mb-4">
-<i class="bi bi-chat-dots" aria-hidden="true" style="font-size: 3rem; color: var(--primary-color);"></i>
-</div>
-<h4 class="mb-3">پشتیبانی ۲۴/۷</h4>
-<p class="text-muted">دستیار هوشمند و تیم پشتیبانی همیشه در دسترس</p>
-</div>
-</div>
-</div>
-</div>
-</section>
+      
+      <!-- نوار آمار -->
+      <div class="stats-row animate__animated animate__fadeInUp animate__delay-1s mt-5">
+        <div class="stat-box">
+          <div class="stat-value" data-count="1250">۰</div>
+          <div class="stat-label">پیمانکار ثبت‌نامی</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-value" data-count="540">۰</div>
+          <div class="stat-label">پروژه تکمیل شده</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-value" data-count="320">۰</div>
+          <div class="stat-label">کارفرمای فعال</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-value" data-count="98">۰</div>
+          <div class="stat-label">رضایت‌مندی</div>
+        </div>
+      </div>
+      
+    </div> <!-- بسته شدن container بخش اول -->
+  </section> <!-- بسته شدن section بخش اول -->
+
+  <!-- بخش دوم - "چرا پیمان‌یار" -->
+  <section class="py-5" aria-label="ویژگی‌های کلیدی">
+    <div class="container">
+      <h2 class="section-title text-center mb-5">چرا پیمان‌یار؟</h2>
+      <div class="row">
+        <div class="col-md-4 mb-4">
+          <div class="card-peymanyar text-center">
+            <div class="stat-icon mb-4">
+              <i class="bi bi-shield-check" aria-hidden="true" style="font-size: 3rem; color: var(--primary-color);"></i>
+            </div>
+            <h4 class="mb-3">اعتبارسنجی هوشمند</h4>
+            <p class="text-muted">بررسی کامل مدارک و سوابق پیمانکاران توسط تیم تخصصی</p>
+          </div>
+        </div>
+        <div class="col-md-4 mb-4">
+          <div class="card-peymanyar text-center">
+            <div class="stat-icon mb-4">
+              <i class="bi bi-search-heart" aria-hidden="true" style="font-size: 3rem; color: var(--primary-color);"></i>
+            </div>
+            <h4 class="mb-3">جستجوی پیشرفته</h4>
+            <p class="text-muted">یافتن پیمانکار مناسب با فیلترهای متنوع و هوشمند</p>
+          </div>
+        </div>
+        <div class="col-md-4 mb-4">
+          <div class="card-peymanyar text-center">
+            <div class="stat-icon mb-4">
+              <i class="bi bi-chat-dots" aria-hidden="true" style="font-size: 3rem; color: var(--primary-color);"></i>
+            </div>
+            <h4 class="mb-3">پشتیبانی ۲۴/۷</h4>
+            <p class="text-muted">دستیار هوشمند و تیم پشتیبانی همیشه در دسترس</p>
+          </div>
+        </div>
+      </div>
+    </div> 
+  </section> 
 </div>
 <!-- صفحه ویژگی‌ها -->
 <div id="features" class="page-section" role="main" aria-label="صفحه ویژگی‌ها">
