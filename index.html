@@ -1740,7 +1740,7 @@ body { background-color: #121212; color: #e0e0e0; }
 </div>
 </div>
 
-<!-- صفحه پنل مدیریت - توسعه کامل ۸ زبانه -->
+<!-- صفحه پنل مدیریت - توسعه کامل ۸ زبانه با قابلیت‌های پیشرفته -->
 <div id="adminMessages" class="page-section" role="main" aria-label="پنل مدیریت پیام‌یار">
 <div class="container page-header">
 <div class="d-flex justify-content-between align-items-center mb-4">
@@ -1785,13 +1785,13 @@ body { background-color: #121212; color: #e0e0e0; }
 </div>
 </div>
 
-<!-- تب‌های پنل مدیریت -->
+<!-- تب‌های پنل مدیریت با قابلیت‌های پیشرفته -->
 <ul class="nav nav-tabs mb-4" id="adminTabs" role="tablist">
   <li class="nav-item" role="presentation">
-    <button class="nav-link active" id="tab1-tab" data-bs-toggle="tab" data-bs-target="#tab1" type="button" role="tab">📊 تحلیل پیام‌ها</button>
+    <button class="nav-link active" id="tab1-tab" data-bs-toggle="tab" data-bs-target="#tab1" type="button" role="tab">📊 تحلیل پیشرفته پیام‌ها</button>
   </li>
   <li class="nav-item" role="presentation">
-    <button class="nav-link" id="tab2-tab" data-bs-toggle="tab" data-bs-target="#tab2" type="button" role="tab">📨 ارسال پیام</button>
+    <button class="nav-link" id="tab2-tab" data-bs-toggle="tab" data-bs-target="#tab2" type="button" role="tab">📨 ارسال پیام مدیریتی</button>
   </li>
   <li class="nav-item" role="presentation">
     <button class="nav-link" id="tab3-tab" data-bs-toggle="tab" data-bs-target="#tab3" type="button" role="tab">🔍 جستجوی جامع</button>
@@ -1800,105 +1800,165 @@ body { background-color: #121212; color: #e0e0e0; }
     <button class="nav-link" id="tab4-tab" data-bs-toggle="tab" data-bs-target="#tab4" type="button" role="tab">📈 آمار سیستم</button>
   </li>
   <li class="nav-item" role="presentation">
-    <button class="nav-link" id="tab5-tab" data-bs-toggle="tab" data-bs-target="#tab5" type="button" role="tab">⚙️ تنظیمات</button>
+    <button class="nav-link" id="tab5-tab" data-bs-toggle="tab" data-bs-target="#tab5" type="button" role="tab">⚙️ تنظیمات سیستم</button>
   </li>
   <li class="nav-item" role="presentation">
     <button class="nav-link" id="tab6-tab" data-bs-toggle="tab" data-bs-target="#tab6" type="button" role="tab">🔄 مدیریت کاربران</button>
   </li>
   <li class="nav-item" role="presentation">
-    <button class="nav-link" id="tab7-tab" data-bs-toggle="tab" data-bs-target="#tab7" type="button" role="tab">🧹 پاکسازی</button>
+    <button class="nav-link" id="tab7-tab" data-bs-toggle="tab" data-bs-target="#tab7" type="button" role="tab">🧹 پاکسازی پیشرفته</button>
   </li>
   <li class="nav-item" role="presentation">
-    <button class="nav-link" id="tab8-tab" data-bs-toggle="tab" data-bs-target="#tab8" type="button" role="tab">📚 لاگ‌ها</button>
+    <button class="nav-link" id="tab8-tab" data-bs-toggle="tab" data-bs-target="#tab8" type="button" role="tab">📚 لاگ و گزارش‌ها</button>
   </li>
 </ul>
 
 <div class="tab-content" id="adminTabsContent">
-  <!-- تب 1: تحلیل پیام‌ها -->
+  <!-- تب 1: تحلیل پیشرفته پیام‌ها (نمودار، آمار کلی، فعال‌ترین کاربران، فیلتر بازه زمانی) -->
   <div class="tab-pane fade show active" id="tab1" role="tabpanel">
     <div class="card-peymanyar">
-      <div class="row">
-        <div class="col-md-6">
-          <h5>آمار کلی پیام‌ها</h5>
-          <table class="table">
-            <tr><td>کل پیام‌ها:</td><td><strong>۱۲,۸۴۵</strong></td></tr>
-            <tr><td>پیام‌های امروز:</td><td><strong>۴۲۸</strong></td></tr>
+      <div class="row mb-4">
+        <div class="col-md-8">
+          <h5>📊 نمودار تعداد پیام‌ها</h5>
+          <div class="btn-group mb-3" role="group">
+            <button class="btn btn-sm btn-outline-primary" onclick="adminLoadMessageChart('daily')">روزانه</button>
+            <button class="btn btn-sm btn-outline-primary" onclick="adminLoadMessageChart('weekly')">هفتگی</button>
+            <button class="btn btn-sm btn-outline-primary" onclick="adminLoadMessageChart('monthly')">ماهانه</button>
+          </div>
+          <div style="height: 200px; background: #f0f0f0; display: flex; align-items: flex-end; padding: 10px; gap: 10px;" id="messageChart">
+            <!-- نمودار ساده با div -->
+            <div style="flex:1; height: 30%; background: var(--primary-color);"></div>
+            <div style="flex:1; height: 60%; background: var(--primary-color);"></div>
+            <div style="flex:1; height: 80%; background: var(--primary-color);"></div>
+            <div style="flex:1; height: 40%; background: var(--primary-color);"></div>
+            <div style="flex:1; height: 70%; background: var(--primary-color);"></div>
+            <div style="flex:1; height: 90%; background: var(--primary-color);"></div>
+            <div style="flex:1; height: 50%; background: var(--primary-color);"></div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <h5>📈 آمار کلی</h5>
+          <table class="table table-sm">
+            <tr><td>کل پیام‌ها:</td><td><strong id="totalMessagesStat">۱۲,۸۴۵</strong></td></tr>
+            <tr><td>امروز:</td><td><strong id="todayMessagesStat">۴۲۸</strong></td></tr>
+            <tr><td>دیروز:</td><td><strong id="yesterdayMessagesStat">۳۹۵</strong></td></tr>
             <tr><td>میانگین روزانه:</td><td><strong>۴۱۵</strong></td></tr>
-            <tr><td>پیام‌های خوانده نشده:</td><td><strong>۱۲۴</strong></td></tr>
           </table>
-        </div>
-        <div class="col-md-6">
-          <h5>تحلیل احساسات</h5>
-          <div class="progress mb-2" style="height: 25px;">
-            <div class="progress-bar bg-success" style="width: 75%">۷۵٪ مثبت</div>
-          </div>
-          <div class="progress mb-2" style="height: 25px;">
-            <div class="progress-bar bg-secondary" style="width: 15%">۱۵٪ خنثی</div>
-          </div>
-          <div class="progress mb-2" style="height: 25px;">
-            <div class="progress-bar bg-danger" style="width: 10%">۱۰٪ منفی</div>
+          <div class="mt-3">
+            <label class="form-label">فیلتر بازه زمانی</label>
+            <div class="row g-2">
+              <div class="col-6"><input type="date" class="form-control form-control-sm" id="dateFrom"></div>
+              <div class="col-6"><input type="date" class="form-control form-control-sm" id="dateTo"></div>
+              <div class="col-12 mt-2"><button class="btn btn-sm btn-peymanyar w-100" onclick="adminFilterMessagesByDate()">اعمال فیلتر</button></div>
+            </div>
           </div>
         </div>
       </div>
-      <div class="row mt-4">
-        <div class="col-12">
-          <h5>پرکاربردترین کلمات</h5>
-          <span class="badge bg-primary p-2 m-1">پروژه (۱۲۴ بار)</span>
-          <span class="badge bg-primary p-2 m-1">قرارداد (۸۹ بار)</span>
-          <span class="badge bg-primary p-2 m-1">پرداخت (۶۷ بار)</span>
-          <span class="badge bg-primary p-2 m-1">تایید (۵۴ بار)</span>
-          <span class="badge bg-primary p-2 m-1">مهلت (۴۳ بار)</span>
-        </div>
-      </div>
-      <button class="btn btn-peymanyar mt-4" onclick="adminAnalyzeMessages()">بروزرسانی تحلیل</button>
+      
+      <h5 class="mt-4">🔥 فعال‌ترین کاربران در ارسال پیام</h5>
+      <table class="table table-hover">
+        <thead>
+          <tr><th>نام کاربر</th><th>تعداد پیام</th><th>آخرین فعالیت</th></tr>
+        </thead>
+        <tbody id="topUsersTable">
+          <tr><td>علی محمدی</td><td>۱۲۴</td><td>۱۴۰۳/۱۲/۰۶</td></tr>
+          <tr><td>شرکت سازه‌گستر</td><td>۸۹</td><td>۱۴۰۳/۱۲/۰۵</td></tr>
+          <tr><td>احمد رضایی</td><td>۶۷</td><td>۱۴۰۳/۱۲/۰۶</td></tr>
+        </tbody>
+      </table>
+      
+      <button class="btn btn-peymanyar mt-4" onclick="adminRefreshMessageStats()">بروزرسانی آمار</button>
     </div>
   </div>
 
-  <!-- تب 2: ارسال پیام -->
+  <!-- تب 2: ارسال پیام مدیریتی (ارسال به همه، گروه خاص، کاربر خاص، تاریخچه) -->
   <div class="tab-pane fade" id="tab2" role="tabpanel">
     <div class="card-peymanyar">
-      <h5>ارسال پیام گروهی</h5>
-      <div class="mb-3">
-        <label class="form-label">گیرندگان</label>
-        <select class="form-select" id="messageRecipients">
-          <option value="all">همه کاربران</option>
-          <option value="employers">کارفرمایان</option>
-          <option value="contractors">پیمانکاران</option>
-          <option value="admins">مدیران</option>
-        </select>
-      </div>
-      <div class="mb-3">
-        <label class="form-label">عنوان پیام</label>
-        <input type="text" class="form-control" id="messageTitle" placeholder="عنوان پیام...">
-      </div>
-      <div class="mb-3">
-        <label class="form-label">متن پیام</label>
-        <textarea class="form-control" id="messageBody" rows="5" placeholder="متن پیام..."></textarea>
-      </div>
-      <div class="mb-3 form-check">
-        <input type="checkbox" class="form-check-input" id="scheduleMessage">
-        <label class="form-check-label">زمان‌بندی ارسال</label>
-      </div>
-      <div id="scheduleOptions" style="display: none;">
-        <div class="row">
-          <div class="col-md-6 mb-3">
-            <label class="form-label">تاریخ</label>
-            <input type="date" class="form-control" id="scheduleDate">
+      <h5>📨 ارسال پیام مدیریتی</h5>
+      
+      <div class="row">
+        <div class="col-md-8">
+          <div class="mb-3">
+            <label class="form-label">گیرندگان</label>
+            <select class="form-select" id="messageRecipients" onchange="toggleRecipientType()">
+              <option value="all">همه کاربران</option>
+              <option value="employers">کارفرمایان</option>
+              <option value="contractors">پیمانکاران</option>
+              <option value="specific">کاربر خاص</option>
+            </select>
           </div>
-          <div class="col-md-6 mb-3">
-            <label class="form-label">ساعت</label>
-            <input type="time" class="form-control" id="scheduleTime">
+          
+          <div id="specificUserField" style="display: none;" class="mb-3">
+            <label class="form-label">انتخاب کاربر</label>
+            <select class="form-select" id="specificUserSelect">
+              <option value="">-- انتخاب کنید --</option>
+              <option value="1">علی محمدی (کارفرما)</option>
+              <option value="2">شرکت سازه‌گستر (پیمانکار)</option>
+              <option value="3">احمد رضایی (پیمانکار)</option>
+            </select>
+          </div>
+          
+          <div class="mb-3">
+            <label class="form-label">عنوان پیام</label>
+            <input type="text" class="form-control" id="messageTitle" placeholder="عنوان پیام...">
+          </div>
+          
+          <div class="mb-3">
+            <label class="form-label">متن پیام</label>
+            <textarea class="form-control" id="messageBody" rows="5" placeholder="متن پیام..."></textarea>
+          </div>
+          
+          <div class="mb-3 form-check">
+            <input type="checkbox" class="form-check-input" id="scheduleMessage">
+            <label class="form-check-label">زمان‌بندی ارسال</label>
+          </div>
+          
+          <div id="scheduleOptions" style="display: none;">
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label class="form-label">تاریخ</label>
+                <input type="date" class="form-control" id="scheduleDate">
+              </div>
+              <div class="col-md-6 mb-3">
+                <label class="form-label">ساعت</label>
+                <input type="time" class="form-control" id="scheduleTime">
+              </div>
+            </div>
+          </div>
+          
+          <button class="btn btn-peymanyar" onclick="adminSendMessage()">ارسال پیام</button>
+        </div>
+        
+        <div class="col-md-4">
+          <h6>📋 تاریخچه پیام‌های ارسالی</h6>
+          <div style="max-height: 300px; overflow-y: auto;">
+            <div class="border p-2 mb-2">
+              <small class="text-muted">۱۴۰۳/۱۲/۰۵</small>
+              <div class="fw-bold">تغییرات جدید در پلتفرم</div>
+              <small>ارسال به: همه کاربران</small>
+            </div>
+            <div class="border p-2 mb-2">
+              <small class="text-muted">۱۴۰۳/۱۲/۰۴</small>
+              <div class="fw-bold">تمدید بیمه مسئولیت</div>
+              <small>ارسال به: پیمانکاران</small>
+            </div>
+            <div class="border p-2 mb-2">
+              <small class="text-muted">۱۴۰۳/۱۲/۰۳</small>
+              <div class="fw-bold">پروژه‌های جدید</div>
+              <small>ارسال به: کارفرمایان</small>
+            </div>
           </div>
         </div>
       </div>
-      <button class="btn btn-peymanyar" onclick="adminSendMessage()">ارسال پیام</button>
     </div>
   </div>
 
-  <!-- تب 3: جستجوی جامع -->
+  <!-- تب 3: جستجوی جامع (کاربران، پروژه‌ها، پیام‌ها با فیلترهای پیشرفته) -->
   <div class="tab-pane fade" id="tab3" role="tabpanel">
     <div class="card-peymanyar">
-      <div class="row">
+      <h5>🔍 جستجوی جامع</h5>
+      
+      <div class="row mb-3">
         <div class="col-md-8">
           <input type="text" class="form-control" id="globalSearch" placeholder="جستجو در کاربران، پروژه‌ها، پیام‌ها...">
         </div>
@@ -1911,68 +1971,154 @@ body { background-color: #121212; color: #e0e0e0; }
           </select>
         </div>
       </div>
-      <button class="btn btn-peymanyar mt-3 w-100" onclick="adminGlobalSearch()">جستجو</button>
-      <div id="searchResults" class="mt-4"></div>
+      
+      <div class="row mb-3">
+        <div class="col-md-3">
+          <label class="form-label">از تاریخ</label>
+          <input type="date" class="form-control" id="searchDateFrom">
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">تا تاریخ</label>
+          <input type="date" class="form-control" id="searchDateTo">
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">وضعیت</label>
+          <select class="form-select" id="searchStatus">
+            <option value="all">همه</option>
+            <option value="active">فعال</option>
+            <option value="inactive">غیرفعال</option>
+          </select>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">نوع</label>
+          <select class="form-select" id="searchUserType">
+            <option value="all">همه</option>
+            <option value="employer">کارفرما</option>
+            <option value="contractor">پیمانکار</option>
+          </select>
+        </div>
+      </div>
+      
+      <button class="btn btn-peymanyar w-100 mb-4" onclick="adminGlobalSearch()">جستجو</button>
+      
+      <div id="searchResults" class="mt-4">
+        <!-- نتایج جستجو -->
+      </div>
     </div>
   </div>
 
-  <!-- تب 4: آمار سیستم -->
+  <!-- تب 4: آمار سیستم (نمودار رشد کاربران، آمار پروژه‌ها، ثبت‌نام، تخصص‌ها، آدرس‌ها) -->
   <div class="tab-pane fade" id="tab4" role="tabpanel">
     <div class="card-peymanyar">
       <div class="row">
         <div class="col-md-6">
-          <h5>آمار کاربران</h5>
-          <canvas id="usersChart" style="height: 200px; width: 100%;"></canvas>
-          <table class="table mt-3">
+          <h5>📈 رشد کاربران</h5>
+          <div style="height: 150px; background: #f0f0f0; display: flex; align-items: flex-end; padding: 5px; gap: 5px;">
+            <div style="flex:1; height: 40%; background: var(--primary-color);"></div>
+            <div style="flex:1; height: 55%; background: var(--primary-color);"></div>
+            <div style="flex:1; height: 70%; background: var(--primary-color);"></div>
+            <div style="flex:1; height: 65%; background: var(--primary-color);"></div>
+            <div style="flex:1; height: 85%; background: var(--primary-color);"></div>
+            <div style="flex:1; height: 100%; background: var(--primary-color);"></div>
+          </div>
+          <table class="table table-sm mt-3">
             <tr><td>کل کاربران:</td><td>۲,۱۵۴</td></tr>
             <tr><td>کارفرمایان:</td><td>۸۹۲</td></tr>
             <tr><td>پیمانکاران:</td><td>۱,۲۶۲</td></tr>
-            <tr><td>مدیران:</td><td>۸</td></tr>
+            <tr><td>ثبت‌نام امروز:</td><td>۱۲</td></tr>
+            <tr><td>ثبت‌نام این ماه:</td><td>۲۳۴</td></tr>
           </table>
         </div>
         <div class="col-md-6">
-          <h5>آمار پروژه‌ها</h5>
-          <canvas id="projectsChart" style="height: 200px; width: 100%;"></canvas>
-          <table class="table mt-3">
+          <h5>📊 آمار پروژه‌ها</h5>
+          <table class="table table-sm">
             <tr><td>کل پروژه‌ها:</td><td>۵۴۰</td></tr>
             <tr><td>در حال انجام:</td><td>۲۳۰</td></tr>
             <tr><td>تکمیل شده:</td><td>۱۸۵</td></tr>
             <tr><td>منتظر تایید:</td><td>۱۲۵</td></tr>
           </table>
+          
+          <h5 class="mt-4">🔧 پرکاربردترین تخصص‌ها</h5>
+          <div class="progress mb-2" style="height: 20px;"><div class="progress-bar" style="width: 35%">ساخت اسکلت فلزی (۳۵٪)</div></div>
+          <div class="progress mb-2" style="height: 20px;"><div class="progress-bar" style="width: 28%">اجرای بتن (۲۸٪)</div></div>
+          <div class="progress mb-2" style="height: 20px;"><div class="progress-bar" style="width: 22%">جوشکاری (۲۲٪)</div></div>
+          <div class="progress mb-2" style="height: 20px;"><div class="progress-bar" style="width: 15%">سایر (۱۵٪)</div></div>
+          
+          <h5 class="mt-4">📍 پرکاربردترین آدرس‌ها</h5>
+          <ul>
+            <li>تهران (۴۵٪)</li>
+            <li>اصفهان (۱۸٪)</li>
+            <li>البرز (۱۲٪)</li>
+            <li>خراسان رضوی (۱۰٪)</li>
+          </ul>
         </div>
       </div>
       <button class="btn btn-peymanyar mt-3" onclick="adminRefreshStats()">بروزرسانی آمار</button>
     </div>
   </div>
 
-  <!-- تب 5: تنظیمات سیستم -->
+  <!-- تب 5: تنظیمات سیستم (عمومی، امنیتی، ثبت‌نام، آپلود، ایمیل، اعلان‌ها) -->
   <div class="tab-pane fade" id="tab5" role="tabpanel">
     <div class="card-peymanyar">
-      <h5>تنظیمات عمومی</h5>
-      <div class="mb-3 form-check">
-        <input type="checkbox" class="form-check-input" id="maintenanceMode" checked>
-        <label class="form-check-label">حالت تعمیرات</label>
+      <h5>⚙️ تنظیمات عمومی</h5>
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <label class="form-label">نام سایت</label>
+          <input type="text" class="form-control" id="siteName" value="پیمان‌یار">
+        </div>
+        <div class="col-md-6 mb-3">
+          <label class="form-label">لوگو (آدرس)</label>
+          <input type="text" class="form-control" id="siteLogo" value="/logo.png">
+        </div>
+        <div class="col-12 mb-3">
+          <label class="form-label">توضیحات سایت</label>
+          <textarea class="form-control" id="siteDescription" rows="2">پلتفرم هوشمند پیمانکاران ساختمانی</textarea>
+        </div>
       </div>
+      
+      <h5 class="mt-4">🔒 تنظیمات امنیتی</h5>
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <label class="form-label">مدت نشست (دقیقه)</label>
+          <input type="number" class="form-control" id="sessionTimeout" value="30">
+        </div>
+        <div class="col-md-6 mb-3">
+          <label class="form-label">قفل خودکار پس از (دقیقه)</label>
+          <input type="number" class="form-control" id="autoLock" value="15">
+        </div>
+      </div>
+      
+      <h5 class="mt-4">📝 تنظیمات ثبت‌نام</h5>
       <div class="mb-3 form-check">
         <input type="checkbox" class="form-check-input" id="allowRegistrations" checked>
-        <label class="form-check-label">اجازه ثبت‌نام کاربران جدید</label>
+        <label class="form-check-label">ثبت‌نام کاربران جدید فعال باشد</label>
       </div>
       <div class="mb-3">
         <label class="form-label">حداکثر حجم آپلود (مگابایت)</label>
         <input type="number" class="form-control" id="maxUploadSize" value="50">
       </div>
       
-      <h5 class="mt-4">تنظیمات امنیتی</h5>
-      <div class="mb-3 form-check">
-        <input type="checkbox" class="form-check-input" id="twoFactorAuth">
-        <label class="form-check-label">فعال‌سازی احراز هویت دو مرحله‌ای برای مدیران</label>
+      <h5 class="mt-4">📧 تنظیمات ایمیل</h5>
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <label class="form-label">سرور SMTP</label>
+          <input type="text" class="form-control" id="smtpServer" value="smtp.gmail.com">
+        </div>
+        <div class="col-md-6 mb-3">
+          <label class="form-label">پورت</label>
+          <input type="text" class="form-control" id="smtpPort" value="587">
+        </div>
+        <div class="col-md-6 mb-3">
+          <label class="form-label">نام کاربری</label>
+          <input type="text" class="form-control" id="smtpUser" value="noreply@peymanyar.com">
+        </div>
+        <div class="col-md-6 mb-3">
+          <label class="form-label">رمز عبور</label>
+          <input type="password" class="form-control" id="smtpPass" value="****">
+        </div>
       </div>
-      <div class="mb-3">
-        <label class="form-label">مدت زمان نشست (دقیقه)</label>
-        <input type="number" class="form-control" id="sessionTimeout" value="30">
-      </div>
-
-      <h5 class="mt-4">تنظیمات اطلاع‌رسانی</h5>
+      
+      <h5 class="mt-4">🔔 تنظیمات اعلان‌ها</h5>
       <div class="mb-3 form-check">
         <input type="checkbox" class="form-check-input" id="emailNotifications" checked>
         <label class="form-check-label">ارسال ایمیل برای ثبت‌نام جدید</label>
@@ -1981,25 +2127,35 @@ body { background-color: #121212; color: #e0e0e0; }
         <input type="checkbox" class="form-check-input" id="smsNotifications">
         <label class="form-check-label">ارسال پیامک برای رویدادهای مهم</label>
       </div>
-
+      
       <button class="btn btn-peymanyar mt-3" onclick="adminSaveSettings()">ذخیره تنظیمات</button>
     </div>
   </div>
 
-  <!-- تب 6: مدیریت کاربران -->
+  <!-- تب 6: مدیریت کاربران (لیست با pagination، فیلتر، ویرایش، تغییر نقش، فعال/غیرفعال) -->
   <div class="tab-pane fade" id="tab6" role="tabpanel">
     <div class="card-peymanyar">
       <div class="row mb-3">
-        <div class="col-md-8">
+        <div class="col-md-4">
           <input type="text" class="form-control" id="userSearch" placeholder="جستجوی کاربران...">
         </div>
-        <div class="col-md-4">
+        <div class="col-md-3">
           <select class="form-select" id="userTypeFilter">
             <option value="all">همه کاربران</option>
             <option value="employer">کارفرمایان</option>
             <option value="contractor">پیمانکاران</option>
             <option value="admin">مدیران</option>
           </select>
+        </div>
+        <div class="col-md-3">
+          <select class="form-select" id="userStatusFilter">
+            <option value="all">همه وضعیت‌ها</option>
+            <option value="active">فعال</option>
+            <option value="inactive">غیرفعال</option>
+          </select>
+        </div>
+        <div class="col-md-2">
+          <button class="btn btn-peymanyar w-100" onclick="adminFilterUsers()">جستجو</button>
         </div>
       </div>
       
@@ -2023,8 +2179,10 @@ body { background-color: #121212; color: #e0e0e0; }
               <td><span class="badge bg-success">فعال</span></td>
               <td>۱۴۰۲/۱۲/۰۱</td>
               <td>
-                <button class="btn btn-sm btn-warning" onclick="adminEditUser(1)">ویرایش</button>
-                <button class="btn btn-sm btn-danger" onclick="adminToggleUser(1)">غیرفعال</button>
+                <button class="btn btn-sm btn-info" onclick="adminViewUserDetails(1)">👁️</button>
+                <button class="btn btn-sm btn-warning" onclick="adminEditUser(1)">✏️</button>
+                <button class="btn btn-sm btn-danger" onclick="adminToggleUser(1)">🔒</button>
+                <button class="btn btn-sm btn-secondary" onclick="adminMakeAdmin(1)">👑</button>
               </td>
             </tr>
             <tr>
@@ -2034,8 +2192,10 @@ body { background-color: #121212; color: #e0e0e0; }
               <td><span class="badge bg-success">فعال</span></td>
               <td>۱۴۰۲/۱۱/۱۵</td>
               <td>
-                <button class="btn btn-sm btn-warning" onclick="adminEditUser(2)">ویرایش</button>
-                <button class="btn btn-sm btn-danger" onclick="adminToggleUser(2)">غیرفعال</button>
+                <button class="btn btn-sm btn-info" onclick="adminViewUserDetails(2)">👁️</button>
+                <button class="btn btn-sm btn-warning" onclick="adminEditUser(2)">✏️</button>
+                <button class="btn btn-sm btn-danger" onclick="adminToggleUser(2)">🔒</button>
+                <button class="btn btn-sm btn-secondary" onclick="adminMakeAdmin(2)">👑</button>
               </td>
             </tr>
             <tr>
@@ -2045,87 +2205,189 @@ body { background-color: #121212; color: #e0e0e0; }
               <td><span class="badge bg-success">فعال</span></td>
               <td>۱۴۰۲/۰۱/۰۱</td>
               <td>
-                <button class="btn btn-sm btn-warning" onclick="adminEditUser(3)">ویرایش</button>
-                <button class="btn btn-sm btn-danger" onclick="adminToggleUser(3)">غیرفعال</button>
+                <button class="btn btn-sm btn-info" onclick="adminViewUserDetails(3)">👁️</button>
+                <button class="btn btn-sm btn-warning" onclick="adminEditUser(3)">✏️</button>
+                <button class="btn btn-sm btn-danger" onclick="adminToggleUser(3)">🔒</button>
+                <button class="btn btn-sm btn-secondary" onclick="adminMakeAdmin(3)">👑</button>
               </td>
             </tr>
           </tbody>
         </table>
       </div>
-      <button class="btn btn-peymanyar mt-3" onclick="adminLoadMoreUsers()">بارگذاری بیشتر</button>
+      
+      <div class="d-flex justify-content-between align-items-center">
+        <span>نمایش ۱ تا ۳ از ۱۵ نتیجه</span>
+        <nav>
+          <ul class="pagination">
+            <li class="page-item"><a class="page-link" href="#">قبلی</a></li>
+            <li class="page-item active"><a class="page-link" href="#">۱</a></li>
+            <li class="page-item"><a class="page-link" href="#">۲</a></li>
+            <li class="page-item"><a class="page-link" href="#">۳</a></li>
+            <li class="page-item"><a class="page-link" href="#">بعدی</a></li>
+          </ul>
+        </nav>
+      </div>
+      
+      <!-- مودال جزئیات کاربر -->
+      <div class="modal fade" id="userDetailsModal" tabindex="-1">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">جزئیات کاربر</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="userDetailsContent">
+              <!-- اطلاعات کاربر -->
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 
-  <!-- تب 7: پاکسازی سیستم -->
+  <!-- تب 7: پاکسازی پیشرفته (کش، لاگ، پیام، فایل موقت، بهینه‌سازی دیتابیس) -->
   <div class="tab-pane fade" id="tab7" role="tabpanel">
     <div class="card-peymanyar">
-      <h5>پاکسازی کش</h5>
-      <p>کش سیستم را پاکسازی کنید. این عملیات باعث افزایش سرعت سیستم می‌شود.</p>
-      <button class="btn btn-warning mb-4" onclick="adminClearCache()">پاکسازی کش</button>
-
-      <h5>پاکسازی لاگ‌های قدیمی</h5>
-      <p>لاگ‌های قدیمی‌تر از ۳۰ روز را پاک کنید.</p>
-      <button class="btn btn-warning mb-4" onclick="adminClearOldLogs()">پاکسازی لاگ‌ها</button>
-
-      <h5>بهینه‌سازی دیتابیس</h5>
-      <p>دیتابیس را بهینه‌سازی کرده و فضای خالی را بازیابی کنید.</p>
-      <button class="btn btn-warning mb-4" onclick="adminOptimizeDB()">بهینه‌سازی دیتابیس</button>
-
-      <h5 class="text-danger">پاکسازی کامل</h5>
-      <p class="text-danger">تمام داده‌های موقت و غیرضروری را پاک کنید. این عملیات قابل بازگشت نیست!</p>
-      <button class="btn btn-danger" onclick="adminFullCleanup()">پاکسازی کامل</button>
+      <h5>🧹 پاکسازی پیشرفته</h5>
+      
+      <div class="row">
+        <div class="col-md-6">
+          <div class="card mb-3">
+            <div class="card-body">
+              <h6>پاکسازی کش</h6>
+              <p>کش سیستم را پاکسازی کنید. این عملیات باعث افزایش سرعت سیستم می‌شود.</p>
+              <button class="btn btn-warning" onclick="adminClearCache()">پاکسازی کش</button>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="card mb-3">
+            <div class="card-body">
+              <h6>پاکسازی لاگ‌های قدیمی (> ۳۰ روز)</h6>
+              <p>لاگ‌های قدیمی‌تر از ۳۰ روز را پاک کنید.</p>
+              <button class="btn btn-warning" onclick="adminClearOldLogs()">پاکسازی لاگ‌ها</button>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="card mb-3">
+            <div class="card-body">
+              <h6>پاکسازی پیام‌های قدیمی</h6>
+              <p>پیام‌های قدیمی‌تر از ۶ ماه را پاک کنید.</p>
+              <button class="btn btn-warning" onclick="adminClearOldMessages()">پاکسازی پیام‌ها</button>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="card mb-3">
+            <div class="card-body">
+              <h6>پاکسازی فایل‌های موقت</h6>
+              <p>فایل‌های موقت و آپلودهای ناتمام را پاک کنید.</p>
+              <button class="btn btn-warning" onclick="adminClearTempFiles()">پاکسازی فایل‌ها</button>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="card mb-3">
+            <div class="card-body">
+              <h6>بهینه‌سازی دیتابیس</h6>
+              <p>دیتابیس را بهینه‌سازی کرده و فضای خالی را بازیابی کنید.</p>
+              <button class="btn btn-warning" onclick="adminOptimizeDB()">بهینه‌سازی دیتابیس</button>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="card mb-3">
+            <div class="card-body">
+              <h6 class="text-danger">پاکسازی کامل</h6>
+              <p class="text-danger">تمام داده‌های موقت و غیرضروری را پاک کنید.</p>
+              <button class="btn btn-danger" onclick="adminFullCleanup()">پاکسازی کامل</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="mt-4" id="cleanupReport" style="display: none;">
+        <div class="alert alert-success">
+          <h6>📊 گزارش پاکسازی</h6>
+          <div id="cleanupReportContent"></div>
+        </div>
+      </div>
     </div>
   </div>
 
-  <!-- تب 8: لاگ و گزارش‌ها -->
+  <!-- تب 8: لاگ و گزارش‌ها (ورود کاربران، فعالیت مدیران، خطاها، تغییرات، فیلتر) -->
   <div class="tab-pane fade" id="tab8" role="tabpanel">
     <div class="card-peymanyar">
-      <div class="mb-3">
-        <select class="form-select" id="logType">
-          <option value="all">همه لاگ‌ها</option>
-          <option value="info">اطلاعیه</option>
-          <option value="warning">هشدار</option>
-          <option value="error">خطا</option>
-          <option value="auth">ورود/خروج</option>
-        </select>
+      <div class="row mb-3">
+        <div class="col-md-4">
+          <select class="form-select" id="logType">
+            <option value="all">همه لاگ‌ها</option>
+            <option value="login">ورود کاربران</option>
+            <option value="admin">فعالیت مدیران</option>
+            <option value="error">خطاهای سیستم</option>
+            <option value="change">تغییرات مهم</option>
+          </select>
+        </div>
+        <div class="col-md-3">
+          <input type="date" class="form-control" id="logDateFrom" placeholder="از تاریخ">
+        </div>
+        <div class="col-md-3">
+          <input type="date" class="form-control" id="logDateTo" placeholder="تا تاریخ">
+        </div>
+        <div class="col-md-2">
+          <button class="btn btn-peymanyar w-100" onclick="adminFilterLogs()">فیلتر</button>
+        </div>
       </div>
+      
       <div class="log-container" style="max-height: 400px; overflow-y: auto;">
         <div class="log-entry mb-2 p-2 border-bottom">
-          <span class="badge bg-info">INFO</span>
-          <span class="ms-2">۱۴۰۳/۱۲/۰۶ ۱۴:۳۰:۲۵ - سیستم راه‌اندازی شد</span>
+          <span class="badge bg-info">ورود کاربر</span>
+          <span class="ms-2">۱۴۰۳/۱۲/۰۶ ۱۴:۳۰:۲۵ - علی محمدی (کارفرما) وارد شد</span>
         </div>
         <div class="log-entry mb-2 p-2 border-bottom">
-          <span class="badge bg-success">USER</span>
-          <span class="ms-2">۱۴۰۳/۱۲/۰۶ ۱۴:۲۵:۱۰ - کاربر جدید ثبت‌نام کرد (کارفرما)</span>
+          <span class="badge bg-success">فعالیت مدیر</span>
+          <span class="ms-2">۱۴۰۳/۱۲/۰۶ ۱۴:۲۵:۱۰ - مدیر تنظیمات را تغییر داد</span>
         </div>
         <div class="log-entry mb-2 p-2 border-bottom">
-          <span class="badge bg-warning">WARNING</span>
-          <span class="ms-2">۱۴۰۳/۱۲/۰۶ ۱۳:۱۵:۳۰ - تلاش ناموفق برای ورود (۳ بار)</span>
+          <span class="badge bg-warning">خطا</span>
+          <span class="ms-2">۱۴۰۳/۱۲/۰۶ ۱۳:۱۵:۳۰ - خطا در اتصال به دیتابیس</span>
         </div>
         <div class="log-entry mb-2 p-2 border-bottom">
-          <span class="badge bg-danger">ERROR</span>
-          <span class="ms-2">۱۴۰۳/۱۲/۰۶ ۱۲:۰۵:۴۵ - خطا در اتصال به دیتابیس</span>
+          <span class="badge bg-danger">تغییر مهم</span>
+          <span class="ms-2">۱۴۰۳/۱۲/۰۶ ۱۲:۰۵:۴۵ - کاربر احمد رضایی به مدیر ارتقا یافت</span>
         </div>
         <div class="log-entry mb-2 p-2 border-bottom">
-          <span class="badge bg-success">USER</span>
-          <span class="ms-2">۱۴۰۳/۱۲/۰۶ ۱۱:۲۰:۱۵ - کاربر وارد سیستم شد (مدیر)</span>
+          <span class="badge bg-info">ورود کاربر</span>
+          <span class="ms-2">۱۴۰۳/۱۲/۰۶ ۱۱:۲۰:۱۵ - مدیر سیستم وارد شد</span>
         </div>
         <div class="log-entry mb-2 p-2 border-bottom">
-          <span class="badge bg-info">INFO</span>
-          <span class="ms-2">۱۴۰۳/۱۲/۰۶ ۱۰:۰۰:۰۰ - پشتیبان‌گیری روزانه انجام شد</span>
+          <span class="badge bg-success">فعالیت مدیر</span>
+          <span class="ms-2">۱۴۰۳/۱۲/۰۶ ۱۰:۰۰:۰۰ - پروژه جدید تایید شد</span>
         </div>
         <div class="log-entry mb-2 p-2 border-bottom">
-          <span class="badge bg-primary">ADMIN</span>
-          <span class="ms-2">۱۴۰۳/۱۲/۰۵ ۱۶:۴۰:۲۰ - مدیر تنظیمات سیستم را تغییر داد</span>
+          <span class="badge bg-success">فعالیت مدیر</span>
+          <span class="ms-2">۱۴۰۳/۱۲/۰۵ ۱۶:۴۰:۲۰ - کاربر جدید غیرفعال شد</span>
         </div>
         <div class="log-entry mb-2 p-2 border-bottom">
-          <span class="badge bg-warning">WARNING</span>
-          <span class="ms-2">۱۴۰۳/۱۲/۰۵ ۱۵:۱۰:۳۵ - فضای ذخیره‌سازی ۸۵٪ پر شده</span>
+          <span class="badge bg-warning">خطا</span>
+          <span class="ms-2">۱۴۰۳/۱۲/۰۵ ۱۵:۱۰:۳۵ - تلاش ناموفق برای ورود (IP: 192.168.1.1)</span>
         </div>
       </div>
-      <button class="btn btn-peymanyar mt-3" onclick="adminExportLogs()">خروجی لاگ‌ها</button>
+      
+      <div class="mt-3">
+        <button class="btn btn-peymanyar" onclick="adminExportLogs()">خروجی لاگ‌ها</button>
+        <button class="btn btn-outline-secondary" onclick="adminRefreshLogs()">بروزرسانی</button>
+      </div>
     </div>
   </div>
+</div>
+
+<!-- بخش نمایش نتایج/پیام‌ها -->
+<div id="adminMessagesResult" class="mt-4"></div>
+<div id="adminMessagesLoading" class="messages-loading">
+  <div class="messages-spinner"></div>
+  <p>در حال پردازش...</p>
 </div>
 </div>
 </div>
@@ -2713,7 +2975,7 @@ body { background-color: #121212; color: #e0e0e0; }
 <div class="col-6 col-md-4">
 <div class="form-check">
 <input class="form-check-input" type="checkbox" id="projectRenovation" name="projectType">
-<label class="form-check-label" for="projectRenovation">نوسازی</label>
+ <label class="form-check-label" for="projectRenovation">نوسازی</label>
 </div>
 </div>
 <div class="col-6 col-md-4">
@@ -5999,134 +6261,30 @@ loadAdminStats() {
   }, 100);
 }
 
-adminAnalyzeMessages() {
-  this.showAdminLoading(true);
-  setTimeout(() => {
-    const result = '<strong>📊 تحلیل پیشرفته پیام‌ها</strong><br><br><div class="row"><div class="col-md-6"><h6>📈 آمار کلی:</h6>• کل پیام‌ها: ۱۲,۸۴۵<br>• پیام‌های امروز: ۴۲۸<br>• کاربران فعال: ۸۹<br>• میانگین پاسخگویی: ۲.۴ دقیقه<br></div><div class="col-md-6"><h6>📊 تحلیل احساسات:</h6>• مثبت: ۸۵٪<br>• خنثی: ۱۲٪<br>• منفی: ۳٪<br>• موضوعات داغ: پروژه، قرارداد، پرداخت<br></div></div>';
-    this.showAdminResult(result);
-    this.showAdminLoading(false);
-  }, 1000);
+adminLoadMessageChart(period) {
+  // این تابع برای بارگذاری نمودار استفاده می‌شود
+  this.showToast(`نمودار ${period} بارگذاری شد`, 'success');
 }
 
-adminSendBroadcast() {
-  const recipients = document.getElementById('messageRecipients')?.value || 'all';
-  const title = document.getElementById('messageTitle')?.value || 'بدون عنوان';
-  const body = document.getElementById('messageBody')?.value || '';
-  
-  if (!body) {
-    this.showToast('متن پیام را وارد کنید', 'error');
-    return;
-  }
-  
-  this.showAdminLoading(true);
-  setTimeout(() => {
-    const result = `<strong>✅ پیام با موفقیت ارسال شد</strong><br><br>📨 گیرندگان: ${recipients}<br>📌 عنوان: ${title}<br>📝 متن: ${body.substring(0, 50)}...`;
-    this.showAdminResult(result);
-    this.showAdminLoading(false);
-    
-    // پاکسازی فرم
-    document.getElementById('messageTitle').value = '';
-    document.getElementById('messageBody').value = '';
-  }, 1500);
+adminFilterMessagesByDate() {
+  const from = document.getElementById('dateFrom').value;
+  const to = document.getElementById('dateTo').value;
+  this.showToast(`فیلتر از ${from} تا ${to} اعمال شد`, 'success');
 }
 
-adminAdvancedSearch() {
-  const query = document.getElementById('globalSearch')?.value || '';
-  const type = document.getElementById('searchType')?.value || 'all';
-  
-  if (!query) {
-    this.showToast('کلمه جستجو را وارد کنید', 'error');
-    return;
-  }
-  
-  this.showAdminLoading(true);
-  setTimeout(() => {
-    const result = `<strong>🔍 نتایج جستجو برای "${query}"</strong><br><br>• کاربران: ۱۲ نتیجه<br>• پروژه‌ها: ۸ نتیجه<br>• پیام‌ها: ۳۴ نتیجه<br><br><em>جستجو در ${type} انجام شد</em>`;
-    this.showAdminResult(result);
-    this.showAdminLoading(false);
-  }, 1000);
+adminRefreshMessageStats() {
+  this.showToast('آمار پیام‌ها به‌روزرسانی شد', 'success');
 }
 
-adminSystemStats() {
-  this.showAdminLoading(true);
-  setTimeout(() => {
-    const result = '<strong>📈 آمار کامل سیستم</strong><br><br><div class="row"><div class="col-md-6"><h6>👥 آمار کاربران:</h6>• کاربران کل: ۲,۱۵۴<br>• کارفرمایان: ۸۹۲<br>• پیمانکاران: ۱,۲۶۲<br>• مدیران: ۸<br></div><div class="col-md-6"><h6>📊 آمار پروژه‌ها:</h6>• کل پروژه‌ها: ۵۴۰<br>• در حال انجام: ۲۳۰<br>• تکمیل شده: ۱۸۵<br>• منتظر تایید: ۱۲۵<br></div></div>';
-    this.showAdminResult(result);
-    this.showAdminLoading(false);
-  }, 1000);
-}
-
-adminSystemSettings() {
-  const maintenance = document.getElementById('maintenanceMode')?.checked;
-  const registrations = document.getElementById('allowRegistrations')?.checked;
-  const maxUpload = document.getElementById('maxUploadSize')?.value;
-  
-  this.showToast('تنظیمات ذخیره شد', 'success');
-  this.showAdminResult('<strong>⚙️ تنظیمات با موفقیت ذخیره شد</strong>');
-}
-
-adminUserManagement() {
-  this.showAdminLoading(true);
-  setTimeout(() => {
-    const result = '<strong>👥 مدیریت کاربران</strong><br><br><table class="table table-sm"><thead><tr><th>نام</th><th>ایمیل</th><th>نوع</th><th>وضعیت</th></tr></thead><tbody><tr><td>علی محمدی</td><td>ali@example.com</td><td>کارفرما</td><td><span class="badge bg-success">فعال</span></td></tr><tr><td>شرکت سازه‌گستر</td><td>info@sazegostar.com</td><td>پیمانکار</td><td><span class="badge bg-success">فعال</span></td></tr><tr><td>مدیر سیستم</td><td>admin@peymanyar.com</td><td>مدیر</td><td><span class="badge bg-success">فعال</span></td></tr></tbody></table>';
-    this.showAdminResult(result);
-    this.showAdminLoading(false);
-  }, 1000);
-}
-
-adminAdvancedCleanup() {
-  if (confirm('⚠️ آیا از پاکسازی پیشرفته اطمینان دارید؟')) {
-    this.showAdminLoading(true);
-    setTimeout(() => {
-      this.showAdminResult('<strong>✅ پاکسازی انجام شد</strong><br><br>• کش پاک شد: ۴۵۰ مگابایت<br>• لاگ‌های قدیمی حذف شد: ۱۲۰ مگابایت<br>• دیتابیس بهینه‌سازی شد');
-      this.showAdminLoading(false);
-    }, 2000);
-  }
-}
-
-adminViewLogs() {
-  this.showAdminLoading(true);
-  setTimeout(() => {
-    const now = new Date().toLocaleString('fa-IR');
-    const result = `<strong>📚 آخرین لاگ‌های سیستم</strong><br><br>
-    <div class="border p-2 mb-2">🔵 INFO - ${now} - سیستم راه‌اندازی شد</div>
-    <div class="border p-2 mb-2">🟢 USER - ${now} - کاربر جدید ثبت‌نام کرد</div>
-    <div class="border p-2 mb-2">🟡 WARNING - ${now} - تلاش ناموفق برای ورود</div>
-    <div class="border p-2 mb-2">🔴 ERROR - ${now} - خطا در اتصال به دیتابیس</div>`;
-    this.showAdminResult(result);
-    this.showAdminLoading(false);
-  }, 1000);
-}
-
-adminClearCache() {
-  this.showToast('کش پاکسازی شد', 'success');
-  this.showAdminResult('✅ کش با موفقیت پاکسازی شد');
-}
-
-adminClearOldLogs() {
-  this.showToast('لاگ‌های قدیمی پاک شدند', 'success');
-  this.showAdminResult('✅ لاگ‌های قدیمی پاکسازی شدند');
-}
-
-adminOptimizeDB() {
-  this.showToast('دیتابیس بهینه‌سازی شد', 'success');
-  this.showAdminResult('✅ دیتابیس با موفقیت بهینه‌سازی شد');
-}
-
-adminFullCleanup() {
-  if (confirm('⚠️ این عملیات قابل بازگشت نیست! ادامه می‌دهید؟')) {
-    this.showAdminLoading(true);
-    setTimeout(() => {
-      this.showAdminResult('✅ پاکسازی کامل انجام شد. ۲.۸ گیگابایت فضا آزاد شد.');
-      this.showAdminLoading(false);
-    }, 3000);
-  }
+toggleRecipientType() {
+  const val = document.getElementById('messageRecipients').value;
+  document.getElementById('specificUserField').style.display = val === 'specific' ? 'block' : 'none';
 }
 
 adminSendMessage() {
-  const recipients = document.getElementById('messageRecipients')?.value;
-  const title = document.getElementById('messageTitle')?.value;
-  const body = document.getElementById('messageBody')?.value;
+  const recipients = document.getElementById('messageRecipients').value;
+  const title = document.getElementById('messageTitle').value;
+  const body = document.getElementById('messageBody').value;
   
   if (!body) {
     this.showToast('متن پیام را وارد کنید', 'error');
@@ -6147,9 +6305,21 @@ adminGlobalSearch() {
     return;
   }
   
+  const type = document.getElementById('searchType')?.value;
+  const from = document.getElementById('searchDateFrom')?.value;
+  const to = document.getElementById('searchDateTo')?.value;
+  const status = document.getElementById('searchStatus')?.value;
+  const userType = document.getElementById('searchUserType')?.value;
+  
   this.showAdminLoading(true);
   setTimeout(() => {
-    this.showAdminResult(`🔍 نتایج جستجو برای "${query}":<br>• ۱۵ کاربر<br>• ۸ پروژه<br>• ۴۲ پیام`);
+    let result = `🔍 نتایج جستجو برای "${query}"<br>`;
+    result += `• نوع جستجو: ${type}<br>`;
+    result += `• فیلتر تاریخ: ${from || 'بدون محدودیت'} تا ${to || 'بدون محدودیت'}<br>`;
+    result += `• وضعیت: ${status}<br>`;
+    result += `• نوع کاربر: ${userType}<br><br>`;
+    result += `• ۱۵ کاربر<br>• ۸ پروژه<br>• ۴۲ پیام`;
+    this.showAdminResult(result);
     this.showAdminLoading(false);
   }, 1000);
 }
@@ -6163,16 +6333,34 @@ adminRefreshStats() {
 }
 
 adminSaveSettings() {
+  const siteName = document.getElementById('siteName')?.value;
+  const sessionTimeout = document.getElementById('sessionTimeout')?.value;
+  const maxUpload = document.getElementById('maxUploadSize')?.value;
+  
   this.showToast('تنظیمات با موفقیت ذخیره شد', 'success');
-  this.showAdminResult('⚙️ تنظیمات ذخیره شد');
+  this.showAdminResult(`⚙️ تنظیمات ذخیره شد (نام سایت: ${siteName}, زمان نشست: ${sessionTimeout} دقیقه)`);
 }
 
-adminLoadMoreUsers() {
-  this.showAdminLoading(true);
-  setTimeout(() => {
-    this.showAdminResult('👥 ۱۰ کاربر دیگر بارگذاری شدند');
-    this.showAdminLoading(false);
-  }, 1000);
+adminFilterUsers() {
+  const search = document.getElementById('userSearch')?.value;
+  const type = document.getElementById('userTypeFilter')?.value;
+  const status = document.getElementById('userStatusFilter')?.value;
+  
+  this.showToast(`فیلتر اعمال شد: ${search || 'همه'} - ${type} - ${status}`, 'success');
+}
+
+adminViewUserDetails(userId) {
+  const modal = new bootstrap.Modal(document.getElementById('userDetailsModal'));
+  document.getElementById('userDetailsContent').innerHTML = `
+    <p><strong>شناسه کاربر:</strong> ${userId}</p>
+    <p><strong>نام:</strong> علی محمدی</p>
+    <p><strong>ایمیل:</strong> ali@example.com</p>
+    <p><strong>نوع:</strong> کارفرما</p>
+    <p><strong>وضعیت:</strong> فعال</p>
+    <p><strong>تاریخ عضویت:</strong> ۱۴۰۲/۱۲/۰۱</p>
+    <p><strong>پروژه‌ها:</strong> ۳ پروژه</p>
+  `;
+  modal.show();
 }
 
 adminEditUser(userId) {
@@ -6183,8 +6371,86 @@ adminToggleUser(userId) {
   this.showToast(`وضعیت کاربر ${userId} تغییر کرد`, 'success');
 }
 
+adminMakeAdmin(userId) {
+  if (confirm(`آیا از تبدیل کاربر ${userId} به مدیر اطمینان دارید؟`)) {
+    this.showToast(`کاربر ${userId} به مدیر ارتقا یافت`, 'success');
+  }
+}
+
+adminLoadMoreUsers() {
+  this.showAdminLoading(true);
+  setTimeout(() => {
+    this.showAdminResult('👥 ۱۰ کاربر دیگر بارگذاری شدند');
+    this.showAdminLoading(false);
+  }, 1000);
+}
+
+adminClearCache() {
+  this.showToast('کش پاکسازی شد', 'success');
+  this.showCleanupReport('کش', '۱۵۰ مگابایت');
+}
+
+adminClearOldLogs() {
+  this.showToast('لاگ‌های قدیمی پاک شدند', 'success');
+  this.showCleanupReport('لاگ‌های قدیمی', '۱۲۰ مگابایت');
+}
+
+adminClearOldMessages() {
+  this.showToast('پیام‌های قدیمی پاک شدند', 'success');
+  this.showCleanupReport('پیام‌های قدیمی', '۸۰ مگابایت');
+}
+
+adminClearTempFiles() {
+  this.showToast('فایل‌های موقت پاک شدند', 'success');
+  this.showCleanupReport('فایل‌های موقت', '۲۰۰ مگابایت');
+}
+
+adminOptimizeDB() {
+  this.showToast('دیتابیس بهینه‌سازی شد', 'success');
+  this.showCleanupReport('بهینه‌سازی دیتابیس', '۵۰ مگابایت فضای خالی بازیابی شد');
+}
+
+adminFullCleanup() {
+  if (confirm('⚠️ این عملیات قابل بازگشت نیست! ادامه می‌دهید؟')) {
+    this.showAdminLoading(true);
+    setTimeout(() => {
+      const report = `
+        <strong>✅ پاکسازی کامل انجام شد</strong><br>
+        • کش: ۱۵۰ مگابایت<br>
+        • لاگ‌های قدیمی: ۱۲۰ مگابایت<br>
+        • پیام‌های قدیمی: ۸۰ مگابایت<br>
+        • فایل‌های موقت: ۲۰۰ مگابایت<br>
+        • بهینه‌سازی دیتابیس: ۵۰ مگابایت<br>
+        <strong>کل فضای آزاد شده: ۶۰۰ مگابایت</strong>
+      `;
+      document.getElementById('cleanupReportContent').innerHTML = report;
+      document.getElementById('cleanupReport').style.display = 'block';
+      this.showAdminResult(report);
+      this.showAdminLoading(false);
+    }, 3000);
+  }
+}
+
+showCleanupReport(item, space) {
+  const report = `✅ ${item} با موفقیت پاکسازی شد (${space} فضای آزاد شد)`;
+  document.getElementById('cleanupReportContent').innerHTML = report;
+  document.getElementById('cleanupReport').style.display = 'block';
+  this.showAdminResult(report);
+}
+
+adminFilterLogs() {
+  const type = document.getElementById('logType')?.value;
+  const from = document.getElementById('logDateFrom')?.value;
+  const to = document.getElementById('logDateTo')?.value;
+  this.showToast(`فیلتر لاگ‌ها اعمال شد: ${type} از ${from} تا ${to}`, 'success');
+}
+
 adminExportLogs() {
   this.showToast('خروجی لاگ‌ها با موفقیت دریافت شد', 'success');
+}
+
+adminRefreshLogs() {
+  this.showToast('لاگ‌ها به‌روزرسانی شدند', 'success');
 }
 
 showAdminLoading(show) {
@@ -6194,7 +6460,7 @@ showAdminLoading(show) {
 
 showAdminResult(content) {
   const result = document.getElementById('adminMessagesResult');
-  if (result) result.innerHTML = content;
+  if (result) result.innerHTML = `<div class="card-peymanyar mt-3">${content}</div>`;
 }
 
 async loadRealStats() {
@@ -6316,27 +6582,29 @@ window.saveProfileChanges = () => app?.saveProfileChanges();
 window.adminLogout = () => app?.adminLogout();
 window.showAdminLogin = () => app?.showAdminLogin();
 window.showAdminMessages = () => app?.showAdminMessages();
-window.adminAnalyzeMessages = () => app?.adminAnalyzeMessages();
-window.adminSendBroadcast = () => app?.adminSendBroadcast();
-window.adminAdvancedSearch = () => app?.adminAdvancedSearch();
-window.adminSystemStats = () => app?.adminSystemStats();
-window.adminSystemSettings = () => app?.adminSystemSettings();
-window.adminUserManagement = () => app?.adminUserManagement();
-window.adminAdvancedCleanup = () => app?.adminAdvancedCleanup();
-window.adminViewLogs = () => app?.adminViewLogs();
-window.executeCleanup = () => app?.executeCleanup?.();
+window.adminLoadMessageChart = (period) => app?.adminLoadMessageChart(period);
+window.adminFilterMessagesByDate = () => app?.adminFilterMessagesByDate();
+window.adminRefreshMessageStats = () => app?.adminRefreshMessageStats();
+window.toggleRecipientType = () => app?.toggleRecipientType();
 window.adminSendMessage = () => app?.adminSendMessage();
 window.adminGlobalSearch = () => app?.adminGlobalSearch();
 window.adminRefreshStats = () => app?.adminRefreshStats();
 window.adminSaveSettings = () => app?.adminSaveSettings();
-window.adminLoadMoreUsers = () => app?.adminLoadMoreUsers();
+window.adminFilterUsers = () => app?.adminFilterUsers();
+window.adminViewUserDetails = (id) => app?.adminViewUserDetails(id);
 window.adminEditUser = (id) => app?.adminEditUser(id);
 window.adminToggleUser = (id) => app?.adminToggleUser(id);
+window.adminMakeAdmin = (id) => app?.adminMakeAdmin(id);
+window.adminLoadMoreUsers = () => app?.adminLoadMoreUsers();
 window.adminClearCache = () => app?.adminClearCache();
 window.adminClearOldLogs = () => app?.adminClearOldLogs();
+window.adminClearOldMessages = () => app?.adminClearOldMessages();
+window.adminClearTempFiles = () => app?.adminClearTempFiles();
 window.adminOptimizeDB = () => app?.adminOptimizeDB();
 window.adminFullCleanup = () => app?.adminFullCleanup();
+window.adminFilterLogs = () => app?.adminFilterLogs();
 window.adminExportLogs = () => app?.adminExportLogs();
+window.adminRefreshLogs = () => app?.adminRefreshLogs();
 </script>
 <script>
 function getCurrentUser() {
