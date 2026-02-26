@@ -3656,17 +3656,19 @@ animateCounter(element, target) {
   const step = () => {
     if (count < target) {
       count += increment;
-      // اصلاح این خط - استفاده از toLocaleString('fa-IR')
-      element.textContent = Math.ceil(count).toLocaleString('fa-IR');
+      // تبدیل به عدد فارسی
+      const persianNumber = Math.ceil(count).toLocaleString('fa-IR');
+      element.textContent = persianNumber;
       requestAnimationFrame(step);
     } else {
-      // اصلاح این خط
-      element.textContent = target.toLocaleString('fa-IR') + (element.getAttribute('data-count') === '98' ? '٪' : '');
+      // تبدیل عدد نهایی به فارسی
+      const persianNumber = target.toLocaleString('fa-IR');
+      // اگه درصد باشه، علامت درصد رو هم اضافه کن
+      element.textContent = persianNumber + (element.getAttribute('data-count') === '98' ? '٪' : '');
     }
   };
   requestAnimationFrame(step);
 }
-
 showTermsModal() {
   const termsModal = new bootstrap.Modal(document.getElementById('termsModal'));
   termsModal.show();
@@ -6008,18 +6010,19 @@ this.showToast(`ارتباط با پیمانکار ${id} برقرار شد`, 'su
 }
 
 animateCounters() {
-const counters = document.querySelectorAll('.stat-value[data-count]');
-const observer = new IntersectionObserver((entries) => {
-entries.forEach(entry => {
-if (entry.isIntersecting) {
-const counter = entry.target;
-const target = +counter.getAttribute('data-count');
-this.animateCounter(counter, target);
-observer.unobserve(counter);
-}
-});
-}, { threshold: 0.5 });
-counters.forEach(counter => observer.observe(counter));
+  const counters = document.querySelectorAll('.stat-value[data-count]');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const counter = entry.target;
+        const target = +counter.getAttribute('data-count');
+        this.animateCounter(counter, target);
+        observer.unobserve(counter);
+      }
+    });
+  }, { threshold: 0.5 });
+  
+  counters.forEach(counter => observer.observe(counter));
 }
 
 animateCounter(element, target) {
