@@ -1161,7 +1161,6 @@ body { background-color: #121212; color: #e0e0e0; }
 </div>
 </div>
 </nav>
-
 <!-- صفحه اصلی -->
 <div id="home" class="page-section active" role="main" aria-label="صفحه اصلی">
 <section class="hero-section" aria-label="بخش معرفی" style="padding-top: 100px;">
@@ -1170,7 +1169,6 @@ body { background-color: #121212; color: #e0e0e0; }
 <div class="col-lg-6">
 <h1 class="hero-title mb-4 animate__animated animate__fadeInUp">
 پلتفرم هوشمند <span style="color: var(--primary-color);">پیمان‌یار</span>
-
 <br><span style="color: var(--accent-color);">اتصال کارفرمایان و پیمانکاران</span>
 </h1>
 <p class="hero-subtitle mb-4 animate__animated animate__fadeInUp animate__delay-1s">
@@ -1185,41 +1183,21 @@ body { background-color: #121212; color: #e0e0e0; }
 <i class="bi bi-tools me-2" aria-hidden="true"></i>ثبت‌نام پیمانکار
 </button>
 </div>
-<!-- این بخش رو جایگزین stats-wrapper قبلی کن -->
-<div class="stats-row animate__animated animate__fadeInUp animate__delay-1s">
-  <div class="stat-box">
-    <div class="stat-value" data-count="1250">۰</div>
-    <div class="stat-label">پیمانکار ثبت‌نامی</div>
-  </div>
-  <div class="stat-box">
-    <div class="stat-value" data-count="540">۰</div>
-    <div class="stat-label">پروژه تکمیل شده</div>
-  </div>
-  <div class="stat-box">
-    <div class="stat-value" data-count="320">۰</div>
-    <div class="stat-label">کارفرمای فعال</div>
-  </div>
-  <div class="stat-box">
-    <div class="stat-value" data-count="98">۰</div>
-    <div class="stat-label">رضایت‌مندی</div>
-  </div>
-</div>
-  </div>
 </div>
 <div class="col-lg-6">
 <div class="position-relative">
-<!-- این بخش رو جایگزین hero-image-slider کن (حدود خط 2300) -->
+<!-- اسلایدر -->
 <div class="hero-image-slider">
-  <img src="https://fycyznoykgxpaatjsawi.supabase.co/storage/v1/object/public/peymanyar-images/photo1.jpg" alt="تیم ساختمانی در حال همکاری" class="hero-slide active">
-  <img src="https://fycyznoykgxpaatjsawi.supabase.co/storage/v1/object/public/peymanyar-images/photo2.jpg" alt="پروژه ساختمانی در حال اجرا" class="hero-slide">
-  <img src="https://fycyznoykgxpaatjsawi.supabase.co/storage/v1/object/public/peymanyar-images/photo3.jpg" alt="معمار در حال طراحی پروژه" class="hero-slide">
-  <img src="https://fycyznoykgxpaatjsawi.supabase.co/storage/v1/object/public/peymanyar-images/photo4.jpg" alt="پروژه مدرن ساختمانی" class="hero-slide">
-  <div class="hero-slide-controls">
-    <div class="hero-slide-dot active" data-slide="0"></div>
-    <div class="hero-slide-dot" data-slide="1"></div>
-    <div class="hero-slide-dot" data-slide="2"></div>
-    <div class="hero-slide-dot" data-slide="3"></div>
-  </div>
+<img src="https://fycyznoykgxpaatjsawi.supabase.co/storage/v1/object/public/peymanyar-images/photo1.jpg" alt="تیم ساختمانی در حال همکاری" class="hero-slide active">
+<img src="https://fycyznoykgxpaatjsawi.supabase.co/storage/v1/object/public/peymanyar-images/photo2.jpg" alt="پروژه ساختمانی در حال اجرا" class="hero-slide">
+<img src="https://fycyznoykgxpaatjsawi.supabase.co/storage/v1/object/public/peymanyar-images/photo3.jpg" alt="معمار در حال طراحی پروژه" class="hero-slide">
+<img src="https://fycyznoykgxpaatjsawi.supabase.co/storage/v1/object/public/peymanyar-images/photo4.jpg" alt="پروژه مدرن ساختمانی" class="hero-slide">
+<div class="hero-slide-controls">
+<div class="hero-slide-dot active" data-slide="0"></div>
+<div class="hero-slide-dot" data-slide="1"></div>
+<div class="hero-slide-dot" data-slide="2"></div>
+<div class="hero-slide-dot" data-slide="3"></div>
+</div>
 </div>
 <div class="position-absolute top-0 end-0 mt-4 me-4">
 <button class="btn btn-peymanyar btn-sm" onclick="toggleAssistant()">
@@ -1229,8 +1207,29 @@ body { background-color: #121212; color: #e0e0e0; }
 </div>
 </div>
 </div>
+<!-- نوار آمار - داخل همون container ولی بعد از بسته شدن row -->
+<div class="stats-row animate__animated animate__fadeInUp animate__delay-1s">
+<div class="stat-box">
+<div class="stat-value" data-count="1250">۰</div>
+<div class="stat-label">پیمانکار ثبت‌نامی</div>
+</div>
+<div class="stat-box">
+<div class="stat-value" data-count="540">۰</div>
+<div class="stat-label">پروژه تکمیل شده</div>
+</div>
+<div class="stat-box">
+<div class="stat-value" data-count="320">۰</div>
+<div class="stat-label">کارفرمای فعال</div>
+</div>
+<div class="stat-box">
+<div class="stat-value" data-count="98">۰</div>
+<div class="stat-label">رضایت‌مندی</div>
+</div>
+</div>
 </div>
 </section>
+
+<!-- بخش "چرا پیمان‌یار" -->
 <section class="py-5" aria-label="ویژگی‌های کلیدی">
 <div class="container">
 <h2 class="section-title text-center mb-5">چرا پیمان‌یار؟</h2>
