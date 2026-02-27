@@ -5190,68 +5190,89 @@ async adminViewUserDetails(userId) {
     
     if (error) throw error;
     
-    const modalBody = document.getElementById('userDetailsContent');
-    const modalEl = document.getElementById('userDetailsModal');
-    
-    if (modalBody && modalEl) {
-      modalBody.innerHTML = `
-        <div class="p-3">
-          <p><strong>نام:</strong> ${user.full_name || user.company_name || '-'}</p>
-          <p><strong>ایمیل:</strong> ${user.email || '-'}</p>
-          <p><strong>نوع:</strong> ${user.user_type === 'employer' ? 'کارفرما' : 'پیمانکار'}</p>
-          <p><strong>نقش:</strong> ${user.role === 'admin' ? 'مدیر' : 'کاربر عادی'}</p>
-          <p><strong>تلفن:</strong> ${user.phone || '-'}</p>
-          <p><strong>آدرس:</strong> ${user.address || '-'}</p>
+    // ساخت مودال ساده
+    const modalHtml = `
+      <div class="modal fade" id="userDetailsModal" tabindex="-1">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">جزئیات کاربر</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+              <p><strong>نام:</strong> ${user.full_name || user.company_name || '-'}</p>
+              <p><strong>ایمیل:</strong> ${user.email || '-'}</p>
+              <p><strong>نوع:</strong> ${user.user_type === 'employer' ? 'کارفرما' : 'پیمانکار'}</p>
+              <p><strong>نقش:</strong> ${user.role === 'admin' ? 'مدیر' : 'کاربر عادی'}</p>
+              <p><strong>تلفن:</strong> ${user.phone || '-'}</p>
+              <p><strong>آدرس:</strong> ${user.address || '-'}</p>
+            </div>
+          </div>
         </div>
-      `;
-      
-      new bootstrap.Modal(modalEl).show();
-    }
+      </div>
+    `;
+    
+    // حذف مودال قبلی
+    const oldModal = document.getElementById('userDetailsModal');
+    if (oldModal) oldModal.remove();
+    
+    // اضافه کردن مودال جدید
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+    const modal = new bootstrap.Modal(document.getElementById('userDetailsModal'));
+    modal.show();
     
   } catch (error) {
+    console.error('❌ خطا:', error);
     this.showToast('خطا: ' + error.message, 'error');
   }
 }
-
 // ویرایش کاربر
 async adminEditUser(userId) {
   console.log('✏️ ویرایش کاربر:', userId);
-  this.showToast('ویرایش کاربر - به زودی', 'info');
-}
-
-// ارتقا/تنزل نقش کاربر - فقط یک نسخه
-async adminMakeAdmin(userId) {
-  console.log('👑 تغییر نقش کاربر:', userId);
   
   try {
-    // گرفتن اطلاعات کاربر
     const { data: user, error } = await this.supabase
       .from('profiles')
-      .select('full_name, company_name, role')
+      .select('full_name, company_name, email')
       .eq('user_id', userId)
       .single();
     
     if (error) throw error;
     
-    const userName = user.full_name || user.company_name || 'کاربر';
-    const newRole = user.role === 'admin' ? 'user' : 'admin';
-    const actionText = newRole === 'admin' ? 'ارتقا به مدیر' : 'تنزل به کاربر عادی';
+    const userName = user.full_name || user.company_name || user.email || 'کاربر';
     
-    if (!confirm(`آیا از ${actionText} "${userName}" اطمینان دارید؟`)) return;
+    // ساخت مودال ویرایش
+    const modalHtml = `
+      <div class="modal fade" id="editUserModal" tabindex="-1">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">ویرایش کاربر</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+              <p class="text-center">ویرایش کاربر "${userName}"</p>
+              <p class="text-muted text-center">این قابلیت به زودی اضافه می‌شود</p>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">بستن</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
     
-    // آپدیت مستقیم (بدون select و بدون log اضافی)
-    const { error: updateError } = await this.supabase
-      .from('profiles')
-      .update({ role: newRole })
-      .eq('user_id', userId);
+    // حذف مودال قبلی
+    const oldModal = document.getElementById('editUserModal');
+    if (oldModal) oldModal.remove();
     
-    if (updateError) throw updateError;
-    
-    this.showToast(`✅ نقش "${userName}" با موفقیت تغییر کرد`, 'success');
-    this.loadAdminUsers(); // بروزرسانی لیست
+    // اضافه کردن مودال جدید
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+    const modal = new bootstrap.Modal(document.getElementById('editUserModal'));
+    modal.show();
     
   } catch (error) {
-    console.error('خطا:', error);
+    console.error('❌ خطا:', error);
     this.showToast('خطا: ' + error.message, 'error');
   }
 }
@@ -5762,5 +5783,40 @@ window.showPage = window.showPage || window.fallbackShowPage;
 </script>
 
 <!-- سرویس ورکر برای PWA (آپشنال) -->
+<script>
+// تعمیر دائمی دکمه‌های مدیریت
+document.addEventListener('DOMContentLoaded', function() {
+  setTimeout(function() {
+    if (window.app) {
+      // کد تعمیر دکمه‌ها اینجا
+      document.querySelectorAll('button[onclick*="adminViewUserDetails"]').forEach(btn => {
+        const match = btn.getAttribute('onclick').match(/'([^']+)'/);
+        if (match) {
+          const userId = match[1];
+          btn.onclick = (e) => { e.preventDefault(); window.app.adminViewUserDetails(userId); };
+        }
+      });
+      
+      document.querySelectorAll('button[onclick*="adminEditUser"]').forEach(btn => {
+        const match = btn.getAttribute('onclick').match(/'([^']+)'/);
+        if (match) {
+          const userId = match[1];
+          btn.onclick = (e) => { e.preventDefault(); window.app.adminEditUser(userId); };
+        }
+      });
+      
+      document.querySelectorAll('button[onclick*="adminMakeAdmin"]').forEach(btn => {
+        const match = btn.getAttribute('onclick').match(/'([^']+)'/);
+        if (match) {
+          const userId = match[1];
+          btn.onclick = (e) => { e.preventDefault(); window.app.adminMakeAdmin(userId); };
+        }
+      });
+      
+      console.log('✅ دکمه‌های مدیریت تعمیر شدند');
+    }
+  }, 1000);
+});
+</script>
 </body>
 </html>
