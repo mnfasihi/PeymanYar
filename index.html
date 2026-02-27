@@ -5784,13 +5784,115 @@ window.showPage = window.showPage || window.fallbackShowPage;
 
 <!-- سرویس ورکر برای PWA (آپشنال) -->
 <script>
-// تعمیر دائمی دکمه‌های مدیریت - با استفاده از MutationObserver
+// ========== راه حل نهایی و قطعی ==========
 (function() {
-  console.log('🔄 نصب تعمیرکار دائمی دکمه‌ها...');
+  console.log('🔄 نصب سیستم مدیریت توابع...');
+  
+  // تابع کمکی برای تعریف توابع اگر وجود نداشته باشند
+  function ensureFunctions() {
+    if (!window.app) return false;
+    
+    let changed = false;
+    
+    // تعریف adminMakeAdmin اگر وجود نداشت
+    if (typeof window.app.adminMakeAdmin !== 'function') {
+      console.log('📝 تعریف تابع adminMakeAdmin...');
+      window.app.adminMakeAdmin = async function(userId) {
+        console.log('👑 تغییر نقش کاربر:', userId);
+        try {
+          const { data: user, error } = await this.supabase
+            .from('profiles')
+            .select('full_name, company_name, role')
+            .eq('user_id', userId)
+            .single();
+          
+          if (error) throw error;
+          
+          const userName = user.full_name || user.company_name || 'کاربر';
+          const newRole = user.role === 'admin' ? 'user' : 'admin';
+          const actionText = newRole === 'admin' ? 'ارتقا به مدیر' : 'تنزل به کاربر عادی';
+          
+          if (!confirm(`آیا از ${actionText} "${userName}" اطمینان دارید؟`)) return;
+          
+          const { error: updateError } = await this.supabase
+            .from('profiles')
+            .update({ role: newRole })
+            .eq('user_id', userId);
+          
+          if (updateError) throw updateError;
+          
+          this.showToast(`✅ نقش "${userName}" با موفقیت تغییر کرد`, 'success');
+          await this.loadAdminUsers();
+          
+        } catch (error) {
+          console.error('خطا:', error);
+          this.showToast('خطا: ' + error.message, 'error');
+        }
+      };
+      changed = true;
+    }
+    
+    // تعریف adminViewUserDetails اگر وجود نداشت
+    if (typeof window.app.adminViewUserDetails !== 'function') {
+      console.log('📝 تعریف تابع adminViewUserDetails...');
+      window.app.adminViewUserDetails = async function(userId) {
+        console.log('👁️ نمایش جزئیات کاربر:', userId);
+        try {
+          const { data: user, error } = await this.supabase
+            .from('profiles')
+            .select('*')
+            .eq('user_id', userId)
+            .single();
+          
+          if (error) throw error;
+          
+          const modalBody = document.getElementById('userDetailsContent');
+          const modalEl = document.getElementById('userDetailsModal');
+          
+          if (modalBody && modalEl) {
+            modalBody.innerHTML = `
+              <div class="p-3">
+                <p><strong>نام:</strong> ${user.full_name || user.company_name || '-'}</p>
+                <p><strong>ایمیل:</strong> ${user.email || '-'}</p>
+                <p><strong>نوع:</strong> ${user.user_type === 'employer' ? 'کارفرما' : 'پیمانکار'}</p>
+                <p><strong>نقش:</strong> ${user.role === 'admin' ? 'مدیر' : 'کاربر عادی'}</p>
+                <p><strong>تلفن:</strong> ${user.phone || '-'}</p>
+                <p><strong>آدرس:</strong> ${user.address || '-'}</p>
+              </div>
+            `;
+            
+            new bootstrap.Modal(modalEl).show();
+          }
+        } catch (error) {
+          this.showToast('خطا: ' + error.message, 'error');
+        }
+      };
+      changed = true;
+    }
+    
+    // تعریف adminEditUser اگر وجود نداشت
+    if (typeof window.app.adminEditUser !== 'function') {
+      console.log('📝 تعریف تابع adminEditUser...');
+      window.app.adminEditUser = async function(userId) {
+        console.log('✏️ ویرایش کاربر:', userId);
+        this.showToast('ویرایش کاربر - به زودی', 'info');
+      };
+      changed = true;
+    }
+    
+    if (changed) {
+      console.log('✅ توابع با موفقیت تعریف شدند');
+    }
+    
+    return true;
+  }
   
   // تابع تعمیر دکمه‌ها
   function fixButtons() {
     if (!window.app) return;
+    
+    // اول مطمئن شو توابع وجود دارن
+    ensureFunctions();
     
     // تعمیر دکمه‌های مشاهده جزئیات
     document.querySelectorAll('button[onclick*="adminViewUserDetails"]:not([data-fixed])').forEach(btn => {
@@ -5800,8 +5902,13 @@ window.showPage = window.showPage || window.fallbackShowPage;
         btn.setAttribute('data-fixed', 'true');
         btn.onclick = (e) => { 
           e.preventDefault(); 
-          window.app.adminViewUserDetails(userId); 
+          if (window.app && window.app.adminViewUserDetails) {
+            window.app.adminViewUserDetails(userId);
+          } else {
+            console.error('تابع adminViewUserDetails موجود نیست');
+          }
         };
+        console.log('🔧 دکمه چشم تعمیر شد:', userId);
       }
     });
     
@@ -5813,8 +5920,13 @@ window.showPage = window.showPage || window.fallbackShowPage;
         btn.setAttribute('data-fixed', 'true');
         btn.onclick = (e) => { 
           e.preventDefault(); 
-          window.app.adminEditUser(userId); 
+          if (window.app && window.app.adminEditUser) {
+            window.app.adminEditUser(userId);
+          } else {
+            console.error('تابع adminEditUser موجود نیست');
+          }
         };
+        console.log('🔧 دکمه مداد تعمیر شد:', userId);
       }
     });
     
@@ -5826,20 +5938,38 @@ window.showPage = window.showPage || window.fallbackShowPage;
         btn.setAttribute('data-fixed', 'true');
         btn.onclick = (e) => { 
           e.preventDefault(); 
-          window.app.adminMakeAdmin(userId); 
+          if (window.app && window.app.adminMakeAdmin) {
+            window.app.adminMakeAdmin(userId);
+          } else {
+            console.error('تابع adminMakeAdmin موجود نیست');
+          }
         };
+        console.log('🔧 دکمه تاج تعمیر شد:', userId);
       }
     });
   }
   
-  // اول دفعه اول تعمیر کن
-  setTimeout(fixButtons, 1000);
+  // اجرای اولیه
+  setTimeout(() => {
+    ensureFunctions();
+    fixButtons();
+  }, 1500);
   
-  // هر وقت محتوای صفحه تغییر کرد، دوباره تعمیر کن
+  // رصد تغییرات
   const observer = new MutationObserver(fixButtons);
   observer.observe(document.body, { childList: true, subtree: true });
   
-  console.log('✅ تعمیرکار دائمی نصب شد');
+  // همچنین هر بار که تابع loadAdminUsers صدا زده میشه، دکمه‌ها رو تعمیر کن
+  const originalLoadAdminUsers = window.app?.loadAdminUsers;
+  if (originalLoadAdminUsers) {
+    window.app.loadAdminUsers = async function() {
+      const result = await originalLoadAdminUsers.apply(this, arguments);
+      setTimeout(fixButtons, 200);
+      return result;
+    };
+  }
+  
+  console.log('✅ سیستم مدیریت توابع نصب شد');
 })();
 </script>
 </body>
