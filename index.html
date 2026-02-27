@@ -4803,40 +4803,40 @@ async checkAdminStatus() {
     await this.loadAdminPanel()
   }
 
- async loadAdminPanel() {
+async loadAdminPanel() {
   console.log('بارگذاری پنل ادمین...');
   
-  // اول آمار رو لود کن (مهم نیست المنت باشه یا نه)
-  await this.loadAdminStats();
-  
-  // بررسی وجود المنت‌ها قبل از صدا زدن توابع
-  const usersListEl = this.getElement('adminUsersList');
-  const projectsListEl = this.getElement('adminProjectsList');
-  const chartEl = this.getElement('adminChart');
-  
-  // فقط اگه المنت وجود داشت، تابع مربوطه رو صدا کن
-  if (usersListEl) {
-    console.log('✅ لود لیست کاربران');
-    this.loadAdminUsers();
-  } else {
-    console.warn('⚠️ المنت adminUsersList در صفحه وجود ندارد - شاید تب مربوطه باز نشده');
-  }
-  
-  if (projectsListEl) {
-    console.log('✅ لود لیست پروژه‌ها');
-    this.loadAdminProjects();
-  } else {
-    console.warn('⚠️ المنت adminProjectsList در صفحه وجود ندارد - شاید تب مربوطه باز نشده');
-  }
-  
-  if (chartEl) {
-    console.log('✅ لود نمودار');
-    this.initAdminChart();
-  } else {
-    console.warn('⚠️ المنت adminChart در صفحه وجود ندارد - شاید تب مربوطه باز نشده');
+  try {
+    // اول آمار رو لود کن
+    await this.loadAdminStats();
+    
+    // یه کم صبر کن تا تب‌ها لود بشن
+    setTimeout(() => {
+      // حالا المنت‌ها رو چک کن
+      const usersListEl = this.getElement('adminUsersList');
+      const projectsListEl = this.getElement('adminProjectsList');
+      const chartEl = this.getElement('adminChart');
+      
+      if (usersListEl) {
+        console.log('✅ لود لیست کاربران');
+        this.loadAdminUsers();
+      }
+      
+      if (projectsListEl) {
+        console.log('✅ لود لیست پروژه‌ها');
+        this.loadAdminProjects();
+      }
+      
+      if (chartEl) {
+        console.log('✅ لود نمودار');
+        this.initAdminChart();
+      }
+    }, 500); // نیم ثانیه صبر کن
+    
+  } catch (error) {
+    console.error('خطا در بارگذاری پنل ادمین:', error);
   }
 }
-
   async loadAdminStats() {
     try {
       const { count: totalMessages } = await this.supabase
@@ -4867,90 +4867,7 @@ async checkAdminStatus() {
     }
   }
 
-  async loadAdminUsers() {
-    try {
-      const { data, error } = await this.supabase
-        .from('profiles')
-        .select('*')
-        .limit(10)
-
-      if (error) throw error
-
-      const container = this.getElement('adminUsersList')
-      if (!container) return
-
-      let html = '<table class="table"><thead><tr><th>نام</th><th>ایمیل</th><th>نوع</th><th>عملیات</th></tr></thead><tbody>'
-      
-      data?.forEach(user => {
-        html += `<tr>
-          <td>${user.full_name || user.company_name || '-'}</td>
-          <td>${user.email || '-'}</td>
-          <td>${user.user_type === 'employer' ? 'کارفرما' : 'پیمانکار'}</td>
-          <td>
-            <button class="btn btn-sm btn-info" onclick="window.app.adminViewUserDetails('${user.user_id}')">مشاهده</button>
-          </td>
-        </tr>`
-      })
-
-      html += '</tbody></table>'
-      container.innerHTML = html
-      
-    } catch (error) {
-      console.error('خطا:', error)
-    }
-  }
-
-  async loadAdminProjects() {
-    try {
-      const { data, error } = await this.supabase
-        .from('projects')
-        .select('*')
-        .order('created_at', { ascending: false })
-        .limit(10)
-
-      if (error) throw error
-
-      const container = this.getElement('projectsAdminList')
-      if (!container) return
-
-      let html = '<table class="table"><thead><tr><th>عنوان</th><th>کارفرما</th><th>وضعیت</th><th>عملیات</th></tr></thead><tbody>'
-      
-      for (const project of data || []) {
-        const { data: employer } = await this.supabase
-          .from('profiles')
-          .select('full_name, company_name')
-          .eq('user_id', project.employer_id)
-          .single()
-
-        html += `<tr>
-          <td>${project.title}</td>
-          <td>${employer?.full_name || employer?.company_name || '-'}</td>
-          <td>${project.admin_approved ? 'تایید شده' : 'در انتظار'}</td>
-          <td>
-            ${!project.admin_approved ? 
-              `<button class="btn btn-sm btn-success" onclick="window.app.approveProject('${project.id}')">تایید</button>` : ''}
-            <button class="btn btn-sm btn-danger" onclick="window.app.deleteProject('${project.id}')">حذف</button>
-          </td>
-        </tr>`
-      }
-
-      html += '</tbody></table>'
-      container.innerHTML = html
-      
-      // به‌روزرسانی آمار پروژه‌ها
-      const total = data?.length || 0
-      const pending = data?.filter(p => !p.admin_approved).length || 0
-      const approved = data?.filter(p => p.admin_approved).length || 0
-      
-      this.getElement('statPending').textContent = pending
-      this.getElement('statApproved').textContent = approved
-      this.getElement('statTotal').textContent = total
-      
-    } catch (error) {
-      console.error('خطا:', error)
-    }
-  }
-
+ 
   async approveProject(id) {
     try {
       const { error } = await this.supabase
@@ -4968,7 +4885,6 @@ async checkAdminStatus() {
       this.showToast(error.message, 'error')
     }
   }
-
   async deleteProject(id) {
     if (!confirm('آیا از حذف این پروژه اطمینان دارید؟')) return
 
@@ -5494,27 +5410,39 @@ async adminMakeAdmin(userId) {
 }
 
 // به‌روزرسانی تابع loadAdminUsers برای استفاده از UUID درست
+// فقط این یکی رو نگه دار - اون یکی رو پاک کن
 async loadAdminUsers() {
+  console.log('بارگذاری لیست کاربران...');
+  
   try {
     const { data, error } = await this.supabase
       .from('profiles')
       .select('*')
-      .order('created_at', { ascending: false })
-      .limit(20);
+      .order('created_at', { ascending: false });
 
     if (error) throw error;
 
+    console.log('تعداد کاربران:', data?.length);
+
     const container = this.getElement('adminUsersList');
-    if (!container) return;
+    if (!container) {
+      console.warn('کانتینر adminUsersList وجود ندارد');
+      return;
+    }
+
+    if (!data || data.length === 0) {
+      container.innerHTML = '<div class="alert alert-info">هیچ کاربری یافت نشد</div>';
+      return;
+    }
 
     let html = '<table class="table table-hover"><thead><tr><th>نام</th><th>ایمیل</th><th>نوع</th><th>نقش</th><th>عملیات</th></tr></thead><tbody>';
     
-    data?.forEach(user => {
+    data.forEach(user => {
       const userType = user.user_type === 'employer' ? 'کارفرما' : 'پیمانکار';
       const role = user.role === 'admin' ? 'مدیر' : 'کاربر عادی';
       
       html += `<tr>
-        <td>${user.full_name || user.company_name || '-'}</td>
+        <td>${user.full_name || user.company_name || 'نامشخص'}</td>
         <td>${user.email || '-'}</td>
         <td><span class="badge bg-info">${userType}</span></td>
         <td><span class="badge ${user.role === 'admin' ? 'bg-danger' : 'bg-secondary'}">${role}</span></td>
@@ -5539,6 +5467,10 @@ async loadAdminUsers() {
     
   } catch (error) {
     console.error('خطا در بارگذاری کاربران:', error);
+    const container = this.getElement('adminUsersList');
+    if (container) {
+      container.innerHTML = '<div class="alert alert-danger">خطا در بارگذاری کاربران</div>';
+    }
   }
 }
   // ========== ابزارهای کمکی ==========
