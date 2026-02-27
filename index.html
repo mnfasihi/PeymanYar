@@ -3563,7 +3563,11 @@ class PeymanyarApp {
   }
   return el;
 }
-
+getElementValue(id) {
+  const el = this.getElement(id);
+  if (!el) return null;
+  return el.value;
+}
   // ========== مدیریت کاربر ==========
   async loadUser() {
     try {
@@ -3690,33 +3694,33 @@ async checkAdminStatus() {
   }
 
   async handleLogin(e) {
-    e.preventDefault()
-    
-    const email = this.getElementValue('loginEmail')
-    const password = this.getElementValue('loginPassword')
-    
-    if (!email || !password) {
-      this.showToast('ایمیل و رمز عبور را وارد کنید', 'error')
-      return
-    }
-
-    try {
-      const { data, error } = await this.supabase.auth.signInWithPassword({
-        email, password
-      })
-
-      if (error) throw error
-
-      await this.loadUser()
-      await this.checkAdminStatus()
-      this.showToast('ورود موفقیت‌آمیز بود', 'success')
-      this.showPage('home')
-      
-    } catch (error) {
-      this.showToast(error.message, 'error')
-    }
+  e.preventDefault()
+  
+  // حالا این خطا نباید بده چون تابع getElementValue رو اضافه کردیم
+  const email = this.getElementValue('loginEmail')
+  const password = this.getElementValue('loginPassword')
+  
+  if (!email || !password) {
+    this.showToast('ایمیل و رمز عبور را وارد کنید', 'error')
+    return
   }
 
+  try {
+    const { data, error } = await this.supabase.auth.signInWithPassword({
+      email, password
+    })
+
+    if (error) throw error
+
+    await this.loadUser()
+    await this.checkAdminStatus()
+    this.showToast('ورود موفقیت‌آمیز بود', 'success')
+    this.showPage('home')
+    
+  } catch (error) {
+    this.showToast(error.message, 'error')
+  }
+}
   async handleForgotPassword(e) {
     e.preventDefault()
     
