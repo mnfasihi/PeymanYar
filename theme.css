@@ -849,3 +849,17 @@ h1, h2, h3, h4, h5, h6 {
     background: var(--gray-700);
   }
 }
+.tab-pane {
+  min-height: 400px;
+}
+
+.card-peymanyar.h-100 {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.log-container {
+  flex: 1;
+  overflow-y: auto;
+}
