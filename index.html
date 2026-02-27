@@ -4947,13 +4947,6 @@ async loadAdminPanel() {
   adminToggleUser(id) {
     this.showToast(`تغییر وضعیت کاربر ${id}`, 'info')
   }
-
-  adminMakeAdmin(id) {
-    if (confirm(`آیا از ارتقای کاربر ${id} به مدیر اطمینان دارید؟`)) {
-      this.showToast(`کاربر ${id} به مدیر ارتقا یافت`, 'success')
-    }
-  }
-
   adminClearCache() {
     this.showToast('کش پاکسازی شد', 'success')
   }
@@ -5183,8 +5176,7 @@ async loadAdminPanel() {
       })
     }
   }
-// ========== توابع مدیریت کاربران در پنل ادمین ==========
-
+// ========== توابع مدیریت کاربران در پنل ادمین (نسخه نهایی) ==========
 // مشاهده جزئیات کاربر
 async adminViewUserDetails(userId) {
   console.log('👁️ نمایش جزئیات کاربر:', userId);
@@ -5213,9 +5205,7 @@ async adminViewUserDetails(userId) {
         </div>
       `;
       
-      // رفع مشکل صفحه تیره
-      const modal = new bootstrap.Modal(modalEl);
-      modal.show();
+      new bootstrap.Modal(modalEl).show();
     }
     
   } catch (error) {
@@ -5229,12 +5219,12 @@ async adminEditUser(userId) {
   this.showToast('ویرایش کاربر - به زودی', 'info');
 }
 
-// ارتقا/تنزل نقش کاربر (فقط یک نسخه)
+// ارتقا/تنزل نقش کاربر - فقط یک نسخه
 async adminMakeAdmin(userId) {
   console.log('👑 تغییر نقش کاربر:', userId);
   
   try {
-    // دریافت اطلاعات کاربر
+    // گرفتن اطلاعات کاربر
     const { data: user, error } = await this.supabase
       .from('profiles')
       .select('full_name, company_name, role')
@@ -5242,7 +5232,6 @@ async adminMakeAdmin(userId) {
       .single();
     
     if (error) throw error;
-    if (!user) throw new Error('کاربر یافت نشد');
     
     const userName = user.full_name || user.company_name || 'کاربر';
     const newRole = user.role === 'admin' ? 'user' : 'admin';
@@ -5250,7 +5239,7 @@ async adminMakeAdmin(userId) {
     
     if (!confirm(`آیا از ${actionText} "${userName}" اطمینان دارید؟`)) return;
     
-    // اجرای آپدیت (بدون select)
+    // آپدیت مستقیم (بدون select و بدون log اضافی)
     const { error: updateError } = await this.supabase
       .from('profiles')
       .update({ role: newRole })
@@ -5259,7 +5248,7 @@ async adminMakeAdmin(userId) {
     if (updateError) throw updateError;
     
     this.showToast(`✅ نقش "${userName}" با موفقیت تغییر کرد`, 'success');
-    await this.loadAdminUsers(); // بروزرسانی لیست
+    this.loadAdminUsers(); // بروزرسانی لیست
     
   } catch (error) {
     console.error('خطا:', error);
