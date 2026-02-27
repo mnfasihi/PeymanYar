@@ -5424,47 +5424,81 @@ async loadAdminUsers() {
 
     html += '</tbody></table>';
     container.innerHTML = html;
-// اضافه کردن event listener به دکمه‌ها
-container.querySelectorAll('.view-details-btn').forEach(btn => {
-  btn.addEventListener('click', (e) => {
-    e.preventDefault();
-    const userId = btn.dataset.userid;
-    this.adminViewUserDetails(userId);
-  });
-});
+// ========== نسخه اصلاح‌شده ==========
+html += '</tbody></table>';
+container.innerHTML = html;
 
-container.querySelectorAll('.edit-user-btn').forEach(btn => {
-  btn.addEventListener('click', (e) => {
-    e.preventDefault();
-    const userId = btn.dataset.userid;
-    this.adminEditUser(userId);
+// اضافه کردن event listener به دکمه‌ها با بررسی وجود توابع
+setTimeout(() => {
+  // دکمه‌های مشاهده جزئیات
+  container.querySelectorAll('.view-details-btn').forEach(btn => {
+    // حذف listenerهای قبلی
+    const newBtn = btn.cloneNode(true);
+    btn.parentNode.replaceChild(newBtn, btn);
+    
+    newBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      const userId = newBtn.dataset.userid;
+      if (typeof this.adminViewUserDetails === 'function') {
+        this.adminViewUserDetails(userId);
+      } else {
+        console.error('adminViewUserDetails تعریف نشده');
+        setTimeout(() => this.adminViewUserDetails(userId), 200);
+      }
+    });
   });
-});
 
-container.querySelectorAll('.make-admin-btn').forEach(btn => {
-  btn.addEventListener('click', (e) => {
-    e.preventDefault();
-    const userId = btn.dataset.userid;
-    this.adminMakeAdmin(userId);
+  // دکمه‌های ویرایش
+  container.querySelectorAll('.edit-user-btn').forEach(btn => {
+    const newBtn = btn.cloneNode(true);
+    btn.parentNode.replaceChild(newBtn, btn);
+    
+    newBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      const userId = newBtn.dataset.userid;
+      if (typeof this.adminEditUser === 'function') {
+        this.adminEditUser(userId);
+      } else {
+        console.error('adminEditUser تعریف نشده');
+        setTimeout(() => this.adminEditUser(userId), 200);
+      }
+    });
   });
-});
+
+  // دکمه‌های تغییر نقش
+  container.querySelectorAll('.make-admin-btn').forEach(btn => {
+    const newBtn = btn.cloneNode(true);
+    btn.parentNode.replaceChild(newBtn, btn);
     
-    // اضافه کردن timestamp با ساعت
-    const timestamp = new Date().toLocaleDateString('fa-IR') + ' ' + new Date().toLocaleTimeString('fa-IR');
-    container.innerHTML += `<div class="text-muted small mt-2 text-center">آخرین بروزرسانی: ${timestamp}</div>`;
-    
-  } catch (error) {
-    console.error('خطا در بارگذاری کاربران:', error);
-    const container = this.getElement('adminUsersList');
-    if (container) {
-      container.innerHTML = `
-        <div class="alert alert-danger">
-          <i class="bi bi-exclamation-triangle me-2"></i>
-          خطا در بارگذاری کاربران: ${error.message}
-        </div>
-      `;
-    }
+    newBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      const userId = newBtn.dataset.userid;
+      if (typeof this.adminMakeAdmin === 'function') {
+        this.adminMakeAdmin(userId);
+      } else {
+        console.error('adminMakeAdmin تعریف نشده');
+        setTimeout(() => this.adminMakeAdmin(userId), 200);
+      }
+    });
+  });
+}, 100); // ۱۰۰ میلی‌ثانیه صبر کن
+
+// اضافه کردن timestamp با ساعت
+const timestamp = new Date().toLocaleDateString('fa-IR') + ' ' + new Date().toLocaleTimeString('fa-IR');
+container.innerHTML += `<div class="text-muted small mt-2 text-center">آخرین بروزرسانی: ${timestamp}</div>`;
+
+} catch (error) {
+  console.error('خطا در بارگذاری کاربران:', error);
+  const container = this.getElement('adminUsersList');
+  if (container) {
+    container.innerHTML = `
+      <div class="alert alert-danger">
+        <i class="bi bi-exclamation-triangle me-2"></i>
+        خطا در بارگذاری کاربران: ${error.message}
+      </div>
+    `;
   }
+}
 }
 // ========== تابع ذخیره تغییرات ==========
 async saveUserEdit(userId) {
