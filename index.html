@@ -5309,6 +5309,40 @@ async adminEditUser(userId) {
     this.showToast('خطا: ' + error.message, 'error');
   }
 }
+// ========== تغییر نقش کاربر ==========
+async adminMakeAdmin(userId) {
+  console.log('👑 تغییر نقش کاربر:', userId);
+  
+  try {
+    const { data: user, error } = await this.supabase
+      .from('profiles')
+      .select('full_name, company_name, role')
+      .eq('user_id', userId)
+      .single();
+    
+    if (error) throw error;
+    
+    const userName = user.full_name || user.company_name || 'کاربر';
+    const newRole = user.role === 'admin' ? 'user' : 'admin';
+    const actionText = newRole === 'admin' ? 'ارتقا به مدیر' : 'تنزل به کاربر عادی';
+    
+    if (!confirm(`آیا از ${actionText} "${userName}" اطمینان دارید؟`)) return;
+    
+    const { error: updateError } = await this.supabase
+      .from('profiles')
+      .update({ role: newRole })
+      .eq('user_id', userId);
+    
+    if (updateError) throw updateError;
+    
+    this.showToast(`✅ نقش "${userName}" با موفقیت تغییر کرد`, 'success');
+    await this.loadAdminUsers();
+    
+  } catch (error) {
+    console.error('❌ خطا:', error);
+    this.showToast('خطا: ' + error.message, 'error');
+  }
+}
 // ========== تابع نهایی مدیریت کاربران ==========
 async loadAdminUsers() {
   console.log('بارگذاری لیست کاربران...');
@@ -5874,106 +5908,5 @@ window.showPage = window.showPage || window.fallbackShowPage;
 </script>
 
 <!-- سرویس ورکر برای PWA (آپشنال) -->
-<script>
-// ========== راه حل نهایی و قطعی ==========
-(function() {
-  console.log('🔄 نصب سیستم مدیریت توابع...');
-  
-  // تابع کمکی برای تعریف توابع اگر وجود نداشته باشند
-  function ensureFunctions() {
-    if (!window.app) return false;
-    let changed = false;  
-    // تعریف adminViewUserDetails اگر وجود نداشت
-    if (typeof window.app.adminViewUserDetails !== 'function') {
-      console.log('📝 تعریف تابع adminViewUserDetails...');
-      window.app.adminViewUserDetails = async function(userId) {
-        console.log('👁️ نمایش جزئیات کاربر:', userId);
-        try {
-          const { data: user, error } = await this.supabase
-            .from('profiles')
-            .select('*')
-            .eq('user_id', userId)
-            .single();
-          
-          if (error) throw error;
-          
-          const modalBody = document.getElementById('userDetailsContent');
-          const modalEl = document.getElementById('userDetailsModal');
-          
-          if (modalBody && modalEl) {
-            modalBody.innerHTML = `
-              <div class="p-3">
-                <p><strong>نام:</strong> ${user.full_name || user.company_name || '-'}</p>
-                <p><strong>ایمیل:</strong> ${user.email || '-'}</p>
-                <p><strong>نوع:</strong> ${user.user_type === 'employer' ? 'کارفرما' : 'پیمانکار'}</p>
-                <p><strong>نقش:</strong> ${user.role === 'admin' ? 'مدیر' : 'کاربر عادی'}</p>
-                <p><strong>تلفن:</strong> ${user.phone || '-'}</p>
-                <p><strong>آدرس:</strong> ${user.address || '-'}</p>
-              </div>
-            `;
-            
-            new bootstrap.Modal(modalEl).show();
-          }
-        } catch (error) {
-          this.showToast('خطا: ' + error.message, 'error');
-        }
-      };
-      changed = true;
-    }
-    
-    // تعریف adminEditUser اگر وجود نداشت
-    if (typeof window.app.adminEditUser !== 'function') {
-      console.log('📝 تعریف تابع adminEditUser...');
-      window.app.adminEditUser = async function(userId) {
-        console.log('✏️ ویرایش کاربر:', userId);
-        this.showToast('ویرایش کاربر - به زودی', 'info');
-      };
-      changed = true;
-    }
-    
-    if (changed) {
-      console.log('✅ توابع با موفقیت تعریف شدند');
-    }
-    
-    return true;
-  }
-  
-  // تابع تعمیر دکمه‌ها
-  function fixButtons() {
-    if (!window.app) return;
-    
-    // اول مطمئن شو توابع وجود دارن
-    ensureFunctions();
-    
-   <script>
-// تعمیر نهایی و قطعی دکمه‌ها
-(function() {
-  // صبر کن تا صفحه کامل لود بشه
-  window.addEventListener('load', function() {
-    setTimeout(function() {
-      console.log('🔧 اجرای تعمیر نهایی...');
-      
-      // پاک کردن onclickهای قدیمی و اضافه کردن event listener
-      document.querySelectorAll('button[onclick*="adminMakeAdmin"]').forEach(btn => {
-        btn.removeAttribute('onclick');
-        btn.classList.add('make-admin');
-        
-        const userId = btn.dataset.userid || 
-                      btn.closest('tr')?.querySelector('.view-details')?.dataset.userid ||
-                      btn.getAttribute('onclick')?.match(/'([^']+)'/)?.[1];
-        
-        if (userId && window.app?.adminMakeAdmin) {
-          btn.addEventListener('click', (e) => {
-            e.preventDefault();
-            window.app.adminMakeAdmin(userId);
-          });
-        }
-      });
-      
-      console.log('✅ تعمیر نهایی تکمیل شد');
-    }, 2000);
-  });
-})();
-</script>
 </body>
 </html>
