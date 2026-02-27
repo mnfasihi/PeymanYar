@@ -5199,7 +5199,7 @@ async adminViewUserDetails(userId) {
       .from('profiles')
       .select('*')
       .eq('user_id', userId)
-      .single(); // از maybeSingle به single تغییر دادم چون انتظار داریم حتماً وجود داشته باشه
+      .single();
     
     if (error) {
       console.error('خطا در دریافت اطلاعات:', error);
@@ -5330,12 +5330,31 @@ async adminViewUserDetails(userId) {
   }
 }
 
-// ویرایش کاربر (فعلاً پیغام میده)
-adminEditUser(userId) {
+// ویرایش کاربر (اصلاح شده - رفع خطای data)
+async adminEditUser(userId) {
   console.log('✏️ ویرایش کاربر:', userId);
-  const user = data?.find(u => u.user_id === userId);
-  const userName = user?.full_name || user?.company_name || 'کاربر';
-  this.showToast(`قابلیت ویرایش کاربر "${userName}" به زودی اضافه میشود`, 'info');
+  
+  try {
+    // دریافت اطلاعات کاربر از دیتابیس
+    const { data: user, error } = await this.supabase
+      .from('profiles')
+      .select('*')
+      .eq('user_id', userId)
+      .single();
+    
+    if (error) {
+      console.error('خطا در دریافت اطلاعات کاربر:', error);
+      this.showToast('خطا در دریافت اطلاعات کاربر', 'error');
+      return;
+    }
+    
+    const userName = user?.full_name || user?.company_name || user?.email || 'کاربر';
+    this.showToast(`🔧 قابلیت ویرایش کاربر "${userName}" به زودی اضافه میشود`, 'info');
+    
+  } catch (error) {
+    console.error('خطا:', error);
+    this.showToast('خطا در ویرایش کاربر', 'error');
+  }
 }
 
 // ارتقا به مدیر یا تنزل به کاربر عادی
@@ -5398,6 +5417,102 @@ async adminMakeAdmin(userId) {
   } catch (error) {
     console.error('خطا در تغییر نقش کاربر:', error);
     this.showToast('خطا در تغییر نقش: ' + error.message, 'error');
+  }
+}
+
+// تابع نهایی مدیریت کاربران
+async loadAdminUsers() {
+  console.log('بارگذاری لیست کاربران...');
+  
+  try {
+    const { data, error } = await this.supabase
+      .from('profiles')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+
+    console.log('تعداد کاربران:', data?.length);
+
+    const container = this.getElement('adminUsersList');
+    if (!container) {
+      console.warn('کانتینر adminUsersList وجود ندارد');
+      return;
+    }
+
+    if (!data || data.length === 0) {
+      container.innerHTML = '<div class="alert alert-info">هیچ کاربری یافت نشد</div>';
+      return;
+    }
+
+    // اضافه کردن دکمه بروزرسانی و آمار به بالای جدول
+    let html = `
+      <div class="d-flex justify-content-between align-items-center mb-3 p-2 bg-light rounded">
+        <div>
+          <span class="fw-bold">تعداد کل کاربران: ${data.length}</span>
+          <span class="mx-2">|</span>
+          <span>مدیران: ${data.filter(u => u.role === 'admin').length}</span>
+          <span class="mx-2">|</span>
+          <span>کارفرمایان: ${data.filter(u => u.user_type === 'employer').length}</span>
+          <span class="mx-2">|</span>
+          <span>پیمانکاران: ${data.filter(u => u.user_type === 'contractor').length}</span>
+        </div>
+        <button class="btn btn-sm btn-outline-primary" onclick="window.app.loadAdminUsers()">
+          <i class="bi bi-arrow-repeat me-1"></i>بروزرسانی
+        </button>
+      </div>
+    `;
+    
+    html += '<table class="table table-hover table-bordered"><thead class="table-light"><tr><th>#</th><th>نام</th><th>ایمیل</th><th>نوع</th><th>نقش</th><th>عملیات</th></tr></thead><tbody>';
+    
+    data.forEach((user, index) => {
+      const userType = user.user_type === 'employer' ? 'کارفرما' : 'پیمانکار';
+      const role = user.role === 'admin' ? 'مدیر' : 'کاربر عادی';
+      const roleClass = user.role === 'admin' ? 'bg-danger' : 'bg-secondary';
+      const userTypeClass = user.user_type === 'employer' ? 'bg-primary' : 'bg-success';
+      
+      html += `<tr>
+        <td>${index + 1}</td>
+        <td>${user.full_name || user.company_name || 'نامشخص'}</td>
+        <td>${user.email || '-'}</td>
+        <td><span class="badge ${userTypeClass}">${userType}</span></td>
+        <td><span class="badge ${roleClass}">${role}</span></td>
+        <td>
+          <div class="btn-group btn-group-sm" role="group">
+            <button class="btn btn-info" onclick="window.app.adminViewUserDetails('${user.user_id}')" title="مشاهده جزئیات">
+              <i class="bi bi-eye"></i>
+            </button>
+            <button class="btn btn-warning" onclick="window.app.adminEditUser('${user.user_id}')" title="ویرایش">
+              <i class="bi bi-pencil"></i>
+            </button>
+            <button class="btn ${user.role === 'admin' ? 'btn-secondary' : 'btn-primary'}" 
+                    onclick="window.app.adminMakeAdmin('${user.user_id}')" 
+                    title="${user.role === 'admin' ? 'تنزل به کاربر عادی' : 'ارتقا به مدیر'}">
+              <i class="bi bi-person-up"></i>
+            </button>
+          </div>
+        </td>
+      </tr>`;
+    });
+
+    html += '</tbody></table>';
+    container.innerHTML = html;
+    
+    // اضافه کردن timestamp
+    const timestamp = new Date().toLocaleDateString('fa-IR');
+    container.innerHTML += `<div class="text-muted small mt-2 text-center">آخرین بروزرسانی: ${timestamp}</div>`;
+    
+  } catch (error) {
+    console.error('خطا در بارگذاری کاربران:', error);
+    const container = this.getElement('adminUsersList');
+    if (container) {
+      container.innerHTML = `
+        <div class="alert alert-danger">
+          <i class="bi bi-exclamation-triangle me-2"></i>
+          خطا در بارگذاری کاربران: ${error.message}
+        </div>
+      `;
+    }
   }
 }
 // ========== تابع نهایی مدیریت کاربران ==========
