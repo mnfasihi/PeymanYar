@@ -5184,12 +5184,12 @@ async loadAdminPanel() {
     }
   }
 // ========== توابع مدیریت کاربران در پنل ادمین ==========
+// ========== توابع مدیریت کاربران ==========
 
 // مشاهده جزئیات کاربر
 async adminViewUserDetails(userId) {
   console.log('نمایش جزئیات کاربر:', userId);
   
-  // اگه userId عددی بود (مثل 1) یا فرمت UUID نداشت، خطا بده
   if (!userId || userId.length < 10) {
     this.showToast('شناسه کاربر معتبر نیست', 'error');
     return;
@@ -5200,13 +5200,37 @@ async adminViewUserDetails(userId) {
       .from('profiles')
       .select('*')
       .eq('user_id', userId)
-      .maybeSingle(); // به جای .single() که خطای 406 میده
+      .maybeSingle();
     
     if (error) throw error;
     
     if (!user) {
       this.showToast('کاربری با این شناسه یافت نشد', 'error');
       return;
+    }
+    
+    // ساخت یا پیدا کردن مودال
+    let modalEl = this.getElement('userDetailsModal');
+    if (!modalEl) {
+      // اگر مودال وجود نداشت، یه مودال جدید بساز
+      modalEl = document.createElement('div');
+      modalEl.className = 'modal fade';
+      modalEl.id = 'userDetailsModal';
+      modalEl.innerHTML = `
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">جزئیات کاربر</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="userDetailsContent"></div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">بستن</button>
+            </div>
+          </div>
+        </div>
+      `;
+      document.body.appendChild(modalEl);
     }
     
     const modalBody = this.getElement('userDetailsContent');
@@ -5217,7 +5241,7 @@ async adminViewUserDetails(userId) {
       modalBody.innerHTML = `
         <div class="row">
           <div class="col-md-6 mb-3">
-            <strong>شناسه کاربر:</strong> ${user.user_id?.substring(0,8)}...
+            <strong>نام:</strong> ${user.full_name || user.company_name || '-'}
           </div>
           <div class="col-md-6 mb-3">
             <strong>ایمیل:</strong> ${user.email || '-'}
@@ -5244,7 +5268,7 @@ async adminViewUserDetails(userId) {
       `;
     }
     
-    const modal = new bootstrap.Modal(this.getElement('userDetailsModal'));
+    const modal = new bootstrap.Modal(modalEl);
     modal.show();
     
   } catch (error) {
@@ -5253,75 +5277,16 @@ async adminViewUserDetails(userId) {
   }
 }
 
-// ویرایش کاربر
+// ویرایش کاربر (فعلاً پیغام میده)
 adminEditUser(userId) {
-  if (!userId || userId.length < 10) {
-    this.showToast('شناسه کاربر معتبر نیست', 'error');
-    return;
-  }
+  console.log('ویرایش کاربر:', userId);
   this.showToast('قابلیت ویرایش به زودی اضافه میشود', 'info');
-}
-
-// تغییر وضعیت فعال/غیرفعال کاربر
-async adminToggleUser(userId) {
-  if (!userId || userId.length < 10) {
-    this.showToast('شناسه کاربر معتبر نیست', 'error');
-    return;
-  }
-  
-  try {
-    // اول بررسی کن ببینیم فیلد is_active وجود داره یا نه
-    const { data: columns } = await this.supabase
-      .from('profiles')
-      .select('is_active')
-      .limit(1);
-    
-    // اگه فیلد وجود نداشت (columns تعریف نشده بود)
-    if (!columns) {
-      this.showToast('فیلد وضعیت فعال/غیرفعال در دیتابیس وجود ندارد', 'warning');
-      return;
-    }
-    
-    const { data: user, error } = await this.supabase
-      .from('profiles')
-      .select('is_active')
-      .eq('user_id', userId)
-      .maybeSingle();
-    
-    if (error) throw error;
-    
-    if (!user) {
-      this.showToast('کاربری با این شناسه یافت نشد', 'error');
-      return;
-    }
-    
-    const newStatus = !user.is_active;
-    const statusText = newStatus ? 'فعال' : 'غیرفعال';
-    
-    if (!confirm(`آیا از ${statusText} کردن این کاربر اطمینان دارید؟`)) return;
-    
-    const { error: updateError } = await this.supabase
-      .from('profiles')
-      .update({ is_active: newStatus })
-      .eq('user_id', userId);
-    
-    if (updateError) throw updateError;
-    
-    this.showToast(`کاربر با موفقیت ${statusText} شد`, 'success');
-    this.loadAdminUsers();
-    
-  } catch (error) {
-    console.error('خطا در تغییر وضعیت کاربر:', error);
-    if (error.message?.includes('is_active')) {
-      this.showToast('فیلد is_active در دیتابیس وجود ندارد', 'warning');
-    } else {
-      this.showToast('خطا در تغییر وضعیت', 'error');
-    }
-  }
 }
 
 // ارتقا به مدیر یا تنزل به کاربر عادی
 async adminMakeAdmin(userId) {
+  console.log('تغییر نقش کاربر:', userId);
+  
   if (!userId || userId.length < 10) {
     this.showToast('شناسه کاربر معتبر نیست', 'error');
     return;
@@ -5354,16 +5319,14 @@ async adminMakeAdmin(userId) {
     if (updateError) throw updateError;
     
     this.showToast(`نقش کاربر با موفقیت به ${newRole === 'admin' ? 'مدیر' : 'کاربر عادی'} تغییر یافت`, 'success');
-    this.loadAdminUsers();
+    this.loadAdminUsers(); // بروزرسانی لیست
     
   } catch (error) {
     console.error('خطا در تغییر نقش کاربر:', error);
     this.showToast('خطا در تغییر نقش', 'error');
   }
 }
-
-// به‌روزرسانی تابع loadAdminUsers برای استفاده از UUID درست
-// فقط این یکی رو نگه دار - اون یکی رو پاک کن
+// ========== تابع نهایی مدیریت کاربران ==========
 async loadAdminUsers() {
   console.log('بارگذاری لیست کاربران...');
   
@@ -5388,29 +5351,52 @@ async loadAdminUsers() {
       return;
     }
 
-    let html = '<table class="table table-hover"><thead><tr><th>نام</th><th>ایمیل</th><th>نوع</th><th>نقش</th><th>عملیات</th></tr></thead><tbody>';
+    // اضافه کردن دکمه بروزرسانی و آمار به بالای جدول
+    let html = `
+      <div class="d-flex justify-content-between align-items-center mb-3 p-2 bg-light rounded">
+        <div>
+          <span class="fw-bold">تعداد کل کاربران: ${data.length}</span>
+          <span class="mx-2">|</span>
+          <span>مدیران: ${data.filter(u => u.role === 'admin').length}</span>
+          <span class="mx-2">|</span>
+          <span>کارفرمایان: ${data.filter(u => u.user_type === 'employer').length}</span>
+          <span class="mx-2">|</span>
+          <span>پیمانکاران: ${data.filter(u => u.user_type === 'contractor').length}</span>
+        </div>
+        <button class="btn btn-sm btn-outline-primary" onclick="window.app.loadAdminUsers()">
+          <i class="bi bi-arrow-repeat me-1"></i>بروزرسانی
+        </button>
+      </div>
+    `;
     
-    data.forEach(user => {
+    html += '<table class="table table-hover table-bordered"><thead class="table-light"><tr><th>#</th><th>نام</th><th>ایمیل</th><th>نوع</th><th>نقش</th><th>عملیات</th></tr></thead><tbody>';
+    
+    data.forEach((user, index) => {
       const userType = user.user_type === 'employer' ? 'کارفرما' : 'پیمانکار';
       const role = user.role === 'admin' ? 'مدیر' : 'کاربر عادی';
+      const roleClass = user.role === 'admin' ? 'bg-danger' : 'bg-secondary';
+      const userTypeClass = user.user_type === 'employer' ? 'bg-primary' : 'bg-success';
       
       html += `<tr>
+        <td>${index + 1}</td>
         <td>${user.full_name || user.company_name || 'نامشخص'}</td>
         <td>${user.email || '-'}</td>
-        <td><span class="badge bg-info">${userType}</span></td>
-        <td><span class="badge ${user.role === 'admin' ? 'bg-danger' : 'bg-secondary'}">${role}</span></td>
+        <td><span class="badge ${userTypeClass}">${userType}</span></td>
+        <td><span class="badge ${roleClass}">${role}</span></td>
         <td>
-          <button class="btn btn-sm btn-info" onclick="window.app.adminViewUserDetails('${user.user_id}')" title="مشاهده جزئیات">
-            <i class="bi bi-eye"></i>
-          </button>
-          <button class="btn btn-sm btn-warning" onclick="window.app.adminEditUser('${user.user_id}')" title="ویرایش">
-            <i class="bi bi-pencil"></i>
-          </button>
-          <button class="btn btn-sm ${user.role === 'admin' ? 'btn-secondary' : 'btn-primary'}" 
-                  onclick="window.app.adminMakeAdmin('${user.user_id}')" 
-                  title="${user.role === 'admin' ? 'تنزل به کاربر عادی' : 'ارتقا به مدیر'}">
-            <i class="bi bi-person-up"></i>
-          </button>
+          <div class="btn-group btn-group-sm" role="group">
+            <button class="btn btn-info" onclick="window.app.adminViewUserDetails('${user.user_id}')" title="مشاهده جزئیات">
+              <i class="bi bi-eye"></i>
+            </button>
+            <button class="btn btn-warning" onclick="window.app.adminEditUser('${user.user_id}')" title="ویرایش">
+              <i class="bi bi-pencil"></i>
+            </button>
+            <button class="btn ${user.role === 'admin' ? 'btn-secondary' : 'btn-primary'}" 
+                    onclick="window.app.adminMakeAdmin('${user.user_id}')" 
+                    title="${user.role === 'admin' ? 'تنزل به کاربر عادی' : 'ارتقا به مدیر'}">
+              <i class="bi bi-person-up"></i>
+            </button>
+          </div>
         </td>
       </tr>`;
     });
@@ -5418,11 +5404,20 @@ async loadAdminUsers() {
     html += '</tbody></table>';
     container.innerHTML = html;
     
+    // اضافه کردن کپی رایت یا توضیحات
+    const timestamp = new Date().toLocaleDateString('fa-IR');
+    container.innerHTML += `<div class="text-muted small mt-2 text-center">آخرین بروزرسانی: ${timestamp}</div>`;
+    
   } catch (error) {
     console.error('خطا در بارگذاری کاربران:', error);
     const container = this.getElement('adminUsersList');
     if (container) {
-      container.innerHTML = '<div class="alert alert-danger">خطا در بارگذاری کاربران</div>';
+      container.innerHTML = `
+        <div class="alert alert-danger">
+          <i class="bi bi-exclamation-triangle me-2"></i>
+          خطا در بارگذاری کاربران: ${error.message}
+        </div>
+      `;
     }
   }
 }
