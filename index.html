@@ -5189,11 +5189,6 @@ async loadAdminPanel() {
 async adminViewUserDetails(userId) {
   console.log('👁️ نمایش جزئیات کاربر:', userId);
   
-  if (!userId || userId.length < 10) {
-    this.showToast('شناسه کاربر معتبر نیست', 'error');
-    return;
-  }
-  
   try {
     const { data: user, error } = await this.supabase
       .from('profiles')
@@ -5201,162 +5196,58 @@ async adminViewUserDetails(userId) {
       .eq('user_id', userId)
       .single();
     
-    if (error) {
-      console.error('خطا در دریافت اطلاعات:', error);
-      this.showToast('خطا در دریافت اطلاعات کاربر', 'error');
-      return;
-    }
-    
-    if (!user) {
-      this.showToast('کاربری با این شناسه یافت نشد', 'error');
-      return;
-    }
-    
-    // ساخت مودال اگر وجود نداشت
-    let modalEl = document.getElementById('userDetailsModal');
-    if (!modalEl) {
-      modalEl = document.createElement('div');
-      modalEl.className = 'modal fade';
-      modalEl.id = 'userDetailsModal';
-      modalEl.innerHTML = `
-        <div class="modal-dialog modal-lg">
-          <div class="modal-content">
-            <div class="modal-header bg-primary text-white">
-              <h5 class="modal-title">جزئیات کاربر</h5>
-              <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body" id="userDetailsContent"></div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">بستن</button>
-            </div>
-          </div>
-        </div>
-      `;
-      document.body.appendChild(modalEl);
-    }
+    if (error) throw error;
     
     const modalBody = document.getElementById('userDetailsContent');
     if (modalBody) {
-      const userType = user.user_type === 'employer' ? 'کارفرما' : 'پیمانکار';
-      const accountType = user.account_type === 'individual' ? 'حقیقی' : 'حقوقی';
-      const roleText = user.role === 'admin' ? 'مدیر' : 'کاربر عادی';
-      const createdDate = new Date(user.created_at).toLocaleDateString('fa-IR');
-      
       modalBody.innerHTML = `
-        <div class="row">
-          <div class="col-md-6 mb-3">
-            <div class="card bg-light">
-              <div class="card-body">
-                <small class="text-muted d-block">شناسه کاربر</small>
-                <strong>${user.user_id.substring(0, 8)}...</strong>
-              </div>
-            </div>
-          </div>
-          <div class="col-md-6 mb-3">
-            <div class="card bg-light">
-              <div class="card-body">
-                <small class="text-muted d-block">ایمیل</small>
-                <strong>${user.email || '-'}</strong>
-              </div>
-            </div>
-          </div>
-          <div class="col-md-6 mb-3">
-            <div class="card bg-light">
-              <div class="card-body">
-                <small class="text-muted d-block">نام / شرکت</small>
-                <strong>${user.full_name || user.company_name || '-'}</strong>
-              </div>
-            </div>
-          </div>
-          <div class="col-md-6 mb-3">
-            <div class="card bg-light">
-              <div class="card-body">
-                <small class="text-muted d-block">نوع کاربر</small>
-                <strong>${userType}</strong>
-              </div>
-            </div>
-          </div>
-          <div class="col-md-6 mb-3">
-            <div class="card bg-light">
-              <div class="card-body">
-                <small class="text-muted d-block">نوع شخصیت</small>
-                <strong>${accountType}</strong>
-              </div>
-            </div>
-          </div>
-          <div class="col-md-6 mb-3">
-            <div class="card bg-light">
-              <div class="card-body">
-                <small class="text-muted d-block">نقش</small>
-                <strong>${roleText}</strong>
-              </div>
-            </div>
-          </div>
-          <div class="col-md-6 mb-3">
-            <div class="card bg-light">
-              <div class="card-body">
-                <small class="text-muted d-block">تلفن همراه</small>
-                <strong>${user.phone || '-'}</strong>
-              </div>
-            </div>
-          </div>
-          <div class="col-md-6 mb-3">
-            <div class="card bg-light">
-              <div class="card-body">
-                <small class="text-muted d-block">تاریخ عضویت</small>
-                <strong>${createdDate}</strong>
-              </div>
-            </div>
-          </div>
-          <div class="col-12 mb-3">
-            <div class="card bg-light">
-              <div class="card-body">
-                <small class="text-muted d-block">آدرس</small>
-                <strong>${user.address || '-'}</strong>
-              </div>
-            </div>
-          </div>
-        </div>
+        <p><strong>نام:</strong> ${user.full_name || user.company_name || '-'}</p>
+        <p><strong>ایمیل:</strong> ${user.email || '-'}</p>
+        <p><strong>نوع:</strong> ${user.user_type === 'employer' ? 'کارفرما' : 'پیمانکار'}</p>
+        <p><strong>نقش:</strong> ${user.role === 'admin' ? 'مدیر' : 'کاربر عادی'}</p>
+        <p><strong>تلفن:</strong> ${user.phone || '-'}</p>
+        <p><strong>آدرس:</strong> ${user.address || '-'}</p>
       `;
     }
     
-    const modal = new bootstrap.Modal(modalEl);
-    modal.show();
-    this.showToast('اطلاعات کاربر با موفقیت دریافت شد', 'success');
+    new bootstrap.Modal(document.getElementById('userDetailsModal')).show();
     
   } catch (error) {
-    console.error('خطا در دریافت اطلاعات کاربر:', error);
-    this.showToast('خطا در دریافت اطلاعات: ' + error.message, 'error');
+    this.showToast('خطا: ' + error.message, 'error');
   }
 }
 
-// ویرایش کاربر (اصلاح شده - رفع خطای data)
+// ویرایش کاربر
 async adminEditUser(userId) {
-  console.log('✏️ ویرایش کاربر:', userId);
-  
+  this.showToast('ویرایش کاربر - به زودی', 'info');
+}
+
+// ارتقا/تنزل نقش کاربر
+async adminMakeAdmin(userId) {
   try {
-    // دریافت اطلاعات کاربر از دیتابیس
-    const { data: user, error } = await this.supabase
+    const { data: user } = await this.supabase
       .from('profiles')
-      .select('*')
+      .select('role')
       .eq('user_id', userId)
       .single();
     
-    if (error) {
-      console.error('خطا در دریافت اطلاعات کاربر:', error);
-      this.showToast('خطا در دریافت اطلاعات کاربر', 'error');
-      return;
-    }
+    const newRole = user.role === 'admin' ? 'user' : 'admin';
+    const action = newRole === 'admin' ? 'ارتقا به مدیر' : 'تنزل به کاربر عادی';
     
-    const userName = user?.full_name || user?.company_name || user?.email || 'کاربر';
-    this.showToast(`🔧 قابلیت ویرایش کاربر "${userName}" به زودی اضافه میشود`, 'info');
+    if (!confirm(`آیا از ${action} اطمینان دارید؟`)) return;
+    
+    await this.supabase
+      .from('profiles')
+      .update({ role: newRole })
+      .eq('user_id', userId);
+    
+    this.showToast(`✅ نقش کاربر تغییر کرد`, 'success');
+    this.loadAdminUsers();
     
   } catch (error) {
-    console.error('خطا:', error);
-    this.showToast('خطا در ویرایش کاربر', 'error');
+    this.showToast('خطا: ' + error.message, 'error');
   }
 }
-
 // ارتقا به مدیر یا تنزل به کاربر عادی
 async adminMakeAdmin(userId) {
   console.log('👑 تغییر نقش کاربر:', userId);
