@@ -5784,39 +5784,63 @@ window.showPage = window.showPage || window.fallbackShowPage;
 
 <!-- سرویس ورکر برای PWA (آپشنال) -->
 <script>
-// تعمیر دائمی دکمه‌های مدیریت
-document.addEventListener('DOMContentLoaded', function() {
-  setTimeout(function() {
-    if (window.app) {
-      // کد تعمیر دکمه‌ها اینجا
-      document.querySelectorAll('button[onclick*="adminViewUserDetails"]').forEach(btn => {
-        const match = btn.getAttribute('onclick').match(/'([^']+)'/);
-        if (match) {
-          const userId = match[1];
-          btn.onclick = (e) => { e.preventDefault(); window.app.adminViewUserDetails(userId); };
-        }
-      });
-      
-      document.querySelectorAll('button[onclick*="adminEditUser"]').forEach(btn => {
-        const match = btn.getAttribute('onclick').match(/'([^']+)'/);
-        if (match) {
-          const userId = match[1];
-          btn.onclick = (e) => { e.preventDefault(); window.app.adminEditUser(userId); };
-        }
-      });
-      
-      document.querySelectorAll('button[onclick*="adminMakeAdmin"]').forEach(btn => {
-        const match = btn.getAttribute('onclick').match(/'([^']+)'/);
-        if (match) {
-          const userId = match[1];
-          btn.onclick = (e) => { e.preventDefault(); window.app.adminMakeAdmin(userId); };
-        }
-      });
-      
-      console.log('✅ دکمه‌های مدیریت تعمیر شدند');
-    }
-  }, 1000);
-});
+// تعمیر دائمی دکمه‌های مدیریت - با استفاده از MutationObserver
+(function() {
+  console.log('🔄 نصب تعمیرکار دائمی دکمه‌ها...');
+  
+  // تابع تعمیر دکمه‌ها
+  function fixButtons() {
+    if (!window.app) return;
+    
+    // تعمیر دکمه‌های مشاهده جزئیات
+    document.querySelectorAll('button[onclick*="adminViewUserDetails"]:not([data-fixed])').forEach(btn => {
+      const match = btn.getAttribute('onclick').match(/'([^']+)'/);
+      if (match) {
+        const userId = match[1];
+        btn.setAttribute('data-fixed', 'true');
+        btn.onclick = (e) => { 
+          e.preventDefault(); 
+          window.app.adminViewUserDetails(userId); 
+        };
+      }
+    });
+    
+    // تعمیر دکمه‌های ویرایش
+    document.querySelectorAll('button[onclick*="adminEditUser"]:not([data-fixed])').forEach(btn => {
+      const match = btn.getAttribute('onclick').match(/'([^']+)'/);
+      if (match) {
+        const userId = match[1];
+        btn.setAttribute('data-fixed', 'true');
+        btn.onclick = (e) => { 
+          e.preventDefault(); 
+          window.app.adminEditUser(userId); 
+        };
+      }
+    });
+    
+    // تعمیر دکمه‌های تغییر نقش
+    document.querySelectorAll('button[onclick*="adminMakeAdmin"]:not([data-fixed])').forEach(btn => {
+      const match = btn.getAttribute('onclick').match(/'([^']+)'/);
+      if (match) {
+        const userId = match[1];
+        btn.setAttribute('data-fixed', 'true');
+        btn.onclick = (e) => { 
+          e.preventDefault(); 
+          window.app.adminMakeAdmin(userId); 
+        };
+      }
+    });
+  }
+  
+  // اول دفعه اول تعمیر کن
+  setTimeout(fixButtons, 1000);
+  
+  // هر وقت محتوای صفحه تغییر کرد، دوباره تعمیر کن
+  const observer = new MutationObserver(fixButtons);
+  observer.observe(document.body, { childList: true, subtree: true });
+  
+  console.log('✅ تعمیرکار دائمی نصب شد');
+})();
 </script>
 </body>
 </html>
