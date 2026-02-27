@@ -5945,42 +5945,6 @@ window.showPage = window.showPage || window.fallbackShowPage;
     // اول مطمئن شو توابع وجود دارن
     ensureFunctions();
     
-    // تعمیر دکمه‌های مشاهده جزئیات
-    document.querySelectorAll('button[onclick*="adminViewUserDetails"]:not([data-fixed])').forEach(btn => {
-      const match = btn.getAttribute('onclick').match(/'([^']+)'/);
-      if (match) {
-        const userId = match[1];
-        btn.setAttribute('data-fixed', 'true');
-        btn.onclick = (e) => { 
-          e.preventDefault(); 
-          if (window.app && window.app.adminViewUserDetails) {
-            window.app.adminViewUserDetails(userId);
-          } else {
-            console.error('تابع adminViewUserDetails موجود نیست');
-          }
-        };
-        console.log('🔧 دکمه چشم تعمیر شد:', userId);
-      }
-    });
-    
-    // تعمیر دکمه‌های ویرایش
-    document.querySelectorAll('button[onclick*="adminEditUser"]:not([data-fixed])').forEach(btn => {
-      const match = btn.getAttribute('onclick').match(/'([^']+)'/);
-      if (match) {
-        const userId = match[1];
-        btn.setAttribute('data-fixed', 'true');
-        btn.onclick = (e) => { 
-          e.preventDefault(); 
-          if (window.app && window.app.adminEditUser) {
-            window.app.adminEditUser(userId);
-          } else {
-            console.error('تابع adminEditUser موجود نیست');
-          }
-        };
-        console.log('🔧 دکمه مداد تعمیر شد:', userId);
-      }
-    });
-    
    <script>
 // تعمیر نهایی و قطعی دکمه‌ها
 (function() {
