@@ -2286,7 +2286,7 @@ body { background-color: #121212; color: #e0e0e0; }
 
   <!-- تب 8: لاگ و گزارش‌ها (ورود کاربران، فعالیت مدیران، خطاها، تغییرات، فیلتر) -->
   <div class="tab-pane fade" id="tab8" role="tabpanel">
-    <div class="card-peymanyar h-100">
+    <div class="card-peymanyar">
       <div class="row mb-3">
         <div class="col-md-4">
           <select class="form-select" id="logType">
@@ -2308,7 +2308,7 @@ body { background-color: #121212; color: #e0e0e0; }
         </div>
       </div>
       
-      <div class="log-container" style="max-height: 400px; overflow-y: auto;">
+      <div class="log-container" style="min-height: 400px; max-height: 600px; overflow-y: auto;">
         <div class="log-entry mb-2 p-2 border-bottom">
           <span class="badge bg-info">ورود کاربر</span>
           <span class="ms-2">۱۴۰۳/۱۲/۰۶ ۱۴:۳۰:۲۵ - علی محمدی (کارفرما) وارد شد</span>
@@ -2352,7 +2352,7 @@ body { background-color: #121212; color: #e0e0e0; }
 
   <!-- تب 9: مدیریت پروژه‌ها (همون چیزی که تو کد اصلی بود) -->
   <div class="tab-pane fade" id="tab9" role="tabpanel">
-    <div class="card-peymanyar h-100">
+    <div class="card-peymanyar">
       <div class="row mb-4">
         <div class="col-md-4">
           <div class="card-peymanyar text-center p-3">
@@ -2373,7 +2373,8 @@ body { background-color: #121212; color: #e0e0e0; }
           </div>
         </div>
       </div>
-      
+      <div id="projectsAdminList" class="row" style="min-height: 400px; max-height: 600px; overflow-y: auto;">
+
       <div class="row mb-3">
         <div class="col-md-8">
           <input type="text" class="form-control" id="projectSearchAdmin" placeholder="جستجوی پروژه‌ها...">
