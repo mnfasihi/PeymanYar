@@ -5314,7 +5314,214 @@ async checkAdminStatus() {
       })
     }
   }
+// ========== توابع مدیریت کاربران در پنل ادمین ==========
 
+// مشاهده جزئیات کاربر
+async adminViewUserDetails(userId) {
+  console.log('نمایش جزئیات کاربر:', userId);
+  
+  try {
+    // دریافت اطلاعات کامل کاربر
+    const { data: user, error } = await this.supabase
+      .from('profiles')
+      .select('*')
+      .eq('user_id', userId)
+      .single();
+    
+    if (error) throw error;
+    
+    // ساخت محتوای مودال
+    const modalBody = this.getElement('userDetailsContent');
+    if (modalBody) {
+      const userType = user.user_type === 'employer' ? 'کارفرما' : 'پیمانکار';
+      const accountType = user.account_type === 'individual' ? 'حقیقی' : 'حقوقی';
+      
+      modalBody.innerHTML = `
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <strong>ایمیل:</strong> ${user.email || '-'}
+          </div>
+          <div class="col-md-6 mb-3">
+            <strong>نوع کاربر:</strong> ${userType}
+          </div>
+          <div class="col-md-6 mb-3">
+            <strong>نوع شخصیت:</strong> ${accountType}
+          </div>
+          <div class="col-md-6 mb-3">
+            <strong>نقش:</strong> ${user.role === 'admin' ? 'مدیر' : 'کاربر عادی'}
+          </div>
+          <div class="col-md-6 mb-3">
+            <strong>تلفن:</strong> ${user.phone || '-'}
+          </div>
+          <div class="col-12 mb-3">
+            <strong>آدرس:</strong> ${user.address || '-'}
+          </div>
+          <div class="col-12 mb-3">
+            <strong>تاریخ عضویت:</strong> ${new Date(user.created_at).toLocaleDateString('fa-IR')}
+          </div>
+        </div>
+      `;
+    }
+    
+    // نمایش مودال
+    const modal = new bootstrap.Modal(this.getElement('userDetailsModal'));
+    modal.show();
+    
+  } catch (error) {
+    console.error('خطا در دریافت اطلاعات کاربر:', error);
+    this.showToast('خطا در دریافت اطلاعات', 'error');
+  }
+}
+
+// ویرایش کاربر
+adminEditUser(userId) {
+  console.log('ویرایش کاربر:', userId);
+  
+  // اینجا می‌تونید فرم ویرایش رو باز کنید
+  // یا یه مودال با فیلدهای قابل ویرایش نمایش بدید
+  this.showToast(`در حال ویرایش کاربر ${userId}...`, 'info');
+  
+  // فعلاً یه پیغام ساده نشون بده
+  setTimeout(() => {
+    this.showToast('قابلیت ویرایش به زودی اضافه میشود', 'info');
+  }, 1500);
+}
+
+// تغییر وضعیت فعال/غیرفعال کاربر
+async adminToggleUser(userId) {
+  console.log('تغییر وضعیت کاربر:', userId);
+  
+  try {
+    // دریافت وضعیت فعلی
+    const { data: user, error: getError } = await this.supabase
+      .from('profiles')
+      .select('is_active')
+      .eq('user_id', userId)
+      .single();
+    
+    if (getError) throw getError;
+    
+    const newStatus = user?.is_active ? false : true;
+    const statusText = newStatus ? 'فعال' : 'غیرفعال';
+    
+    if (!confirm(`آیا از ${statusText} کردن این کاربر اطمینان دارید؟`)) return;
+    
+    // به‌روزرسانی وضعیت
+    const { error } = await this.supabase
+      .from('profiles')
+      .update({ is_active: newStatus })
+      .eq('user_id', userId);
+    
+    if (error) throw error;
+    
+    this.showToast(`کاربر با موفقیت ${statusText} شد`, 'success');
+    
+    // اگر فیلد is_active وجود نداره، این خطا میده - پس اول چک کنیم
+    if (getError && getError.message.includes('column "is_active" does not exist')) {
+      this.showToast('فیلد وضعیت فعال/غیرفعال در دیتابیس وجود ندارد', 'warning');
+    }
+    
+    // بروزرسانی لیست کاربران
+    this.loadAdminUsers();
+    
+  } catch (error) {
+    console.error('خطا در تغییر وضعیت کاربر:', error);
+    this.showToast('خطا در تغییر وضعیت', 'error');
+  }
+}
+
+// ارتقا به مدیر یا تنزل به کاربر عادی
+async adminMakeAdmin(userId) {
+  console.log('تغییر نقش کاربر:', userId);
+  
+  try {
+    // دریافت نقش فعلی
+    const { data: user, error: getError } = await this.supabase
+      .from('profiles')
+      .select('role')
+      .eq('user_id', userId)
+      .single();
+    
+    if (getError) throw getError;
+    
+    const newRole = user?.role === 'admin' ? 'user' : 'admin';
+    const actionText = newRole === 'admin' ? 'ارتقا به مدیر' : 'تنزل به کاربر عادی';
+    
+    if (!confirm(`آیا از ${actionText} این کاربر اطمینان دارید؟`)) return;
+    
+    // به‌روزرسانی نقش
+    const { error } = await this.supabase
+      .from('profiles')
+      .update({ role: newRole })
+      .eq('user_id', userId);
+    
+    if (error) throw error;
+    
+    this.showToast(`نقش کاربر با موفقیت به ${newRole === 'admin' ? 'مدیر' : 'کاربر عادی'} تغییر یافت`, 'success');
+    
+    // بروزرسانی لیست کاربران
+    this.loadAdminUsers();
+    
+  } catch (error) {
+    console.error('خطا در تغییر نقش کاربر:', error);
+    this.showToast('خطا در تغییر نقش', 'error');
+  }
+}
+
+// بارگذاری مجدد لیست کاربران (برای بعد از تغییرات)
+async loadAdminUsers() {
+  try {
+    const { data, error } = await this.supabase
+      .from('profiles')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .limit(20);
+
+    if (error) throw error;
+
+    const container = this.getElement('adminUsersList');
+    if (!container) return;
+
+    let html = '<table class="table table-hover"><thead><tr><th>نام</th><th>ایمیل</th><th>نوع</th><th>نقش</th><th>وضعیت</th><th>عملیات</th></tr></thead><tbody>';
+    
+    data?.forEach(user => {
+      const userType = user.user_type === 'employer' ? 'کارفرما' : 'پیمانکار';
+      const role = user.role === 'admin' ? 'مدیر' : 'کاربر عادی';
+      const status = user.is_active === false ? 'غیرفعال' : 'فعال';
+      const statusClass = user.is_active === false ? 'danger' : 'success';
+      
+      html += `<tr>
+        <td>${user.full_name || user.company_name || '-'}</td>
+        <td>${user.email || '-'}</td>
+        <td><span class="badge bg-info">${userType}</span></td>
+        <td><span class="badge ${user.role === 'admin' ? 'bg-danger' : 'bg-secondary'}">${role}</span></td>
+        <td><span class="badge bg-${statusClass}">${status}</span></td>
+        <td>
+          <button class="btn btn-sm btn-info" onclick="window.app.adminViewUserDetails('${user.user_id}')" title="مشاهده جزئیات">
+            <i class="bi bi-eye"></i>
+          </button>
+          <button class="btn btn-sm btn-warning" onclick="window.app.adminEditUser('${user.user_id}')" title="ویرایش">
+            <i class="bi bi-pencil"></i>
+          </button>
+          <button class="btn btn-sm btn-danger" onclick="window.app.adminToggleUser('${user.user_id}')" title="تغییر وضعیت">
+            <i class="bi bi-lock"></i>
+          </button>
+          <button class="btn btn-sm ${user.role === 'admin' ? 'btn-secondary' : 'btn-primary'}" 
+                  onclick="window.app.adminMakeAdmin('${user.user_id}')" 
+                  title="${user.role === 'admin' ? 'تنزل به کاربر عادی' : 'ارتقا به مدیر'}">
+            <i class="bi bi-person-up"></i>
+          </button>
+        </td>
+      </tr>`;
+    });
+
+    html += '</tbody></table>';
+    container.innerHTML = html;
+    
+  } catch (error) {
+    console.error('خطا در بارگذاری کاربران:', error);
+  }
+}
   // ========== ابزارهای کمکی ==========
   showToast(message, type = 'info') {
     const container = this.getElement('toastContainer')
