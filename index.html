@@ -5372,17 +5372,17 @@ async loadAdminUsers() {
         <td><span class="badge ${roleClass}">${role}</span></td>
         <td>
           <div class="btn-group btn-group-sm" role="group">
-            <button class="btn btn-info" onclick="window.app.adminViewUserDetails('${user.user_id}')" title="مشاهده جزئیات">
-              <i class="bi bi-eye"></i>
-            </button>
-            <button class="btn btn-warning" onclick="window.app.adminEditUser('${user.user_id}')" title="ویرایش">
-              <i class="bi bi-pencil"></i>
-            </button>
-            <button class="btn ${user.role === 'admin' ? 'btn-secondary' : 'btn-primary'}" 
-                    onclick="window.app.adminMakeAdmin('${user.user_id}')" 
-                    title="${user.role === 'admin' ? 'تنزل به کاربر عادی' : 'ارتقا به مدیر'}">
-              <i class="bi bi-person-up"></i>
-            </button>
+            <button class="btn btn-info view-details-btn" data-userid="${user.user_id}" title="مشاهده جزئیات">
+  <i class="bi bi-eye"></i>
+</button>
+<button class="btn btn-warning edit-user-btn" data-userid="${user.user_id}" title="ویرایش">
+  <i class="bi bi-pencil"></i>
+</button>
+<button class="btn ${user.role === 'admin' ? 'btn-secondary' : 'btn-primary'} make-admin-btn" 
+        data-userid="${user.user_id}" 
+        title="${user.role === 'admin' ? 'تنزل به کاربر عادی' : 'ارتقا به مدیر'}">
+  <i class="bi bi-person-up"></i>
+</button>
           </div>
         </td>
       </tr>`;
@@ -5390,6 +5390,30 @@ async loadAdminUsers() {
 
     html += '</tbody></table>';
     container.innerHTML = html;
+// اضافه کردن event listener به دکمه‌ها
+container.querySelectorAll('.view-details-btn').forEach(btn => {
+  btn.addEventListener('click', (e) => {
+    e.preventDefault();
+    const userId = btn.dataset.userid;
+    this.adminViewUserDetails(userId);
+  });
+});
+
+container.querySelectorAll('.edit-user-btn').forEach(btn => {
+  btn.addEventListener('click', (e) => {
+    e.preventDefault();
+    const userId = btn.dataset.userid;
+    this.adminEditUser(userId);
+  });
+});
+
+container.querySelectorAll('.make-admin-btn').forEach(btn => {
+  btn.addEventListener('click', (e) => {
+    e.preventDefault();
+    const userId = btn.dataset.userid;
+    this.adminMakeAdmin(userId);
+  });
+});
     
     // اضافه کردن timestamp با ساعت
     const timestamp = new Date().toLocaleDateString('fa-IR') + ' ' + new Date().toLocaleTimeString('fa-IR');
