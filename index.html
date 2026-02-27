@@ -5858,47 +5858,7 @@ window.showPage = window.showPage || window.fallbackShowPage;
   // تابع کمکی برای تعریف توابع اگر وجود نداشته باشند
   function ensureFunctions() {
     if (!window.app) return false;
-    
-    let changed = false;
-    
-    // تعریف adminMakeAdmin اگر وجود نداشت
-    if (typeof window.app.adminMakeAdmin !== 'function') {
-      console.log('📝 تعریف تابع adminMakeAdmin...');
-      window.app.adminMakeAdmin = async function(userId) {
-        console.log('👑 تغییر نقش کاربر:', userId);
-        try {
-          const { data: user, error } = await this.supabase
-            .from('profiles')
-            .select('full_name, company_name, role')
-            .eq('user_id', userId)
-            .single();
-          
-          if (error) throw error;
-          
-          const userName = user.full_name || user.company_name || 'کاربر';
-          const newRole = user.role === 'admin' ? 'user' : 'admin';
-          const actionText = newRole === 'admin' ? 'ارتقا به مدیر' : 'تنزل به کاربر عادی';
-          
-          if (!confirm(`آیا از ${actionText} "${userName}" اطمینان دارید؟`)) return;
-          
-          const { error: updateError } = await this.supabase
-            .from('profiles')
-            .update({ role: newRole })
-            .eq('user_id', userId);
-          
-          if (updateError) throw updateError;
-          
-          this.showToast(`✅ نقش "${userName}" با موفقیت تغییر کرد`, 'success');
-          await this.loadAdminUsers();
-          
-        } catch (error) {
-          console.error('خطا:', error);
-          this.showToast('خطا: ' + error.message, 'error');
-        }
-      };
-      changed = true;
-    }
-    
+    let changed = false;  
     // تعریف adminViewUserDetails اگر وجود نداشت
     if (typeof window.app.adminViewUserDetails !== 'function') {
       console.log('📝 تعریف تابع adminViewUserDetails...');
