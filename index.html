@@ -2152,100 +2152,49 @@ body { background-color: #121212; color: #e0e0e0; }
   </div>
 
   <!-- تب 6: مدیریت کاربران (لیست با pagination، فیلتر، ویرایش، تغییر نقش، فعال/غیرفعال) -->
-  <div class="tab-pane fade" id="tab6" role="tabpanel">
-    <div class="card-peymanyar">
-      <div class="row mb-3">
-        <div class="col-md-4">
-          <input type="text" class="form-control" id="userSearch" placeholder="جستجوی کاربران...">
-        </div>
-        <div class="col-md-3">
-          <select class="form-select" id="userTypeFilter">
-            <option value="all">همه کاربران</option>
-            <option value="employer">کارفرمایان</option>
-            <option value="contractor">پیمانکاران</option>
-            <option value="admin">مدیران</option>
-          </select>
-        </div>
-        <div class="col-md-3">
-          <select class="form-select" id="userStatusFilter">
-            <option value="all">همه وضعیت‌ها</option>
-            <option value="active">فعال</option>
-            <option value="inactive">غیرفعال</option>
-          </select>
-        </div>
-        <div class="col-md-2">
-          <button class="btn btn-peymanyar w-100" onclick="window.app?.adminFilterUsers()">جستجو</button>
-        </div>
+<div class="tab-pane fade" id="tab6" role="tabpanel">
+  <div class="card-peymanyar">
+    <div class="row mb-3">
+      <div class="col-md-4">
+        <input type="text" class="form-control" id="userSearch" placeholder="جستجوی کاربران...">
       </div>
-      
-      <div class="table-responsive">
-        <table class="table table-hover">
-          <thead>
-            <tr>
-              <th>نام</th>
-              <th>ایمیل</th>
-              <th>نوع کاربر</th>
-              <th>وضعیت</th>
-              <th>تاریخ عضویت</th>
-              <th>عملیات</th>
-            </tr>
-          </thead>
-          <tbody id="usersTableBody">
-            <tr>
-              <td>علی محمدی</td>
-              <td>ali@example.com</td>
-              <td><span class="badge bg-primary">کارفرما</span></td>
-              <td><span class="badge bg-success">فعال</span></td>
-              <td>۱۴۰۲/۱۲/۰۱</td>
-              <td>
-                <button class="btn btn-sm btn-info" onclick="window.app?.adminViewUserDetails(1)">👁️</button>
-                <button class="btn btn-sm btn-warning" onclick="window.app?.adminEditUser(1)">✏️</button>
-                <button class="btn btn-sm btn-danger" onclick="window.app?.adminToggleUser(1)">🔒</button>
-                <button class="btn btn-sm btn-secondary" onclick="window.app?.adminMakeAdmin(1)">👑</button>
-              </td>
-            </tr>
-            <tr>
-              <td>شرکت سازه‌گستر</td>
-              <td>info@sazegostar.com</td>
-              <td><span class="badge bg-success">پیمانکار</span></td>
-              <td><span class="badge bg-success">فعال</span></td>
-              <td>۱۴۰۲/۱۱/۱۵</td>
-              <td>
-                <button class="btn btn-sm btn-info" onclick="window.app?.adminViewUserDetails(2)">👁️</button>
-                <button class="btn btn-sm btn-warning" onclick="window.app?.adminEditUser(2)">✏️</button>
-                <button class="btn btn-sm btn-danger" onclick="window.app?.adminToggleUser(2)">🔒</button>
-                <button class="btn btn-sm btn-secondary" onclick="window.app?.adminMakeAdmin(2)">👑</button>
-              </td>
-            </tr>
-            <tr>
-              <td>مدیر سیستم</td>
-              <td>admin@peymanyar.com</td>
-              <td><span class="badge bg-danger">مدیر</span></td>
-              <td><span class="badge bg-success">فعال</span></td>
-              <td>۱۴۰۲/۰۱/۰۱</td>
-              <td>
-                <button class="btn btn-sm btn-info" onclick="window.app?.adminViewUserDetails(3)">👁️</button>
-                <button class="btn btn-sm btn-warning" onclick="window.app?.adminEditUser(3)">✏️</button>
-                <button class="btn btn-sm btn-danger" onclick="window.app?.adminToggleUser(3)">🔒</button>
-                <button class="btn btn-sm btn-secondary" onclick="window.app?.adminMakeAdmin(3)">👑</button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+      <div class="col-md-3">
+        <select class="form-select" id="userTypeFilter">
+          <option value="all">همه کاربران</option>
+          <option value="employer">کارفرمایان</option>
+          <option value="contractor">پیمانکاران</option>
+          <option value="admin">مدیران</option>
+        </select>
       </div>
-      
-      <div class="d-flex justify-content-between align-items-center">
-        <span>نمایش ۱ تا ۳ از ۱۵ نتیجه</span>
-        <nav>
-          <ul class="pagination">
-            <li class="page-item"><a class="page-link" href="#">قبلی</a></li>
-            <li class="page-item active"><a class="page-link" href="#">۱</a></li>
-            <li class="page-item"><a class="page-link" href="#">۲</a></li>
-            <li class="page-item"><a class="page-link" href="#">۳</a></li>
-            <li class="page-item"><a class="page-link" href="#">بعدی</a></li>
-          </ul>
-        </nav>
+      <div class="col-md-3">
+        <select class="form-select" id="userStatusFilter">
+          <option value="all">همه وضعیت‌ها</option>
+          <option value="active">فعال</option>
+          <option value="inactive">غیرفعال</option>
+        </select>
       </div>
+      <div class="col-md-2">
+        <button class="btn btn-peymanyar w-100" onclick="window.app?.adminFilterUsers()">جستجو</button>
+      </div>
+    </div>
+    
+    <!-- این div جاییه که تابع loadAdminUsers داده‌ها رو میریزه -->
+    <div id="adminUsersList" class="table-responsive"></div>
+    
+    <div class="d-flex justify-content-between align-items-center">
+      <span>نمایش ۱ تا ۳ از ۱۵ نتیجه</span>
+      <nav>
+        <ul class="pagination">
+          <li class="page-item"><a class="page-link" href="#">قبلی</a></li>
+          <li class="page-item active"><a class="page-link" href="#">۱</a></li>
+          <li class="page-item"><a class="page-link" href="#">۲</a></li>
+          <li class="page-item"><a class="page-link" href="#">۳</a></li>
+          <li class="page-item"><a class="page-link" href="#">بعدی</a></li>
+        </ul>
+      </nav>
+    </div>
+  </div>
+</div>
       
       <!-- مودال جزئیات کاربر -->
       <div class="modal fade" id="userDetailsModal" tabindex="-1">
@@ -5534,7 +5483,29 @@ async loadAdminUsers() {
     
     this.showToast('قوانین با موفقیت پذیرفته شد', 'success')
   }
-
+setupAdminTabs() {
+  const tabButtons = document.querySelectorAll('#adminTabs .nav-link');
+  tabButtons.forEach(button => {
+    button.addEventListener('shown.bs.tab', (event) => {
+      const targetId = event.target.getAttribute('data-bs-target');
+      
+      if (targetId === '#tab6') { // تب مدیریت کاربران
+        console.log('تب کاربران فعال شد');
+        setTimeout(() => {
+          this.loadAdminUsers();
+        }, 100);
+      } else if (targetId === '#tab9') { // تب مدیریت پروژه‌ها
+        setTimeout(() => {
+          this.loadAdminProjects();
+        }, 100);
+      } else if (targetId === '#tab1') { // تب آمار
+        setTimeout(() => {
+          this.initAdminChart();
+        }, 100);
+      }
+    });
+  });
+}
   // ========== Event Listeners ==========
   setupEventListeners() {
     window.addEventListener('popstate', (e) => {
